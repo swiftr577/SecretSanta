@@ -1,0 +1,15 @@
+{
+  "name": "Pass the Phone",
+  "short_name": "Pass the Phone",
+  "description": "Secret Santa and party games for one phone passed around the room.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F6F4",
+  "theme_color": "#C4202A",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

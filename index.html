@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pass the Phone</title>
+<meta name="description" content="Secret Santa and party games for one phone passed around the room.">
+<meta name="theme-color" content="#F2F6F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1F1A" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pass the Phone">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#F2F6F4; --surface:#FFFFFF; --tint:#E3EDE9; --ink:#12332B; --muted:#55706A;
+  --line:#CFDCD6; --accent:#C4202A; --on-accent:#FFFFFF; --green:#17694C; --gold:#D99A1C;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0D1F1A; --surface:#162E27; --tint:#1E3B33; --ink:#EAF3EF; --muted:#9FB7AF;
+    --line:#2D4A41; --accent:#F2676C; --on-accent:#23070A; --green:#5AD0A4; --gold:#F0BC4A;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:ui-rounded,"SF Pro Rounded","Hiragino Maru Gothic ProN","Arial Rounded MT Bold",Quicksand,Nunito,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:19px; line-height:1.45; -webkit-tap-highlight-color:transparent;
+  min-height:100vh; min-height:100dvh;
+}
+#app{max-width:540px; margin:0 auto; padding:0 18px calc(28px + env(safe-area-inset-bottom));}
+h1,h2,p{margin:0}
+button,input,select{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold); outline-offset:2px}
+
+/* header */
+.top{display:flex; align-items:center; gap:10px; padding:calc(14px + env(safe-area-inset-top)) 0 14px;}
+.top h1{font-size:1.45rem; font-weight:800; letter-spacing:-.01em; flex:1}
+.back{min-width:52px; height:52px; padding:0 14px; border-radius:26px; border:2px solid var(--line); background:var(--surface); font-size:1.05rem; font-weight:700}
+.back.arrow{font-size:1.7rem; line-height:1; padding:0 0 4px}
+.hero{padding:calc(34px + env(safe-area-inset-top)) 0 22px}
+.hero h1{font-size:2.5rem; line-height:1.05; font-weight:800; letter-spacing:-.02em}
+.hero p{color:var(--muted); margin-top:10px; max-width:22em}
+
+main{display:flex; flex-direction:column; gap:16px}
+section{display:flex; flex-direction:column; gap:12px; padding-top:18px; border-top:2px solid var(--line)}
+section:first-child{border-top:0; padding-top:0}
+h2{font-size:1.15rem; font-weight:800}
+.lead{font-size:1.15rem}
+.muted{color:var(--muted); font-size:.95rem}
+.err{color:var(--accent); font-weight:700}
+strong{font-weight:800}
+
+/* buttons */
+.btn{
+  display:flex; align-items:center; justify-content:center; text-align:center; width:100%; min-height:60px; padding:12px 20px;
+  border-radius:16px; border:2px solid var(--accent); background:var(--accent); color:var(--on-accent);
+  font-size:1.15rem; font-weight:800;
+}
+.btn:active{transform:translateY(1px)}
+.btn.alt{background:var(--surface); color:var(--ink); border-color:var(--ink)}
+.btn.quiet{background:transparent; color:var(--ink); border-color:transparent; text-decoration:underline; text-underline-offset:4px; min-height:52px; font-weight:700}
+.btn.danger{color:var(--accent)}
+.btn:disabled{opacity:.4; cursor:not-allowed}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.vh{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* home menu */
+.menu{display:flex; flex-direction:column; gap:12px}
+.game{
+  display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px; width:100%; text-align:left;
+  padding:16px 18px; min-height:84px; border-radius:20px; border:2px solid var(--line); background:var(--surface);
+}
+.game b{display:block; font-size:1.3rem; font-weight:800}
+.game span{display:block; color:var(--muted); font-size:.95rem}
+.game i{font-style:normal; font-size:2.1rem}
+.game.main{background:var(--accent); border-color:var(--accent); color:var(--on-accent); min-height:104px}
+.game.main span{color:inherit; opacity:.9}
+.game:active{transform:translateY(1px)}
+
+/* lists */
+.list{display:flex; flex-direction:column; border:2px solid var(--line); border-radius:18px; overflow:hidden; background:var(--surface)}
+.row{
+  display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; min-height:62px; padding:10px 16px;
+  background:transparent; border:0; border-top:2px solid var(--line); text-align:left; font-size:1.15rem; font-weight:700;
+}
+.row:first-child{border-top:0}
+.row .st{font-size:.95rem; font-weight:600; color:var(--muted); text-align:right}
+.row .st strong{color:var(--ink); font-size:1.1rem}
+.row:disabled{opacity:1; cursor:default}
+.row:disabled > span:first-child{color:var(--muted)}
+.row:disabled .st{color:var(--green)}
+.row.out > span:first-child{text-decoration:line-through; color:var(--muted)}
+.acts{display:flex; gap:8px}
+.mini{min-height:46px; min-width:46px; padding:0 14px; border-radius:23px; border:2px solid var(--line); background:transparent; font-size:.95rem; font-weight:700; color:var(--muted)}
+.mini.on{background:var(--green); border-color:var(--green); color:var(--bg)}
+.mini.x{padding:0}
+
+/* inputs */
+input[type=text],input:not([type]),select{
+  width:100%; min-height:58px; padding:10px 16px; border-radius:16px; border:2px solid var(--line); background:var(--surface); font-size:1.1rem;
+}
+.add{display:grid; grid-template-columns:1fr auto; gap:10px}
+.add .btn{width:auto; min-height:58px}
+.money{display:grid; grid-template-columns:auto 1fr; align-items:center; gap:10px; font-size:1.3rem; font-weight:800}
+.chips{display:flex; flex-wrap:wrap; gap:10px}
+.chip{min-height:52px; padding:8px 18px; border-radius:26px; border:2px solid var(--line); background:var(--surface); font-size:1.05rem; font-weight:700; color:var(--muted)}
+.chip.on{background:var(--green); border-color:var(--green); color:var(--bg)}
+.chip.on::before{content:"✓ "}
+.seg{display:grid; grid-template-columns:1fr 1fr; border:2px solid var(--ink); border-radius:16px; overflow:hidden}
+.seg button{min-height:56px; border:0; background:var(--surface); font-size:1.1rem; font-weight:800}
+.seg button.on{background:var(--ink); color:var(--bg)}
+label.field{display:flex; flex-direction:column; gap:6px; font-weight:700}
+
+/* handoff and reveal */
+.handoff,.reveal,.center{display:flex; flex-direction:column; align-items:center; text-align:center; gap:14px; padding:18px 0 6px}
+.big{font-size:2.6rem; line-height:1.1; font-weight:800; letter-spacing:-.02em; overflow-wrap:anywhere}
+.big.sm{font-size:1.75rem}
+.huge{font-size:3.4rem; line-height:1.05; font-weight:800; overflow-wrap:anywhere}
+.tag{display:inline-block; padding:6px 16px; border-radius:20px; background:var(--tint); font-weight:800}
+.tag.bad{background:var(--accent); color:var(--on-accent)}
+.tag.good{background:var(--green); color:var(--bg)}
+.hold{
+  position:relative; width:210px; height:210px; border-radius:50%; border:0; margin:10px 0; background:var(--accent); color:var(--on-accent);
+  font-size:1.25rem; font-weight:800; touch-action:none; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+}
+.hold em{font-style:normal; font-size:2.6rem; line-height:1}
+.hold svg{position:absolute; inset:-12px; width:calc(100% + 24px); height:calc(100% + 24px); transform:rotate(-90deg); pointer-events:none}
+.hold circle{fill:none; stroke-width:5}
+.hold .trk{stroke:var(--line)}
+.hold .rng{stroke:var(--gold); stroke-linecap:round; stroke-dasharray:302; stroke-dashoffset:302; transition:stroke-dashoffset .2s}
+.hold.on{transform:scale(.97)}
+.hold.on .rng{stroke-dashoffset:0; transition:stroke-dashoffset .9s linear}
+.hold.small{width:150px; height:150px; font-size:1rem}
+
+/* pin */
+.dots{display:flex; gap:16px}
+.dots i{width:22px; height:22px; border-radius:50%; border:2px solid var(--ink)}
+.dots i.f{background:var(--ink)}
+.pad{display:grid; grid-template-columns:repeat(3,84px); gap:14px; justify-content:center}
+.pad button{height:84px; border-radius:50%; border:2px solid var(--line); background:var(--surface); font-size:1.8rem; font-weight:800}
+.pad button:active{background:var(--tint)}
+
+/* presents */
+.gifts{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%}
+.gift{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; min-height:92px; padding:8px 4px;
+  border-radius:16px; border:2px solid var(--line); background:var(--surface); color:var(--ink);
+}
+.gift b{font-size:2.3rem; line-height:1.1; font-weight:400}
+.gift span{font-size:.85rem; font-weight:700; text-align:center; line-height:1.2}
+.gift b svg{display:block; width:2.5rem; height:3.1rem}
+.huge svg{width:5.5rem; height:6.9rem}
+.seg.four button:nth-child(n+3){border-top:2px solid var(--ink)}
+button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 0 3px var(--gold)}
+
+/* clock and scores */
+.clock{display:flex; flex-direction:column; gap:12px; align-items:stretch; text-align:center}
+#clock{font-size:4.2rem; line-height:1; font-weight:800; font-variant-numeric:tabular-nums; padding:8px 0}
+.clock.done #clock{color:var(--accent)}
+.board{width:100%; border-collapse:collapse; font-size:1.1rem}
+.board td{padding:10px 4px; border-top:2px solid var(--line)}
+.board tr:first-child td{border-top:0}
+.board td:last-child{text-align:right; font-weight:800; font-variant-numeric:tabular-nums}
+ol.steps{margin:0; padding-left:1.4em; display:flex; flex-direction:column; gap:8px}
+#toast{
+  position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom)); transform:translateX(-50%); max-width:88vw;
+  background:var(--ink); color:var(--bg); padding:12px 20px; border-radius:26px; font-weight:700; opacity:0; pointer-events:none; transition:opacity .2s;
+}
+#toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+(() => {
+'use strict';
+
+/* ---------- content ---------- */
+// [word, clue everyone sees, vaguer clue for the imposter]
+const WORDS = {
+  'Animals': {
+    easy: [
+      ['Lion','The big cat with a mane that roars','A large wild cat'],
+      ['Penguin','A bird that swims but cannot fly','A bird that lives near cold water'],
+      ['Elephant','Huge and grey, with a trunk','A very big animal'],
+      ['Kiwi','New Zealand\'s night-time bird with a long beak','A bird that cannot fly'],
+      ['Giraffe','The tallest animal, with a very long neck','A tall animal from Africa'],
+      ['Shark','A big fish with lots of sharp teeth','Something that lives in the sea']],
+    hard: [
+      ['Chameleon','A lizard that changes colour','A small reptile'],
+      ['Platypus','It has a duck bill and lays eggs, but it is a mammal','An unusual Australian animal'],
+      ['Octopus','Eight arms, and it squirts ink','A sea creature with no bones'],
+      ['Hedgehog','Small and spiky, it rolls into a ball','A small animal that comes out at night'],
+      ['Albatross','A seabird with enormous wings','A bird that lives by the ocean'],
+      ['Tuatara','An ancient New Zealand reptile, like a living dinosaur','A rare reptile']]
+  },
+  'In the garden': {
+    easy: [
+      ['Worm','Wriggly, and lives in the soil','A small garden creature'],
+      ['Sunflower','A tall yellow flower that faces the sun','A bright flower'],
+      ['Watering can','You fill it up and pour it on the plants','A garden tool'],
+      ['Butterfly','Colourful wings, and it used to be a caterpillar','An insect that flies'],
+      ['Trampoline','You bounce on it','Something to play on outside'],
+      ['Lawnmower','The noisy machine that cuts the grass','A garden machine']],
+    hard: [
+      ['Compost bin','Where food scraps turn into soil','Something kept in a corner of the garden'],
+      ['Wheelbarrow','One wheel and two handles, for heavy loads','Used to move things around outside'],
+      ['Bumblebee','Fuzzy and buzzy, it collects pollen','An insect that visits flowers'],
+      ['Greenhouse','A glass house that keeps plants warm','A garden building'],
+      ['Clothesline','Where the washing dries','Something you find in the back yard'],
+      ['Scarecrow','A straw figure that frightens birds','Something that stands in a veggie patch']]
+  },
+  'Food': {
+    easy: [
+      ['Pizza','Round, cheesy and cut into slices','A favourite takeaway'],
+      ['Ice cream','Cold and sweet, and it comes in a cone','A sweet treat'],
+      ['Banana','A yellow fruit you peel','A fruit'],
+      ['Popcorn','It pops in the pot and you eat it at the movies','A snack'],
+      ['Pancake','Flat and round, flipped in a pan','A breakfast food'],
+      ['Carrot','Orange and crunchy, it grows underground','A vegetable']],
+    hard: [
+      ['Pavlova','A meringue dessert with cream and fruit','A dessert for special occasions'],
+      ['Sushi','Rice and fish rolled in seaweed','A food from Japan'],
+      ['Avocado','Green and creamy, with a big stone','Something you might put on toast'],
+      ['Lasagne','Layers of pasta, mince and cheese','An Italian dinner'],
+      ['Feijoa','A green autumn fruit you scoop out with a spoon','A fruit that grows on a tree'],
+      ['Croissant','A flaky, buttery French pastry','Something from a bakery']]
+  },
+  'Around the house': {
+    easy: [
+      ['Fridge','It keeps food cold','Something in the kitchen'],
+      ['Toothbrush','You use it on your teeth morning and night','Something in the bathroom'],
+      ['Couch','A big soft seat for the whole family','A piece of furniture'],
+      ['Television','You watch shows on it','Something with a screen'],
+      ['Pillow','Soft, and it goes under your head','Something on a bed'],
+      ['Vacuum cleaner','It sucks dirt up from the carpet','A cleaning machine']],
+    hard: [
+      ['Dishwasher','The machine that cleans plates and cups','A kitchen appliance'],
+      ['Smoke alarm','It beeps loudly when it senses a fire','Something on the ceiling'],
+      ['Letterbox','Where the post arrives','Something at the front of a house'],
+      ['Remote control','It changes the channel from the couch','Something small with buttons'],
+      ['Hot water bottle','Filled up to warm a bed in winter','Something that keeps you warm'],
+      ['Fuse box','Where the power switches live','Something an electrician checks']]
+  },
+  'Sports and games': {
+    easy: [
+      ['Football','Kick a round ball into a goal','A team sport'],
+      ['Swimming','Racing through the water','A sport without a ball'],
+      ['Hide and seek','One person counts and everyone else hides','A playground game'],
+      ['Basketball','Bounce the ball and shoot hoops','A sport with a ball'],
+      ['Skateboard','A board with four wheels','Something you ride'],
+      ['Tag','Run away, or you are "it"','A running game']],
+    hard: [
+      ['Rugby','An oval ball, scrums and tries','A team sport played on grass'],
+      ['Chess','Kings, queens and checkmate','A board game'],
+      ['Surfing','Riding waves on a board','A water sport'],
+      ['Netball','Pass and shoot, but no running with the ball','A team sport with a hoop'],
+      ['Archery','Bows, arrows and a target','A sport about aiming'],
+      ['Monopoly','Buy streets and collect rent','A game played at a table']]
+  },
+  'Christmas': {
+    easy: [
+      ['Santa','Red suit, white beard, comes down the chimney','Someone who visits at Christmas'],
+      ['Reindeer','They pull the sleigh','A Christmas animal'],
+      ['Christmas tree','Covered in lights and decorations','Something in the lounge in December'],
+      ['Candy cane','A red and white striped sweet','A Christmas treat'],
+      ['Snowman','Made of snow, with a carrot for a nose','Something from winter'],
+      ['Stocking','Hung up to be filled with small presents','Something filled on Christmas Eve']],
+    hard: [
+      ['Mistletoe','The plant people kiss under','A Christmas plant'],
+      ['Advent calendar','A door to open on each day of December','A countdown to Christmas'],
+      ['Christmas cracker','Pull it for a bang, a paper hat and a bad joke','Something on the Christmas table'],
+      ['Tinsel','Shiny, sparkly strands','A decoration'],
+      ['Pōhutukawa','New Zealand\'s Christmas tree, with red flowers','A tree that blooms in summer'],
+      ['Gingerbread house','Made of biscuit and covered in lollies','Something you bake and decorate']]
+  },
+  'Places': {
+    easy: [
+      ['Beach','Sand, waves and sandcastles','A place for a summer day'],
+      ['School','Teachers, classrooms and lunch breaks','A place you go on weekdays'],
+      ['Zoo','Where you visit lots of animals','A place for a day out'],
+      ['Playground','Swings, slides and monkey bars','A place to play'],
+      ['Supermarket','Trolleys and aisles of food','A kind of shop'],
+      ['Library','Shelves full of books to borrow','A quiet place']],
+    hard: [
+      ['Airport','Planes, gates and suitcases','A place where trips begin'],
+      ['Museum','Old treasures behind glass','A place to learn things'],
+      ['Lighthouse','A tall tower with a light for ships','A building by the sea'],
+      ['Volcano','A mountain that can erupt','Something in nature'],
+      ['Aquarium','Tanks full of fish and sea life','A place to see animals'],
+      ['Campground','Tents, caravans and toasted marshmallows','A place for a holiday']]
+  },
+  'Jobs': {
+    easy: [
+      ['Firefighter','Puts out fires','Someone who helps in an emergency'],
+      ['Teacher','Helps children learn at school','Someone who works with kids'],
+      ['Doctor','Makes sick people better','Someone who helps people'],
+      ['Chef','Cooks in a restaurant','Someone who works with food'],
+      ['Pilot','Flies a plane','Someone who works with machines'],
+      ['Farmer','Looks after animals and crops','Someone who works outdoors']],
+    hard: [
+      ['Astronaut','Works in space','Someone who travels for work'],
+      ['Dentist','Looks after teeth','Someone you make an appointment with'],
+      ['Electrician','Fixes wiring and lights','A tradesperson'],
+      ['Vet','A doctor for animals','Someone who works with animals'],
+      ['Architect','Designs buildings','Someone who draws for work'],
+      ['Lifeguard','Watches over swimmers','Someone who works near water']]
+  }
+};
+
+const TOD = {
+  easy: {
+    truth: [
+      'What is your favourite thing to eat for breakfast?','What is the funniest thing that has ever happened to you?',
+      'If you could be any animal, which would you be?','What is the best present you have ever been given?',
+      'What food do you really not like?','Who makes you laugh the most?','What would you buy if you had a hundred dollars?',
+      'What is your favourite song to sing?','What is the silliest thing you are scared of?',
+      'If you could have a superpower, what would it be?','What is the best thing about Christmas?',
+      'What do you want to be when you grow up?','What is the messiest your room has ever been?','Which toy is your favourite?'],
+    dare: [
+      'Hop on one foot ten times.','Do your best chicken impression.','Sing "Happy Birthday" in a robot voice.',
+      'Make the funniest face you can.','Walk like a penguin across the room.','Do five star jumps.',
+      'Talk in a squeaky voice until your next turn.','Pretend to be a cat for 20 seconds.',
+      'Give someone a high five with your elbow.','Spin around three times, then walk in a straight line.',
+      'Say the alphabet as fast as you can.','Dance with no music for 15 seconds.','Roar like a dinosaur.',
+      'Balance on one leg while everyone counts to ten.']
+  },
+  hard: {
+    truth: [
+      'What is the most embarrassing thing you have done in front of a crowd?','What habit of yours annoys other people?',
+      'What is the worst present you have pretended to like?','Who in this room would last longest on a desert island?',
+      'What is the last thing you searched for on your phone?','What did you believe for far too long as a kid?',
+      'What is the worst meal you have ever cooked?','Which chore do you avoid the most?','What is your most useless talent?',
+      'Which film does everyone love that you cannot stand?','If you had to swap lives with someone here for a day, who would it be?',
+      'What is the silliest thing you have ever cried about?','What was your worst haircut?','What is the strangest thing you have eaten?'],
+    dare: [
+      'Speak in an accent chosen by the group until your next turn.','Impersonate someone in the room until somebody guesses who.',
+      'Tell a joke. If nobody laughs, tell another.','Do 15 squats and name a different fruit for each one.',
+      'Sing the chorus of a song the group chooses.','Let the group pose you like a statue, then hold it for 30 seconds.',
+      'Balance a spoon on your nose for 10 seconds.','Give a one-minute speech on why socks are the best present.',
+      'Act out scoring the winning try in slow motion.','Try to lick your elbow.',
+      'Narrate what the person on your left is doing, like a nature documentary.','Do the worm, or your best attempt.',
+      'Talk without showing your teeth until your next turn.','Sell the nearest object to the group like a TV advert.']
+  }
+};
+
+const WHO = {
+  easy: ['Santa','A pirate','An astronaut','A firefighter','A dinosaur','A mermaid','A kiwi bird','A snowman','A princess','A wizard',
+    'A robot','A lion','A teacher','A reindeer','A superhero','A dragon','A farmer','A penguin','The tooth fairy','A shark','An elf','A clown'],
+  hard: ['Cleopatra','Albert Einstein','William Shakespeare','Leonardo da Vinci','Sir Edmund Hillary','Neil Armstrong','Queen Victoria',
+    'Kate Sheppard','Marie Curie','Captain Cook','Ernest Rutherford','Julius Caesar','A Viking','A ninja','A lighthouse keeper','A vampire',
+    'A news reader','An Olympic swimmer','A weather forecaster','A sheep shearer','A ghost','A magician']
+};
+
+const GIFTS = [['🧸','Teddy'],['🚲','Bike'],['🎸','Guitar'],['⚽','Football'],['🎮','Video game'],['📚','Books'],['🧦','Socks'],['🪁','Kite'],
+  ['🎨','Paint set'],['🛹','Skateboard'],['🪀','Yo-yo'],['🧩','Puzzle'],['🚂','Train'],['🎧','Headphones'],['⌚','Watch'],['🧢','Cap'],
+  ['🎲','Dice'],['🛷','Sled'],['🤖','Robot'],['🎺','Trumpet'],['🥁','Drum'],['🚀','Rocket'],['🧣','Scarf'],['🕶️','Sunglasses'],
+  ['🎹','Keyboard'],['🏓','Table tennis'],['🔭','Telescope'],['🎒','Backpack'],['🍫','Chocolate'],['🎳','Bowling set']];
+
+const TREATS = [['🎃','Pumpkin'],['👻','Ghost'],['🦇','Bat'],['🕷️','Spider'],['🕸️','Cobweb'],['🍬','Sweet'],['🍭','Lollipop'],['🍫','Chocolate'],
+  ['🧹','Broomstick'],['🕯️','Candle'],['💀','Skull'],['🧛','Vampire'],['🧟','Zombie'],['🐈‍⬛','Black cat'],['🦉','Owl'],['🌕','Full moon'],
+  ['🧪','Potion'],['🔮','Crystal ball'],['🎩','Top hat'],['🗝️','Old key'],['🪄','Magic wand'],['🍎','Toffee apple'],['👽','Alien'],['🦴','Bone'],
+  ['🐸','Frog'],['🐀','Rat'],['🍪','Cookie'],['🧁','Cupcake'],['👑','Crown'],['🔦','Torch']];
+
+const PARTY = [['🎂','Cake'],['🎈','Balloon'],['🎁','Present'],['🧁','Cupcake'],['🍭','Lollipop'],['🎉','Party popper'],['🪅','Piñata'],['🍕','Pizza'],
+  ['🍦','Ice cream'],['🥤','Fizzy drink'],['🍿','Popcorn'],['🕯️','Candle'],['👑','Crown'],['🃏','Cards'],['🍩','Donut'],['🍪','Cookie'],
+  ['🍬','Sweets'],['🎤','Microphone'],['🪩','Disco ball'],['🧃','Juice box'],['🍓','Strawberries'],['🍉','Watermelon'],['🌭','Hot dog'],['🍔','Burger'],
+  ['🍟','Chips'],['🎯','Dartboard'],['🎵','Music'],['🍇','Grapes'],['🥨','Pretzel'],['🎀','Ribbon']];
+
+// Patterned Easter eggs, drawn as small pictures: six colours by five patterns.
+const EGGS = (() => {
+  const cols = [['Pink','#EE7FA8'],['Blue','#3F97DA'],['Yellow','#EDB91F'],['Green','#43AE68'],['Purple','#8E63CF'],['Orange','#EE7F2D']];
+  const pats = {
+    'stripes': '<path d="M0 16h40M0 26h40M0 36h40" stroke-width="4.5"/>',
+    'spots': '<g fill="#fff" stroke="none"><circle cx="13" cy="16" r="3.6"/><circle cx="27" cy="19" r="3.6"/><circle cx="10" cy="30" r="3.6"/><circle cx="21" cy="29" r="3.6"/><circle cx="31" cy="33" r="3.6"/><circle cx="17" cy="41" r="3.6"/></g>',
+    'zigzags': '<path d="M0 20l5-6 5 6 5-6 5 6 5-6 5 6 5-6 5 6M0 36l5-6 5 6 5-6 5 6 5-6 5 6 5-6 5 6" stroke-width="3.5" stroke-linejoin="round"/>',
+    'waves': '<path d="M0 18q5-7 10 0t10 0 10 0 10 0M0 28q5-7 10 0t10 0 10 0 10 0M0 38q5-7 10 0t10 0 10 0 10 0" stroke-width="3"/>',
+    'diamonds': '<g fill="#fff" stroke="none"><path d="M20 9l6 8-6 8-6-8zM9 25l6 8-6 8-6-8zM31 25l6 8-6 8-6-8zM20 30l5 7-5 7-5-7z"/></g>'
+  };
+  const egg = 'M20 2C30 2 38 20 38 31C38 42 30 48 20 48C10 48 2 42 2 31C2 20 10 2 20 2Z';
+  const out = [];
+  cols.forEach((c, i) => Object.keys(pats).forEach((k, j) => {
+    const id = 'egg' + i + j;
+    out.push([`<svg viewBox="0 0 40 50" role="img" aria-label="${c[0]} egg with ${k}"><clipPath id="${id}"><path d="${egg}"/></clipPath><path d="${egg}" fill="${c[1]}"/>` +
+      `<g clip-path="url(#${id})" fill="none" stroke="#fff" stroke-linecap="round" opacity=".92">${pats[k]}</g><path d="${egg}" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="1.5"/></svg>`, `${c[0]} ${k}`]);
+  }));
+  return out;
+})();
+
+// The same hide-and-steal game, dressed for different occasions.
+const THEMES = {
+  xmas: {t:'Christmas', name:'Grinch', thief:'the Grinch', Thief:'Grinch', one:'an elf', Crew:'Elves', thing:'present', place:'under the tree',
+    nudge:'give it a polish', caught:'Caught green-handed', items: GIFTS},
+  easter: {t:'Easter', name:'Egg thief', thief:'the Fox', Thief:'Fox', one:'a bunny', Crew:'Bunnies', thing:'egg', place:'in the basket',
+    nudge:'give it a gentle turn', caught:'Caught red-pawed', items: EGGS},
+  halloween: {t:'Halloween', name:'Treat thief', thief:'the Goblin', Thief:'Goblin', one:'a trick-or-treater', Crew:'Trick-or-treaters', thing:'treat', place:'in the bucket',
+    nudge:'check it is still there', caught:'Caught in the torchlight', items: TREATS},
+  party: {t:'Birthday', name:'Party thief', thief:'the Party Pooper', Thief:'Party Pooper', one:'a guest', Crew:'Guests', thing:'party treat', place:'on the party table',
+    nudge:'straighten it up', caught:'Caught with crumbs on their face', items: PARTY}
+};
+
+const ROLE = {
+  wolf: ['🐺','Werewolf','At night, silently agree with any other werewolves on one villager to catch. By day, pretend to be a villager.'],
+  seer: ['🔮','Seer','Each night, point at one player. The narrator nods if that player is a werewolf.'],
+  doctor: ['🩹','Doctor','Each night, point at one player to protect. You can choose yourself.'],
+  villager: ['🏡','Villager','Sleep through the night. By day, work out who the werewolves are and vote them out.']
+};
+
+const GAMES = {
+  santa: {t:'Secret Santa'},
+  imp: {t:'Imposter', min:3, lv:['Simpler words','Trickier words']},
+  grinch: {t:'Grinch', min:3, lv:['12 things to remember','15 things to remember']},
+  wolf: {t:'Werewolf', min:4, lv:['Werewolves and villagers only','Adds a seer and a doctor']},
+  who: {t:'Who am I?', min:2, lv:['Characters young players know','Famous people and odd jobs']},
+  tod: {t:'Truth or dare', min:2, lv:['Gentle questions and silly dares','Braver questions and bigger dares']}
+};
+
+/* ---------- storage ---------- */
+const KEY = 'pass-the-phone-v1';
+let memStore = null;
+const store = {
+  get(){ try { return window.localStorage.getItem(KEY); } catch (e) { return memStore; } },
+  set(v){ try { window.localStorage.setItem(KEY, v); } catch (e) { memStore = v; } }
+};
+const blank = () => ({v:1, santa:{people:[], limit:'', pin:'', draws:[]}, extras:[], selected:null, lastPlayers:[],
+  level:'easy', timer:120, cat:'any', scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
+function load(){
+  try { const r = JSON.parse(store.get()); if (r && r.v === 1 && r.santa) { const o = Object.assign(blank(), r); if (!o.tally || o.tally.elves !== undefined) o.tally = {}; if (!THEMES[o.theme]) o.theme = 'xmas'; return o; } } catch (e) {}
+  return blank();
+}
+let S = load();
+const save = () => store.set(JSON.stringify(S));
+
+/* ---------- helpers ---------- */
+const app = document.getElementById('app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = n => Math.floor(Math.random() * n);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const mmss = s => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+const fmtDate = d => { try { return new Date(d).toLocaleDateString('en-NZ', {day:'numeric', month:'short', year:'numeric'}); } catch (e) { return ''; } };
+const cleanName = s => String(s || '').replace(/\s+/g, ' ').trim().slice(0, 20);
+const has = (list, n) => list.some(x => x.toLowerCase() === n.toLowerCase());
+let toastT = null;
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); }
+const buzz = () => { try { navigator.vibrate && navigator.vibrate([300, 150, 300]); } catch (e) {} };
+
+// Everyone gives to the next person in one random loop, so nobody can draw themselves.
+function drawPairs(names){
+  const r = names.slice();
+  for (let i = r.length - 1; i > 0; i--) { const j = rnd(i); [r[i], r[j]] = [r[j], r[i]]; }
+  return names.map((g, i) => ({g, r: r[i]}));
+}
+
+/* ---------- state and routing ---------- */
+let view = {n:'home'}, G = null, unlocked = false, tick = null, armed = null, deferred = null;
+const used = new Set();
+function go(n, d){ clearInterval(tick); tick = null; armed = null; view = Object.assign({n}, d || {}); render(); window.scrollTo(0, 0); }
+function render(){ app.innerHTML = V[view.n](); after(); }
+
+const page = (title, body, back, quit) =>
+  `<header class="top">${quit
+    ? `<button class="back" data-act="nav" data-to="home" data-confirm="Sure?">Quit</button>`
+    : `<button class="back arrow" data-act="nav" data-to="${back || 'home'}" aria-label="Back">‹</button>`}<h1>${esc(title)}</h1></header><main>${body}</main>`;
+
+const holdBtn = (label, small) =>
+  `<button class="hold${small ? ' small' : ''}" id="hold"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="48"/><circle class="rng" cx="50" cy="50" r="48"/></svg><em aria-hidden="true">${small ? '👁' : '🎁'}</em>${label}</button>`;
+
+const clock = () =>
+  `<div class="clock${view.left === 0 ? ' done' : ''}"><div id="clock" role="timer">${mmss(view.left)}</div><div class="pair">` +
+  `<button class="btn alt" data-act="clockTog" ${view.left === 0 ? 'disabled' : ''}>${view.left === 0 ? 'Time is up' : view.run ? 'Pause' : 'Start the timer'}</button>` +
+  `<button class="btn quiet" data-act="clockReset">Reset</button></div></div>`;
+
+function board(key){
+  const e = Object.entries(S.scores[key] || {}).sort((a, b) => b[1] - a[1]);
+  if (!e.length) return '';
+  return `<section><h2>Scores</h2><table class="board">${e.map(([n, p]) => `<tr><td>${esc(n)}</td><td>${p}</td></tr>`).join('')}</table>` +
+    `<button class="btn quiet" data-act="resetScores" data-k="${key}" data-confirm="Tap again to clear the scores">Clear the scores</button></section>`;
+}
+const againBtns = game =>
+  `<button class="btn" data-act="again">Play again with the same players</button>` +
+  `<button class="btn alt" data-act="open" data-g="${game}">Change players or settings</button>` +
+  `<button class="btn quiet" data-act="nav" data-to="home">Back to all games</button>`;
+
+/* ---------- player picker ---------- */
+function pool(){
+  const out = [];
+  [...S.santa.people.map(p => p.name), ...S.extras].forEach(n => { if (!has(out, n)) out.push(n); });
+  return out;
+}
+function selected(){
+  const p = pool();
+  if (!S.selected) return p.filter(n => S.santa.people.some(x => x.name === n));
+  return p.filter(n => S.selected.includes(n));
+}
+
+/* ---------- views ---------- */
+const V = {};
+
+V.home = () => {
+  const games = [['imp','🕵️','Imposter','One player has a different clue. Find them.'],
+    ['grinch','🎄','Grinch','Something goes missing. Christmas, Easter, Halloween and birthday versions.'],
+    ['wolf','🐺','Werewolf','Secret roles, sleepy nights and noisy votes.'],
+    ['who','🤔','Who am I?','Twenty questions to guess the name on your forehead.'],
+    ['tod','🎲','Truth or dare','Family-friendly questions and challenges.']];
+  const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
+  const install = standalone ? '' : deferred
+    ? `<button class="btn alt" data-act="install">Install on this phone</button>`
+    : `<p class="muted">To keep saved draws safe, add this page to your home screen: open the browser's share or menu button, then choose Add to Home Screen.</p>`;
+  return `<header class="hero"><h1>Pass the Phone</h1><p>Secret Santa and party games for one phone and a room full of people.</p></header><main><nav class="menu">` +
+    `<button class="game main" data-act="open" data-g="santa"><div><b>Secret Santa</b><span>Draw names, then reveal them one person at a time.</span></div><i aria-hidden="true">🎁</i></button>` +
+    games.map(g => `<button class="game" data-act="open" data-g="${g[0]}"><div><b>${g[2]}</b><span>${g[3]}</span></div><i aria-hidden="true">${g[1]}</i></button>`).join('') +
+    `</nav>${install}</main>`;
+};
+
+/* Secret Santa */
+V.santa = () => {
+  const d = S.santa.draws[0];
+  let b;
+  if (!d) {
+    b = `<div class="center"><p class="big sm">No draw yet</p><p class="muted">An admin adds the names, sets the spend limit and draws the names.</p></div>`;
+  } else {
+    b = `<p class="lead"><strong>${esc(d.name)}</strong>${d.limit ? `, spend up to $${esc(d.limit)}` : ''}</p>` +
+      `<p class="muted">Tap your own name, then hold the button to see who you are buying for.</p>` +
+      `<div class="list">${d.pairs.map((p, i) => { const seen = d.seen.includes(p.g);
+        return `<button class="row" data-act="santaWho" data-i="${i}" ${seen ? 'disabled' : ''}><span>${esc(p.g)}</span><span class="st">${seen ? 'Seen ✓' : 'Tap to reveal'}</span></button>`; }).join('')}</div>` +
+      `<p class="muted">Forgotten who you drew? An admin can unlock your name.</p>`;
+  }
+  return page('Secret Santa', b + `<button class="btn alt" data-act="admin">${S.santa.pin ? 'Admin' : 'Set up as admin'}</button>`);
+};
+
+V.pin = () => {
+  const t = {enter:'Enter the admin PIN', set:'Choose a 4-digit admin PIN', confirm:'Enter the same PIN again'}[view.mode];
+  return page('Admin', `<div class="center"><p class="lead">${t}</p>` +
+    `<div class="dots" role="img" aria-label="${view.buf.length} of 4 digits entered">${[0,1,2,3].map(i => `<i class="${i < view.buf.length ? 'f' : ''}"></i>`).join('')}</div>` +
+    `<p class="err" aria-live="polite">${view.err || '&nbsp;'}</p>` +
+    `<div class="pad">${[1,2,3,4,5,6,7,8,9].map(k => `<button data-act="key" data-k="${k}">${k}</button>`).join('')}<span></span>` +
+    `<button data-act="key" data-k="0">0</button><button data-act="key" data-k="del" aria-label="Delete">⌫</button></div>` +
+    (view.mode === 'enter' ? `<button class="btn quiet" data-act="nav" data-to="forgot">Forgot the PIN?</button>` : '') + `</div>`, 'santa');
+};
+
+V.forgot = () => page('Forgot the PIN', `<p class="lead">The PIN cannot be recovered. The only way back in is to erase everything saved on this phone and set up again.</p>` +
+  `<p class="muted">That removes the names, every draw and all scores.</p>` +
+  `<button class="btn" data-act="erase" data-confirm="Tap again to erase everything">Erase everything on this phone</button>`, 'santa');
+
+V.admin = () => {
+  if (!unlocked) return V.santa();
+  const s = S.santa;
+  const year = new Date().getFullYear();
+  let nm = `Christmas ${year}`, k = 2;
+  while (s.draws.some(d => d.name === nm)) nm = `Christmas ${year} (${k++})`;
+  let h = `<section><h2>People</h2>` +
+    (s.people.length ? `<div class="list">${s.people.map((p, i) => `<div class="row"><span>${esc(p.name)}</span><span class="acts">` +
+      `<button class="mini${p.admin ? ' on' : ''}" data-act="togAdmin" data-i="${i}" aria-pressed="${!!p.admin}">Admin</button>` +
+      `<button class="mini x" data-act="delPerson" data-i="${i}" aria-label="Remove ${esc(p.name)}">✕</button></span></div>`).join('')}</div>`
+      : `<p class="muted">Nobody yet. Add at least three people.</p>`) +
+    `<div class="add"><input id="newName" type="text" maxlength="20" placeholder="Add a name" autocomplete="off" enterkeyhint="done" data-enter="addPerson" aria-label="Name to add"><button class="btn alt" data-act="addPerson">Add</button></div>` +
+    `<p class="muted">Tick Admin for the people who know the PIN. In the full list, whoever is buying for an admin stays hidden unless tapped, so admins keep their own surprise.</p></section>`;
+  h += `<section><h2>Spend limit</h2><label class="money"><span>$</span><input id="limit" type="text" inputmode="decimal" maxlength="8" placeholder="50" value="${esc(s.limit)}" data-chg="limit" aria-label="Spend limit in dollars"></label>` +
+    `<p class="muted">The same for everyone. It shows on each person's reveal.</p></section>`;
+  h += `<section><h2>New draw</h2><input id="drawName" type="text" maxlength="30" value="${esc(nm)}" aria-label="Name for this draw">` +
+    `<button class="btn" data-act="runDraw" ${s.people.length < 3 ? 'disabled' : ''}>Draw names</button>` +
+    (s.draws.length ? `<p class="muted">A new draw becomes the one people reveal. Earlier draws stay in the list below.</p>` : '') + `</section>`;
+  h += `<section><h2>Draws</h2>` + (s.draws.length
+    ? `<div class="list">${s.draws.map((d, i) => `<button class="row" data-act="openDraw" data-i="${i}"><span>${esc(d.name)}</span><span class="st">${fmtDate(d.date)}${i === 0 ? '<br>Current' : ''}</span></button>`).join('')}</div>`
+    : `<p class="muted">Nothing drawn yet.</p>`) + `</section>`;
+  h += `<section><h2>Backup</h2><p class="muted">Draws are saved in this phone's browser. A backup file is a copy you can keep in Files or email to yourself, and restore later.</p>` +
+    `<button class="btn alt" data-act="export">Save a backup file</button>` +
+    `<label class="btn alt">Restore from a backup file<input class="vh" type="file" accept=".json,application/json" data-chg="import"></label></section>`;
+  h += `<section><h2>PIN and reset</h2><button class="btn alt" data-act="changePin">Change the PIN</button>` +
+    `<button class="btn quiet danger" data-act="erase" data-confirm="Tap again to erase everything">Erase everything on this phone</button></section>`;
+  return page('Admin', h, 'santa');
+};
+
+V.draw = () => {
+  if (!unlocked) return V.santa();
+  const d = S.santa.draws[view.i];
+  if (!d) return V.admin();
+  const open = view.open || [];
+  let h = `<p class="lead"><strong>${esc(d.name)}</strong></p><p class="muted">Drawn ${fmtDate(d.date)}${d.limit ? `, spend up to $${esc(d.limit)}` : ''}</p>` +
+    `<div class="list">${d.pairs.map((p, i) => { const on = open.includes(i);
+      return `<button class="row" data-act="peek" data-i="${i}" aria-expanded="${on}"><span>${esc(p.g)}</span><span class="st">${on ? `buys for <strong>${esc(p.r)}</strong>` : 'Tap to show'}</span></button>`; }).join('')}</div>` +
+    `<div class="pair"><button class="btn alt" data-act="showAll">Show all</button><button class="btn alt" data-act="hideAll">Hide all</button></div>` +
+    `<p class="muted">Show all leaves out whoever is buying for an admin. Tap a row to see it anyway.</p>`;
+  if (d.seen.length) h += `<section><h2>Let someone look again</h2><p class="muted">Tap a name to unlock it on the reveal screen.</p>` +
+    `<div class="chips">${d.seen.map((n, i) => `<button class="chip" data-act="unsee" data-i="${i}">${esc(n)}</button>`).join('')}</div></section>`;
+  h += `<section><button class="btn quiet danger" data-act="delDraw" data-confirm="Tap again to delete this draw">Delete this draw</button></section>`;
+  return page('Full list', h, 'admin');
+};
+
+/* Game setup */
+V.setup = () => {
+  const g = GAMES[view.game], p = pool(), sel = selected();
+  let h = `<section><h2>Who is playing?</h2>` +
+    (p.length ? `<div class="chips">${p.map((n, i) => `<button class="chip${sel.includes(n) ? ' on' : ''}" data-act="tog" data-i="${i}" aria-pressed="${sel.includes(n)}">${esc(n)}</button>`).join('')}</div>`
+      : `<p class="muted">Add the name of everyone playing.</p>`) +
+    `<div class="add"><input id="newName" type="text" maxlength="20" placeholder="Add a name" autocomplete="off" enterkeyhint="done" data-enter="addExtra" aria-label="Name to add"><button class="btn alt" data-act="addExtra">Add</button></div>` +
+    (p.length ? `<p class="muted">${sel.length} playing. Tap a name to add or drop it for this game.</p>` : '') +
+    (S.lastPlayers.length ? `<button class="btn alt" data-act="sameAgain">Use the same players as last game</button>` : '') +
+    (S.extras.length ? `<button class="btn quiet" data-act="clearExtras" data-confirm="Tap again to remove the extra names">Remove the extra names</button>` : '') + `</section>`;
+  h += `<section><h2>Level</h2><div class="seg"><button class="${S.level === 'easy' ? 'on' : ''}" data-act="level" data-l="easy" aria-pressed="${S.level === 'easy'}">Easy</button>` +
+    `<button class="${S.level === 'hard' ? 'on' : ''}" data-act="level" data-l="hard" aria-pressed="${S.level === 'hard'}">Hard</button></div>` +
+    `<p class="muted">${g.lv[S.level === 'easy' ? 0 : 1]}. Easy suits the youngest players.</p></section>`;
+  if (view.game === 'grinch') h += `<section><h2>Version</h2><div class="seg four">${Object.keys(THEMES).map(k => `<button class="${S.theme === k ? 'on' : ''}" data-act="theme" data-k="${k}" aria-pressed="${S.theme === k}">${THEMES[k].t}</button>`).join('')}</div>` +
+    `<p class="muted">${(t => `${t.Crew} guard what is ${t.place}. One of them is secretly ${t.thief}.`)(THEMES[S.theme])}</p></section>`;
+  if (view.game === 'imp') h += `<section><h2>Category</h2><select data-chg="cat" aria-label="Category"><option value="any">Any category</option>` +
+    Object.keys(WORDS).map(c => `<option${S.cat === c ? ' selected' : ''}>${esc(c)}</option>`).join('') + `</select></section>`;
+  if (view.game === 'imp' || view.game === 'wolf') h += `<section><h2>Discussion timer</h2><select data-chg="timer" aria-label="Discussion timer">` +
+    [60,120,180,300].map(t => `<option value="${t}"${S.timer === t ? ' selected' : ''}>${t / 60} minute${t > 60 ? 's' : ''}</option>`).join('') + `</select></section>`;
+  h += `<section><button class="btn" data-act="start" ${sel.length < g.min ? 'disabled' : ''}>Start</button>` +
+    (sel.length < g.min ? `<p class="muted">This game needs at least ${g.min} players.</p>` : '') + `</section>`;
+  return page(view.game === 'grinch' ? THEMES[S.theme].name : g.t, h);
+};
+
+/* Pass the phone, hold to reveal */
+V.pass = () => {
+  const c = G.cards[view.i], many = G.cards.length > 1;
+  const body = view.shown
+    ? `<div class="reveal">${typeof c.html === 'function' ? c.html() : c.html}</div>` +
+      `<button class="btn" id="passBtn" data-act="passNext" ${G.type === 'grinch' && view.pick == null ? 'disabled' : ''}>Hide and pass on</button>`
+    : `<div class="handoff"><p class="lead">Hand the phone to</p><p class="big">${esc(c.name)}</p>${holdBtn('Hold to reveal')}` +
+      `<p class="muted">Only ${esc(c.name)} should be looking.${many ? ` Player ${view.i + 1} of ${G.cards.length}.` : ''}</p></div>`;
+  return G.type === 'santa' ? page('Secret Santa', body, 'santa') : page(G.th ? G.th.name : GAMES[G.type].t, body, 'home', true);
+};
+
+/* Imposter */
+V.impTalk = () => page('Imposter', `<div class="center"><p class="tag">${esc(G.starter)} starts</p>` +
+  `<p class="lead">Go around the circle. Each player says one thing about the word without giving it away.</p></div>` +
+  clock() + `<button class="btn" data-act="nav" data-to="impVote">Time to vote</button>`, 'home', true);
+
+V.impVote = () => page('Imposter', `<p class="lead">Count to three and all point. Who got the most votes?</p>` +
+  `<div class="list">${G.players.map((n, i) => `<button class="row" data-act="impVoted" data-i="${i}"><span>${esc(n)}</span></button>`).join('')}</div>`, 'home', true);
+
+V.impResult = () => {
+  const imp = G.players[G.imp], caught = view.vote === G.imp;
+  return page('Imposter', `<div class="center"><p class="tag ${caught ? 'good' : 'bad'}">${caught ? 'Caught' : 'Got away with it'}</p>` +
+    `<p class="lead">The imposter was</p><p class="big">${esc(imp)}</p><p class="lead">The word was <strong>${esc(G.word)}</strong></p>` +
+    `<p class="muted">${caught ? 'Everyone else gets a point.' : `${esc(imp)} gets two points.`}</p></div>` +
+    againBtns('imp') + board('imp'));
+};
+
+/* Grinch */
+const shelfHTML = (items, pickable) => `<div class="gifts">${items.map((g, k) => pickable
+  ? `<button class="gift${view.pick === k ? ' on' : ''}" data-act="${pickable}" data-k="${k}"><b aria-hidden="true">${g[0]}</b><span>${g[1]}</span></button>`
+  : `<div class="gift"><b aria-hidden="true">${g[0]}</b><span>${g[1]}</span></div>`).join('')}</div>`;
+
+V.grMem = () => page(G.th.name, `<div class="center"><p class="lead">Everyone look. Remember what is ${G.th.place}.</p><div id="clock" role="timer">${mmss(view.left)}</div></div>` +
+  shelfHTML(G.shelf) + `<button class="btn" data-act="grReady">We are ready</button>`, 'home', true);
+
+V.grGuess = () => page(G.th.name, `<p class="lead">${G.th.Crew}, one ${G.th.thing} has gone. Here is what is left ${G.th.place}.</p>` + shelfHTML(G.rem) +
+  `<section><h2>Which ${G.th.thing} is missing?</h2>${shelfHTML(G.opts, 'grPick')}</section>`, 'home', true);
+
+V.grWho = () => page(G.th.name, `<p class="lead">Now, who is ${G.th.thief}? Count to three and all point.</p>` +
+  `<div class="list">${G.players.map((n, i) => `<button class="row" data-act="grAccuse" data-i="${i}"><span>${esc(n)}</span></button>`).join('')}</div>`, 'home', true);
+
+V.grResult = () => {
+  const t = G.th, st = G.shelf[G.stolen], who = G.players[G.grinch], ty = S.tally[G.key] || {c:0, t:0}, cap = x => x.charAt(0).toUpperCase() + x.slice(1);
+  return page(t.name, `<div class="center"><p class="lead">${cap(t.thief)} stole</p><p class="huge">${st[0]}</p><p class="big sm">${esc(st[1])}</p>` +
+    `<p class="tag ${G.okGift ? 'good' : 'bad'}">${G.okGift ? `The ${t.Crew.toLowerCase()} spotted it` : `The guess was ${esc(G.opts[G.guess][1])}`}</p>` +
+    `<p class="lead">${cap(t.thief)} was <strong>${esc(who)}</strong></p>` +
+    `<p class="tag ${G.okWho ? 'good' : 'bad'}">${G.okWho ? t.caught : `${esc(G.players[G.accused])} got the blame`}</p></div>` +
+    `<section><h2>Running score</h2><table class="board"><tr><td>${t.Crew}</td><td>${ty.c}</td></tr><tr><td>${t.Thief}</td><td>${ty.t}</td></tr></table>` +
+    `<p class="muted">${t.Crew} score for each right answer. ${cap(t.thief)} scores for each wrong one.</p>` +
+    `<button class="btn quiet" data-act="resetTally" data-confirm="Tap again to clear the score">Clear the score</button></section>` + againBtns('grinch'));
+};
+
+/* Werewolf */
+V.wolf = () => {
+  const alive = G.players.filter((_, i) => !G.out.includes(i));
+  const wolves = G.players.filter((_, i) => !G.out.includes(i) && G.roles[i] === 'wolf').length;
+  const others = alive.length - wolves;
+  const win = wolves === 0 ? 'The villagers win' : wolves >= others ? 'The werewolves win' : '';
+  const hard = G.roles.includes('seer');
+  const steps = ['Everyone closes their eyes.', '"Werewolves, wake up and point at one villager." Then they sleep again.'];
+  if (hard) steps.push('"Seer, wake up and point at one player." Nod if that player is a werewolf.');
+  if (G.roles.includes('doctor')) steps.push('"Doctor, wake up and point at one player to protect."');
+  steps.push('"Everyone wake up." Say who was caught in the night and tap their name below.' + (G.roles.includes('doctor') ? ' Nobody is caught if the doctor protected them.' : ''));
+  steps.push('Everyone talks it over, then votes one player out. Tap their name.');
+  let h = win ? `<div class="center"><p class="tag good">${win}</p></div>` : '';
+  h += `<section><h2>Each round</h2><p class="muted">Pick a narrator to read these out. A narrator who is not playing can hold the button further down to see every role.</p>` +
+    `<ol class="steps">${steps.map(s => `<li>${s}</li>`).join('')}</ol></section>`;
+  h += `<section><h2>Players</h2><p class="muted">${alive.length} still in. Tap a name when that player is out.</p>` +
+    `<div class="list">${G.players.map((n, i) => `<button class="row${G.out.includes(i) ? ' out' : ''}" data-act="wolfOut" data-i="${i}" aria-pressed="${G.out.includes(i)}"><span>${esc(n)}</span>` +
+      `<span class="st">${view.roles ? ROLE[G.roles[i]][0] + ' ' + ROLE[G.roles[i]][1] : G.out.includes(i) ? 'Out' : ''}</span></button>`).join('')}</div></section>`;
+  h += `<section><h2>Daytime talk</h2>${clock()}</section>`;
+  h += `<section><h2>Roles</h2>${view.roles ? `<button class="btn alt" data-act="hideRoles">Hide the roles</button>`
+    : `<div class="center">${holdBtn('Hold to see roles', true)}<p class="muted">For the narrator, or once the game is over.</p></div>`}</section>`;
+  h += `<section>${againBtns('wolf')}</section>`;
+  return page('Werewolf', h, 'home', true);
+};
+
+/* Who am I */
+V.who = () => {
+  const name = G.players[G.turn], id = G.deck[G.k % G.deck.length];
+  let b;
+  if (view.ph === 'ready') b = `<div class="center"><p class="lead">Next up</p><p class="big">${esc(name)}</p>` +
+    `<p class="lead">Tap start, then hold the phone on your forehead with the screen facing out. No peeking.</p>` +
+    `<p class="muted">Ask yes or no questions to work out who you are. You get 20.</p></div><button class="btn" data-act="whoStart">Start</button>`;
+  else if (view.ph === 'count') b = `<div class="center"><p class="lead">Phone on your forehead, ${esc(name)}</p><p class="huge">${view.c}</p></div>`;
+  else if (view.ph === 'show') b = `<div class="center"><p class="huge">${esc(id)}</p><p class="lead">${view.q >= 20 ? 'That is 20 questions. One last guess.' : `Question ${view.q} of 20`}</p></div>` +
+    `<button class="btn alt" data-act="whoQ" ${view.q >= 20 ? 'disabled' : ''}>Count a question</button>` +
+    `<div class="pair"><button class="btn" data-act="whoEnd" data-ok="1">Guessed it</button><button class="btn alt" data-act="whoEnd" data-ok="0">Give up</button></div>`;
+  else b = `<div class="center"><p class="tag ${view.ok ? 'good' : 'bad'}">${view.ok ? 'Guessed it' : 'Not this time'}</p><p class="lead">${esc(name)} was</p><p class="big">${esc(id)}</p>` +
+    (view.ok ? `<p class="muted">One point, using ${view.q} question${view.q === 1 ? '' : 's'}.</p>` : '') + `</div>` +
+    `<button class="btn" data-act="whoNext">Next: ${esc(G.players[(G.turn + 1) % G.players.length])}</button>` +
+    `<button class="btn quiet" data-act="open" data-g="who">Change players or settings</button>` + board('who');
+  return page('Who am I?', b, 'home', true);
+};
+
+/* Truth or dare */
+V.tod = () => {
+  const name = G.players[G.turn % G.players.length];
+  const b = view.kind
+    ? `<div class="center"><p class="tag">${esc(name)}, ${view.kind === 'truth' ? 'truth' : 'dare'}</p><p class="big sm">${esc(view.text)}</p></div>` +
+      `<button class="btn" data-act="todNext">Next player</button><button class="btn quiet" data-act="todPick" data-kind="${view.kind}">Give me a different one</button>`
+    : `<div class="center"><p class="lead">It is your turn</p><p class="big">${esc(name)}</p></div>` +
+      `<div class="pair"><button class="btn" data-act="todPick" data-kind="truth">Truth</button><button class="btn alt" data-act="todPick" data-kind="dare">Dare</button></div>`;
+  return page('Truth or dare', b, 'home', true);
+};
+
+/* ---------- game starters ---------- */
+function startGame(type, players){
+  if (type === 'imp') {
+    let list = [];
+    Object.keys(WORDS).forEach(c => { if (S.cat === 'any' || S.cat === c) list = list.concat(WORDS[c][S.level]); });
+    if (!list.length) list = WORDS['Animals'][S.level];
+    let fresh = list.filter(e => !used.has(e[0]));
+    if (!fresh.length) { list.forEach(e => used.delete(e[0])); fresh = list; }
+    const e = fresh[rnd(fresh.length)]; used.add(e[0]);
+    const imp = rnd(players.length);
+    G = {type, players, word: e[0], imp, starter: players[rnd(players.length)], scored: false,
+      cards: players.map((name, i) => ({name, html: i === imp
+        ? `<p class="tag bad">You are the imposter</p><p class="lead">You do not get the word. Your clue is</p><p class="big sm">${esc(e[2])}</p><p class="muted">Blend in, and try to work out the word.</p>`
+        : `<p class="tag">The secret word</p><p class="big">${esc(e[0])}</p><p class="lead">${esc(e[1])}</p><p class="muted">One of the others is an imposter with a different clue.</p>`})),
+      after: () => go('impTalk', {left: S.timer, total: S.timer, run: false})};
+    return go('pass', {i: 0, shown: false, pick: null});
+  }
+  if (type === 'grinch') {
+    const n = S.level === 'easy' ? 12 : 15, th = THEMES[S.theme] || THEMES.xmas, all = shuffle(th.items);
+    G = {type, players, th, key: S.theme, shelf: all.slice(0, n), spare: all.slice(n), grinch: rnd(players.length), stolen: null,
+      cards: players.map((name, i) => ({name, html: () => {
+        const isG = i === G.grinch;
+        return `<p class="tag ${isG ? 'bad' : 'good'}">You are ${isG ? th.thief : th.one}</p>` +
+          `<p class="lead">${isG ? `Tap the ${th.thing} you want to steal.` : `Tap any ${th.thing} to ${th.nudge}. Everyone taps one, so ${th.thief} stays hidden.`}</p>` + shelfHTML(G.shelf, 'pickGift');
+      }})),
+      after: () => {
+        G.rem = shuffle(G.shelf.filter((_, k) => k !== G.stolen));
+        G.opts = shuffle([G.shelf[G.stolen]].concat(G.spare.slice(0, S.level === 'easy' ? 5 : 8)));
+        go('grGuess', {pick: null});
+      }};
+    return go('grMem', {left: n === 12 ? 20 : 25});
+  }
+  if (type === 'wolf') {
+    const n = players.length, w = n >= 11 ? 3 : n >= 7 ? 2 : 1;
+    let roles = Array(w).fill('wolf');
+    if (S.level === 'hard') { roles.push('seer'); if (n >= 5) roles.push('doctor'); }
+    while (roles.length < n) roles.push('villager');
+    roles = shuffle(roles);
+    G = {type, players, roles, out: [],
+      cards: players.map((name, i) => { const r = ROLE[roles[i]];
+        const pack = players.filter((_, j) => j !== i && roles[j] === 'wolf');
+        return {name, html: `<p class="huge" aria-hidden="true">${r[0]}</p><p class="big">${r[1]}</p><p class="lead">${r[2]}</p>` +
+          (roles[i] === 'wolf' && pack.length ? `<p class="tag bad">Your pack: ${pack.map(esc).join(', ')}</p>` : '')}; }),
+      after: () => go('wolf', {left: S.timer, total: S.timer, run: false, roles: false})};
+    return go('pass', {i: 0, shown: false, pick: null});
+  }
+  if (type === 'who') {
+    G = {type, players, turn: 0, k: 0, deck: shuffle(WHO[S.level])};
+    return go('who', {ph: 'ready', q: 0});
+  }
+  if (type === 'tod') {
+    G = {type, players: shuffle(players), turn: 0, deck: {truth: shuffle(TOD[S.level].truth), dare: shuffle(TOD[S.level].dare)}, at: {truth: 0, dare: 0}};
+    return go('tod', {});
+  }
+}
+
+/* ---------- actions ---------- */
+const A = {};
+A.nav = el => { const to = el.dataset.to; if (to === 'home' || to === 'santa') unlocked = false; if (to === 'home') G = null; go(to, to === 'draw' ? {} : undefined); };
+A.open = el => { const g = el.dataset.g; unlocked = false; g === 'santa' ? go('santa') : go('setup', {game: g}); };
+A.install = () => { if (deferred) { deferred.prompt(); deferred = null; render(); } };
+
+// PIN
+A.admin = () => unlocked ? go('admin') : go('pin', {mode: S.santa.pin ? 'enter' : 'set', buf: '', first: '', err: ''});
+A.changePin = () => go('pin', {mode: 'set', buf: '', first: '', err: ''});
+A.key = el => {
+  const k = el.dataset.k;
+  if (k === 'del') view.buf = view.buf.slice(0, -1); else if (view.buf.length < 4) view.buf += k;
+  view.err = '';
+  if (view.buf.length === 4) {
+    if (view.mode === 'enter') {
+      if (view.buf === S.santa.pin) { unlocked = true; return go('admin'); }
+      view.err = 'That PIN is not right. Try again.'; view.buf = '';
+    } else if (view.mode === 'set') { view.first = view.buf; view.buf = ''; view.mode = 'confirm'; }
+    else {
+      if (view.buf === view.first) { S.santa.pin = view.buf; save(); unlocked = true; toast('PIN saved'); return go('admin'); }
+      view.err = 'Those two did not match. Choose a PIN again.'; view.buf = ''; view.mode = 'set';
+    }
+  }
+  render();
+};
+A.erase = () => { S = blank(); save(); unlocked = false; G = null; toast('Everything erased'); go('home'); };
+
+// admin
+A.addPerson = () => {
+  const inp = document.getElementById('newName'), n = cleanName(inp.value);
+  if (!n) return inp.focus();
+  if (has(S.santa.people.map(p => p.name), n)) { toast(`${n} is already on the list`); return inp.focus(); }
+  S.santa.people.push({name: n, admin: false}); save(); view.focus = 'newName'; render();
+};
+A.delPerson = el => { S.santa.people.splice(+el.dataset.i, 1); save(); render(); };
+A.togAdmin = el => { const p = S.santa.people[+el.dataset.i]; p.admin = !p.admin; save(); render(); };
+A.runDraw = () => {
+  const s = S.santa, lim = document.getElementById('limit'), nm = document.getElementById('drawName');
+  if (lim) s.limit = lim.value.replace(/[^0-9.]/g, '');
+  if (s.people.length < 3) return;
+  s.draws.unshift({id: Date.now(), name: (nm && nm.value.trim()) || 'Secret Santa', date: new Date().toISOString(), limit: s.limit,
+    pairs: drawPairs(s.people.map(p => p.name)), seen: [], admins: s.people.filter(p => p.admin).map(p => p.name)});
+  save();
+  try { navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch (e) {}
+  unlocked = false; toast('Names drawn. Pass the phone around.'); go('santa');
+};
+A.openDraw = el => go('draw', {i: +el.dataset.i, open: []});
+A.peek = el => { const i = +el.dataset.i, o = view.open || []; view.open = o.includes(i) ? o.filter(x => x !== i) : o.concat(i); render(); };
+A.showAll = () => { const d = S.santa.draws[view.i], ad = d.admins || []; view.open = d.pairs.map((p, i) => ad.includes(p.r) ? -1 : i).filter(i => i >= 0); render(); };
+A.hideAll = () => { view.open = []; render(); };
+A.unsee = el => { const d = S.santa.draws[view.i], n = d.seen[+el.dataset.i]; d.seen.splice(+el.dataset.i, 1); save(); toast(`${n} can look again`); render(); };
+A.delDraw = () => { S.santa.draws.splice(view.i, 1); save(); toast('Draw deleted'); go('admin'); };
+A.export = () => {
+  const name = `pass-the-phone-backup-${new Date().toISOString().slice(0, 10)}.json`, data = JSON.stringify(S, null, 1);
+  try {
+    const file = new File([data], name, {type: 'application/json'});
+    if (navigator.canShare && navigator.canShare({files: [file]})) { navigator.share({files: [file], title: 'Pass the Phone backup'}).catch(() => {}); return; }
+  } catch (e) {}
+  try {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([data], {type: 'application/json'})); a.download = name;
+    document.body.appendChild(a); a.click(); a.remove(); toast('Backup file saved');
+  } catch (e) { toast('This browser could not save a file'); }
+};
+
+// Secret Santa reveal
+A.santaWho = el => {
+  const d = S.santa.draws[0], p = d.pairs[+el.dataset.i];
+  G = {type: 'santa', cards: [{name: p.g, html: `<p class="lead">${esc(p.g)}, you are buying a gift for</p><p class="big">${esc(p.r)}</p>` +
+    (d.limit ? `<p class="tag">Spend up to $${esc(d.limit)}</p>` : '') + `<p class="muted">Keep it secret.</p>`}],
+    onShown: () => { if (!d.seen.includes(p.g)) { d.seen.push(p.g); save(); } }, after: () => { G = null; go('santa'); }};
+  go('pass', {i: 0, shown: false, pick: null});
+};
+A.passNext = () => {
+  if (G.type === 'grinch' && view.i === G.grinch) G.stolen = view.pick;
+  if (view.i + 1 < G.cards.length) go('pass', {i: view.i + 1, shown: false, pick: null}); else G.after();
+};
+
+// picker and setup
+A.tog = el => { const n = pool()[+el.dataset.i], sel = selected(); S.selected = sel.includes(n) ? sel.filter(x => x !== n) : sel.concat(n); save(); render(); };
+A.addExtra = () => {
+  const inp = document.getElementById('newName'), n = cleanName(inp.value);
+  if (!n) return inp.focus();
+  const sel = selected(), p = pool(), hit = p.find(x => x.toLowerCase() === n.toLowerCase());
+  if (!hit) S.extras.push(n);
+  const nm = hit || n;
+  S.selected = sel.includes(nm) ? sel : sel.concat(nm);
+  save(); view.focus = 'newName'; render();
+};
+A.sameAgain = () => { const p = pool(); S.lastPlayers.forEach(n => { if (!has(p, n)) S.extras.push(n); }); S.selected = S.lastPlayers.slice(); save(); toast('Same players as last game'); render(); };
+A.clearExtras = () => { S.extras = []; save(); render(); };
+A.level = el => { S.level = el.dataset.l; save(); render(); };
+A.start = () => { const players = selected(); if (players.length < GAMES[view.game].min) return; S.lastPlayers = players.slice(); save(); startGame(view.game, players); };
+A.again = () => startGame(G.type, G.players);
+
+// clock
+A.clockTog = () => {
+  if (view.left === 0) return;
+  view.run = !view.run; clearInterval(tick); tick = null;
+  if (view.run) tick = setInterval(() => {
+    view.left--;
+    if (view.left <= 0) { view.left = 0; view.run = false; clearInterval(tick); tick = null; buzz(); render(); }
+    else { const c = document.getElementById('clock'); if (c) c.textContent = mmss(view.left); }
+  }, 1000);
+  render();
+};
+A.clockReset = () => { clearInterval(tick); tick = null; view.left = view.total; view.run = false; render(); };
+
+// imposter
+A.impVoted = el => {
+  const v = +el.dataset.i;
+  if (!G.scored) {
+    G.scored = true; const sc = S.scores.imp;
+    if (v === G.imp) G.players.forEach((n, i) => { if (i !== G.imp) sc[n] = (sc[n] || 0) + 1; });
+    else sc[G.players[G.imp]] = (sc[G.players[G.imp]] || 0) + 2;
+    save();
+  }
+  go('impResult', {vote: v});
+};
+A.resetScores = el => { S.scores[el.dataset.k] = {}; save(); render(); };
+
+// grinch
+A.grReady = () => go('pass', {i: 0, shown: false, pick: null});
+A.pickGift = el => {
+  view.pick = +el.dataset.k;
+  document.querySelectorAll('.gift.on').forEach(g => g.classList.remove('on'));
+  el.classList.add('on');
+  const b = document.getElementById('passBtn'); if (b) b.disabled = false;
+};
+A.grPick = el => { G.guess = +el.dataset.k; G.okGift = G.opts[G.guess] === G.shelf[G.stolen]; go('grWho'); };
+A.grAccuse = el => {
+  G.accused = +el.dataset.i; G.okWho = G.accused === G.grinch;
+  const ty = S.tally[G.key] || (S.tally[G.key] = {c:0, t:0});
+  [G.okGift, G.okWho].forEach(ok => { if (ok) ty.c++; else ty.t++; });
+  save(); go('grResult');
+};
+A.resetTally = () => { S.tally[G.key] = {c:0, t:0}; save(); render(); };
+A.theme = el => { S.theme = el.dataset.k; save(); render(); };
+
+// werewolf
+A.wolfOut = el => { const i = +el.dataset.i; G.out = G.out.includes(i) ? G.out.filter(x => x !== i) : G.out.concat(i); render(); };
+A.hideRoles = () => { view.roles = false; render(); };
+
+// who am I
+A.whoStart = () => {
+  view.ph = 'count'; view.c = 3; render();
+  tick = setInterval(() => { view.c--; if (view.c <= 0) { clearInterval(tick); tick = null; view.ph = 'show'; view.q = 0; } render(); }, 1000);
+};
+A.whoQ = () => { if (view.q < 20) view.q++; render(); };
+A.whoEnd = el => {
+  view.ok = el.dataset.ok === '1'; view.ph = 'done';
+  if (view.ok) { const n = G.players[G.turn]; S.scores.who[n] = (S.scores.who[n] || 0) + 1; save(); }
+  render();
+};
+A.whoNext = () => { G.turn = (G.turn + 1) % G.players.length; G.k++; if (G.k % G.deck.length === 0) G.deck = shuffle(G.deck); go('who', {ph: 'ready', q: 0}); };
+
+// truth or dare
+A.todPick = el => { const k = el.dataset.kind, d = G.deck[k]; view.kind = k; view.text = d[G.at[k] % d.length]; G.at[k]++; render(); };
+A.todNext = () => { G.turn++; go('tod', {}); };
+
+/* change handlers */
+const C = {};
+C.limit = el => { S.santa.limit = el.value.replace(/[^0-9.]/g, ''); el.value = S.santa.limit; save(); };
+C.cat = el => { S.cat = el.value; save(); };
+C.timer = el => { S.timer = +el.value; save(); };
+C.import = el => {
+  const f = el.files && el.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const o = JSON.parse(r.result);
+      if (!o || o.v !== 1 || !o.santa || !Array.isArray(o.santa.people) || !Array.isArray(o.santa.draws)) throw new Error('bad');
+      S = Object.assign(blank(), o); if (!S.tally || S.tally.elves !== undefined) S.tally = {}; if (!THEMES[S.theme]) S.theme = 'xmas'; save(); toast('Backup restored'); render();
+    } catch (e) { toast('That file is not a Pass the Phone backup'); }
+  };
+  r.readAsText(f);
+};
+
+/* ---------- wiring ---------- */
+function holdDone(){
+  if (view.n === 'pass') { view.shown = true; if (G.onShown) G.onShown(); render(); window.scrollTo(0, 0); }
+  else if (view.n === 'wolf') { view.roles = true; render(); }
+}
+function after(){
+  const h = document.getElementById('hold');
+  if (h) {
+    let t = null;
+    const stop = () => { clearTimeout(t); t = null; h.classList.remove('on'); };
+    const start = e => { e.preventDefault(); if (t) return; h.classList.add('on'); t = setTimeout(() => { t = null; holdDone(); }, 900); };
+    h.addEventListener('pointerdown', start);
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(x => h.addEventListener(x, stop));
+    h.addEventListener('contextmenu', e => e.preventDefault());
+    h.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') start(e); });
+    h.addEventListener('keyup', stop);
+  }
+  if (view.n === 'grMem' && !tick) tick = setInterval(() => {
+    view.left--;
+    if (view.left <= 0) { buzz(); return A.grReady(); }
+    const c = document.getElementById('clock'); if (c) c.textContent = mmss(view.left);
+  }, 1000);
+  if (view.focus) { const f = document.getElementById(view.focus); view.focus = null; if (f) f.focus(); }
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  if (el.dataset.confirm !== undefined && armed !== el) { armed = el; el.textContent = el.dataset.confirm || 'Tap again to confirm'; return; }
+  armed = null;
+  const f = A[el.dataset.act]; if (f) f(el);
+});
+document.addEventListener('change', e => { const el = e.target.closest('[data-chg]'); if (el && C[el.dataset.chg]) C[el.dataset.chg](el); });
+document.addEventListener('keydown', e => { const t = e.target; if (e.key === 'Enter' && t && t.dataset && t.dataset.enter) { e.preventDefault(); A[t.dataset.enter](t); } });
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; if (view.n === 'home') render(); });
+if ('serviceWorker' in navigator && location.protocol === 'https:') { try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {} }
+
+render();
+})();
+</script>
+</body>
+</html>
