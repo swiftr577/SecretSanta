@@ -197,7 +197,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 @keyframes glint{0%,90%,100%{opacity:0} 94%{opacity:.8}}
 @keyframes twitch{0%,91%,100%{transform:none} 95%{transform:translateX(-3px)}}
 @keyframes flick{0%,38%,50%,58%,100%{background:#F3CF73} 42%,54%{background:#141C26}}
-@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw,.rocket.hover,.rocket.climb,.sky .st,.balloon svg,.sig.wait,.dial.hid .dtrk,.dial.hid #clock,.shake,.pad2.won{animation:none}}
+@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw,.burst,.sky .st,.balloon svg,.sig.wait,.dial.hid .dtrk,.dial.hid #clock,.shake,.pad2.won{animation:none}}
 
 .grid{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:6px}
 .gc{aspect-ratio:1; padding:0; border:2px solid var(--line); border-radius:12px; background:var(--surface); font-weight:800; line-height:1;
@@ -228,10 +228,10 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
   background:linear-gradient(#070A1C,#1A2452 70%,#2A2F66)}
 .lane{position:relative; border-left:1px dashed rgba(255,255,255,.12)}
 .lane:first-child{border-left:0}
-.rocket{position:absolute; left:50%; bottom:0; margin-left:-.85rem; font-size:1.7rem; line-height:1; transform:rotate(-45deg)}
-.rocket.hover{animation:hover .6s ease-in-out infinite alternate}
-@keyframes hover{from{transform:translateY(2px) rotate(-45deg)} to{transform:translateY(-3px) rotate(-45deg)}}
-.burst{position:absolute; left:50%; width:10px; height:10px; margin:0 0 -5px -5px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px var(--pc), 0 0 14px 6px var(--pc); animation:boom .35s ease-out both}
+.rocket{position:absolute; left:0; top:0; width:28px; height:28px; font-size:26px; line-height:28px; text-align:center; opacity:0; will-change:transform; pointer-events:none}
+#skyfx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+@keyframes glowpulse{from{filter:brightness(1)} to{filter:brightness(1.5)}}
+.burst{position:absolute; left:50%; width:10px; height:10px; margin:0 0 -5px -5px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px var(--pc), 0 0 14px 6px var(--pc); animation:boom .35s ease-out both, glowpulse 1.6s ease-in-out .35s infinite alternate}
 .burst.best{width:14px; height:14px; margin:0 0 -7px -7px; box-shadow:0 0 0 4px var(--pc), 0 0 22px 10px #FFD166}
 #fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:5}
 .lane .alt{position:absolute; left:0; right:0; margin-bottom:-34px; text-align:center; color:#fff; font-size:.8rem; font-weight:800}
@@ -257,7 +257,6 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .sky .city{position:absolute; left:0; right:0; bottom:0; width:100%; height:44px}
 .sky::after{content:""; position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none}
 .sky.flash::after{animation:skyflash .4s ease-out}
-.rocket.climb{animation:wiggle .18s ease-in-out infinite alternate}
 .shake{animation:shake .45s}
 .dial{position:relative; width:240px; height:240px; display:flex; align-items:center; justify-content:center}
 .dial svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
@@ -968,7 +967,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.12'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.13'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1565,13 +1564,16 @@ const SKY = [[8,12],[19,31],[27,8],[36,22],[44,40],[52,14],[61,29],[69,6],[74,45
 const SHAPES = ['peony', 'ring', 'star', 'heart', 'willow'];
 function fireNew(){
   const pool = shuffle(Array.from({length: 66}, (_, i) => i + 28));   // every height is different, so there is never a tie
-  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.climb = false; G.shape = shuffle(SHAPES); G.round = (G.round || 0) + 1;
+  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.climb = false; G.shape = shuffle(SHAPES);
+  Object.assign(FW, {p: [], tc: -1, end: -1, show: 0, showN: 0, amb: .6, lastLaunch: 0, rk: G.players.map(() => ({ph: 'pad', t: 0, phi: Math.random() * 6.283, lx: null, ly: null}))}); G.round = (G.round || 0) + 1;
 }
 const fireBurst = i => `<div class="burst${G.done && i === G.win ? ' best' : ''}" style="bottom:${G.h[i]}%"></div><span class="alt" style="bottom:${G.h[i]}%">${G.h[i]} m${G.done && i === G.win ? ' 👑' : ''}</span>`;
 V.fire = () => {
   const n = G.players.length;
-  const b = `<p class="tag ${G.done ? 'good' : ''}">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : 'Everyone, launch your rocket'}</p>` +
-    `<div class="sky" style="--c:${n}">${SKY}${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}</div>` +
+  const b = `<p class="tag ${G.done ? 'good' : ''}" id="fireTag">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : G.climb ? 'Here they go' : 'Everyone, launch your rocket'}</p>` +
+    `<div class="sky" style="--c:${n}">${SKY}<canvas id="skyfx" aria-hidden="true"></canvas>` +
+      G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : ''}</div>`).join('') +
+      G.players.map((_, i) => G.st[i] === 2 ? '' : `<div class="rocket${G.st[i] === 1 ? ' hover' : ''}" id="rk${i}" aria-hidden="true">🚀</div>`).join('') + `</div>` +
     `<div class="pads" style="--c:${n}">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="fireGo" data-i="${i}" ${G.st[i] ? 'disabled' : ''}>${esc(p)}</button>`).join('')}</div>` +
     (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name whenever you like. Once every rocket is up, they all climb together and burst at secret heights.</p>`);
   return page('Fireworks', b, 'home', true);
@@ -2016,16 +2018,7 @@ function fxLoop(t){
   if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
   const ctx = cv.getContext('2d'), dt = Math.min(Math.max((t - FX.last) / 1000, .001), .05); FX.last = t;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
-  // a trail of sparks under every rocket that is in the air
-  let flying = false;
-  if (view.n === 'fire' && G && G.type === 'fire' && !G.done) G.st.forEach((st, i) => {
-    if (st !== 1) return;
-    flying = true;
-    const r = document.getElementById('rk' + i); if (!r || FX.p.length > 1500) return;
-    const b = r.getBoundingClientRect(), x = b.left + b.width / 2, y = b.bottom - 5;
-    for (let k = 0; k < (G.climb ? 4 : 1); k++) FX.p.push({k: 'spark', x: x + (R() - .5) * 6, y, vx: (R() - .5) * 38, vy: 50 + R() * (G.climb ? 130 : 50), g: 30, d: .96,
-      life: 0, max: .25 + R() * (G.climb ? .55 : .25), c: R() < .45 ? '#FFD166' : R() < .5 ? '#FF9F43' : R() < .5 ? '#FFF3C4' : COL[i], s: 1.3 + R() * 2.2});
-  });
+  const flying = false;
   const born = [];
   FX.p = FX.p.filter(q => {
     q.life += dt;
@@ -2113,44 +2106,144 @@ function fxBoomAt(o, c, big, shape){
 const fxSmoke = i => fxPuff(fxSpot(i, 2), 14);
 const fxBoom = (i, big, dx, dy, shape) => { const o = fxSpot(i, G.h[i]); if (o) fxBoomAt({x: o.x + (dx || 0), y: o.y + (dy || 0)}, COL[i], big, shape || G.shape[i % G.shape.length]); };
 
-// A tap lifts that rocket to a low hover. Once every rocket is up they all climb together at the same speed,
-// so the order they burst in depends only on the secret heights, never on who tapped first.
-const FIRE_HOLD = 12, FIRE_SPEED = 26;
+/* The fireworks sky runs as one continuous animation: every frame it fades the last picture a little (which leaves flowing
+   streaks behind anything that moves), moves the rockets along smooth paths, and keeps small fireworks going in the distance. */
+const FW = {raf: 0, last: 0, p: [], rk: [], tc: -1, end: -1, show: 0, showN: 0, amb: 0, lastLaunch: 0};
+const FIRE_HOLD = 12, FIRE_SPEED = 24, FIRE_RAMP = .9, FIRE_EASE = 7;
+const PASTEL = ['#FF9AA2', '#FFDAC1', '#E2F0CB', '#B5EAD7', '#C7CEEA', '#FFD166', '#A0E7E5'];
+const backOut = u => { const c = 1.9; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+function fwBurst(x, y, c, scale, shape, alpha){
+  if (calm()) return;
+  const S = 150 * scale, P = FW.p, al = alpha || 1, many = Math.max(.45, scale);
+  P.push({k: 'bloom', x, y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .55, c, s: 95 * scale, al});
+  const add = (vx, vy, col, life, size, o) => P.push(Object.assign({k: 'star', x, y, vx, vy, g: 42, d: .966, life: 0, max: life, c: col, s: size * Math.max(.6, scale), al, ph: R() * 6}, o));
+  const any = (sp, col, life, size, o) => { const an = R() * 6.283; add(Math.cos(an) * sp, Math.sin(an) * sp, col, life, size, o); };
+  if (shape === 'ring') {
+    const N = Math.round(40 * many);
+    for (let k = 0; k < N; k++) { const an = k / N * 6.283; add(Math.cos(an) * S, Math.sin(an) * S, c, 1.9, 2.3); if (k % 2) add(Math.cos(an) * S * .55, Math.sin(an) * S * .55, '#FFFFFF', 1.5, 1.6, {tw: true}); }
+  } else if (shape === 'star' || shape === 'heart') {
+    shapePts(shape, Math.round(64 * many)).forEach(p => add(p[0] * S, p[1] * S, c, 2.1, 2.2));
+    for (let k = 0; k < 14 * many; k++) any(S * (.1 + R() * .3), '#FFFFFF', 1.2 + R() * .5, 1.4, {tw: true});
+  } else if (shape === 'willow') {
+    for (let k = 0; k < 70 * many; k++) any(S * (.35 + R() * .7), R() < .8 ? '#FFD166' : c, 2.4 + R() * 1.2, 1.7, {g: 95, d: .95, tw: true});
+  } else {
+    for (let k = 0; k < 44 * many; k++) any(S * (.88 + R() * .2), c, 1.6 + R() * .7, 2.2, {crk: scale > 1 && k % 3 === 0});
+    for (let k = 0; k < 30 * many; k++) any(S * (.25 + R() * .55), R() < .5 ? c : '#FFFFFF', 1.2 + R() * .6, 1.5, {tw: true});
+    for (let k = 0; k < 14 * many; k++) any(S * (.5 + R() * .6), '#FFD166', 2 + R() * .9, 1.6, {tw: true, g: 70});
+  }
+}
+function fireFinish(){
+  G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
+  const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save();
+  FW.show = 7; FW.showN = 0; FW.showT = 0;
+  render();                                   // the particles live in FW.p, so the show carries straight on over the new screen
+  pulse(document.querySelector('.sky'), 'shake');
+  fxRain(70, [COL[G.win], '#FFD166', '#FFFFFF']);
+}
+function fwLoop(t){
+  const cv = document.getElementById('skyfx');
+  if (!cv || view.n !== 'fire' || !G || G.type !== 'fire') { FW.raf = 0; FW.p = []; return; }
+  const sky = cv.parentElement, w = sky.clientWidth, h = sky.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2), quiet = calm();
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const ctx = cv.getContext('2d'), dt = Math.min(Math.max((t - FW.last) / 1000, .001), .05); FW.last = t;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // fade what was drawn before instead of wiping it, so everything leaves a soft streak
+  ctx.globalCompositeOperation = 'destination-out'; ctx.globalAlpha = 1; ctx.fillStyle = `rgba(0,0,0,${(1 - Math.pow(.86, dt * 60)).toFixed(3)})`; ctx.fillRect(0, 0, w, h);
+  ctx.globalCompositeOperation = 'lighter';
+  const n = G.players.length, laneW = w / n;
+
+  // small fireworks in the distance keep the sky alive; after a win they turn into a show in the winner's colour
+  if (!quiet) {
+    FW.amb -= dt;
+    if (FW.amb <= 0) { FW.amb = 1.2 + R() * 1.8; fwBurst(R() * w, h * (.06 + R() * .32), PASTEL[rnd(PASTEL.length)], .26 + R() * .14, SHAPES[rnd(SHAPES.length)], .5); }
+    if (FW.show > 0) {
+      FW.show -= dt; FW.showT -= dt;
+      if (FW.showT <= 0) {
+        const k = FW.showN++, wx = (G.win + .5) * laneW, wy = h * (1 - G.h[G.win] / 100);
+        if (k < 3) fwBurst(wx + [0, -30, 28][k], wy + [0, 26, -8][k], COL[G.win], 1.35, ['peony', 'star', 'willow'][k]);
+        else fwBurst(w * (.12 + R() * .76), h * (.12 + R() * .5), R() < .6 ? COL[G.win] : R() < .5 ? '#FFD166' : '#FFFFFF', .55 + R() * .5, SHAPES[rnd(SHAPES.length)]);
+        FW.showT = k < 3 ? .42 : .3 + R() * .45;
+      }
+    }
+  }
+
+  // rockets
+  if (!G.done) {
+    if (FW.tc < 0 && G.st.every(x => x >= 1) && t - FW.lastLaunch > 900) { FW.tc = 0; G.climb = true; const tag = document.getElementById('fireTag'); if (tag) tag.textContent = 'Here they go'; }
+    if (FW.tc >= 0) FW.tc += dt;
+    const tc = FW.tc, rise = tc < 0 ? 0 : tc < FIRE_RAMP ? FIRE_SPEED * tc * tc / (2 * FIRE_RAMP) : FIRE_SPEED * (tc - FIRE_RAMP / 2), Y = FIRE_HOLD + rise;
+    FW.rk.forEach((r, i) => {
+      if (r.ph === 'done') return;
+      const el = document.getElementById('rk' + i), cx = (i + .5) * laneW, top = G.h[i];
+      let y = 0, x = 0, power = 0;
+      if (r.ph === 'pad') { x = Math.sin(t / 90 + r.phi) * .4; if (!quiet && R() < dt * 2.5) FW.p.push({k: 'smoke', x: cx + (R() - .5) * 8, y: h - 4, vx: (R() - .5) * 14, vy: -12 - R() * 14, g: -4, d: .97, life: 0, max: 1 + R(), s: 3 + R() * 3}); }
+      else {
+        r.t += dt;
+        const lift = backOut(Math.min(r.t / .85, 1));
+        y = FIRE_HOLD * lift + Math.sin(r.t * 2.1 + r.phi) * 1.1 * Math.min(r.t / .85, 1); x = Math.sin(r.t * 1.35 + r.phi) * 5; power = .45;
+        if (tc >= 0) {
+          power = Math.min(1, .45 + tc / FIRE_RAMP);
+          const start = top - FIRE_EASE;
+          if (Y < start) { y = Math.max(y, Y + Math.sin(r.t * 2.1 + r.phi) * .5); x = Math.sin(r.t * 1.35 + r.phi) * 5 + Math.sin(tc * 3.1 + r.phi) * 2.5; }
+          else {                                  // glide to a stop at its own height, then burst
+            const u = (Y - start) / FIRE_EASE; y = start + FIRE_EASE * (1 - Math.exp(-u * 1.7)); x = Math.sin(r.t * 1.35 + r.phi) * 5 * Math.max(0, 1 - u); power = Math.max(.25, 1 - u * .6);
+            if (u >= 1.5) {
+              r.ph = 'done'; G.st[i] = 2; buzz1();
+              if (el) el.remove();
+              fwBurst(cx, h * (1 - top / 100), COL[i], 1, G.shape[i % G.shape.length]);
+              const ln = document.getElementById('ln' + i); if (ln) ln.innerHTML = fireBurst(i);
+              if (G.st.every(s2 => s2 === 2)) FW.end = 1.7;
+              return;
+            }
+          }
+        }
+      }
+      const px = cx + x, py = h * (1 - y / 100);
+      const tilt = r.lx === null ? 0 : Math.max(-16, Math.min(16, (px - r.lx) / dt * .35));
+      if (el) { el.style.opacity = 1; el.style.transform = `translate(${(px - 14).toFixed(1)}px,${(py - 27).toFixed(1)}px) rotate(${(tilt - 45).toFixed(1)}deg)`; }
+      if (power > 0 && !quiet) {
+        if (r.lx !== null) {                     // a bright ribbon from where the tail was to where it is now
+          ctx.globalAlpha = .9; ctx.strokeStyle = '#FFF3C4'; ctx.lineWidth = 2 + power * 2.5; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(r.lx, r.ly); ctx.lineTo(px, py); ctx.stroke();
+          ctx.globalAlpha = .5; ctx.strokeStyle = COL[i]; ctx.lineWidth = 5 + power * 5; ctx.beginPath(); ctx.moveTo(r.lx, r.ly); ctx.lineTo(px, py); ctx.stroke();
+        }
+        const fl = 7 + power * 9 + R() * 4, gr = ctx.createRadialGradient(px, py + 3, 0, px, py + 3, fl);
+        gr.addColorStop(0, 'rgba(255,255,255,.9)'); gr.addColorStop(.4, 'rgba(255,190,80,.55)'); gr.addColorStop(1, 'rgba(255,120,40,0)');
+        ctx.globalAlpha = 1; ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(px, py + 3, fl, 0, 7); ctx.fill();
+        if (FW.p.length < 1600) for (let k = 0; k < Math.round(1 + power * 3); k++) FW.p.push({k: 'star', x: px + (R() - .5) * 5, y: py + 3, vx: (R() - .5) * 30, vy: 35 + R() * 110 * power, g: 30, d: .95,
+          life: 0, max: .3 + R() * .6 * power, c: R() < .5 ? '#FFD166' : R() < .5 ? '#FF9F43' : COL[i], s: 1 + R() * 1.6, ph: 0});
+      }
+      r.lx = px; r.ly = py;
+    });
+    if (FW.end > 0) { FW.end -= dt; if (FW.end <= 0) { FW.end = -1; FW.raf = requestAnimationFrame(fwLoop); return fireFinish(); } }
+  }
+
+  // particles
+  const born = [];
+  FW.p = FW.p.filter(q => {
+    q.life += dt;
+    if (q.life >= q.max) { if (q.crk) for (let k = 0; k < 3; k++) { const an = R() * 6.283, sp = 25 + R() * 45; born.push({k: 'star', x: q.x, y: q.y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 40, d: .93, life: 0, max: .25 + R() * .3, c: '#FFFFFF', s: 1 + R(), tw: true, ph: R() * 6}); } return false; }
+    const drag = Math.pow(q.d, dt * 60); q.vx *= drag; q.vy = q.vy * drag + q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
+    const a = 1 - q.life / q.max, al = q.al || 1;
+    if (q.k === 'bloom') { const rad = q.s * (.5 + .7 * (1 - a)), gr = ctx.createRadialGradient(q.x, q.y, 0, q.x, q.y, rad); gr.addColorStop(0, q.c); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.globalAlpha = a * .22 * al; ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(q.x, q.y, rad, 0, 7); ctx.fill(); return true; }
+    if (q.k === 'smoke') { ctx.globalAlpha = a * .05; ctx.fillStyle = '#C9D2DC'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + q.life * 1.6), 0, 7); ctx.fill(); return true; }
+    ctx.globalAlpha = Math.min(1, a * 1.6) * al * (q.tw ? .55 + .45 * Math.sin(q.life * 34 + q.ph) : 1); ctx.fillStyle = q.c;
+    ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (.5 + .5 * a), 0, 7); ctx.fill();
+    return true;
+  });
+  if (born.length) FW.p = FW.p.concat(born);
+  ctx.globalAlpha = 1;
+  FW.raf = requestAnimationFrame(fwLoop);
+}
+const fwStart = () => { if (!FW.raf) { FW.last = performance.now(); FW.raf = requestAnimationFrame(fwLoop); } };
 A.fireGo = el => {
   const i = +el.dataset.i;
   if (G.st[i]) return;
   G.st[i] = 1; el.disabled = true;
-  const round = G.round, live = () => view.n === 'fire' && G && G.type === 'fire' && G.round === round;
-  const rk = document.getElementById('rk' + i);
-  rk.style.transition = 'bottom .5s ease-out';
-  requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.bottom = FIRE_HOLD + '%'; rk.classList.add('hover'); }));
-  fxSmoke(i); fxKick();
-  if (!G.st.every(x => x >= 1)) return;
-  const tag = document.querySelector('main .tag'); if (tag) tag.textContent = 'Here they go';
-  setTimeout(() => {
-    if (!live()) return;
-    G.climb = true;
-    G.players.forEach((_, j) => {
-      const r = document.getElementById('rk' + j), h = G.h[j], dur = (h - FIRE_HOLD) / FIRE_SPEED;
-      r.classList.remove('hover'); r.classList.add('climb'); r.style.transition = `bottom ${dur}s linear`; r.style.bottom = `calc(${h}% - .85rem)`;
-      setTimeout(() => {
-        if (!live()) return;
-        G.st[j] = 2; buzz1();
-        fxBoom(j, false); pulse(document.querySelector('.sky'), 'flash');
-        const ln = document.getElementById('ln' + j); if (ln) ln.innerHTML = fireBurst(j);
-        if (G.st.every(x => x === 2)) setTimeout(() => {
-          if (!live()) return;
-          G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
-          const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
-          // a finale over the winner: three big bursts in different shapes, a shake, and confetti in their colour
-          const sky = () => document.querySelector('.sky');
-          fxBoom(G.win, true, 0, 0, 'peony'); pulse(sky(), 'flash'); pulse(sky(), 'shake');
-          setTimeout(() => { if (live()) { fxBoom(G.win, true, -30, 26, 'star'); pulse(sky(), 'flash'); } }, 420);
-          setTimeout(() => { if (live()) { fxBoom(G.win, true, 26, -10, 'willow'); pulse(sky(), 'flash'); fxRain(70, [COL[G.win], '#FFD166', '#FFFFFF']); } }, 860);
-        }, 1300);
-      }, dur * 1000 + 60);
-    });
-  }, 1000);
+  const r = FW.rk[i]; r.ph = 'hold'; r.t = 0; FW.lastLaunch = performance.now();
+  const rk = document.getElementById('rk' + i); if (rk) rk.classList.add('hover');
+  if (!calm()) { const sky = document.querySelector('.sky'), cx = (i + .5) * sky.clientWidth / G.players.length;
+    for (let k = 0; k < 26; k++) FW.p.push({k: 'smoke', x: cx + (R() - .5) * 16, y: sky.clientHeight - 6, vx: (R() - .5) * 110, vy: -8 - R() * 30, g: -6, d: .93, life: 0, max: .8 + R() * .7, s: 5 + R() * 6}); }
+  fwStart();
 };
 const buzz1 = () => { try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} };
 
@@ -2275,6 +2368,7 @@ function after(){
     if (view.left <= 0) { buzz(); return A.grReady(); }
     const c = document.getElementById('clock'); if (c) c.textContent = mmss(view.left);
   }, 1000);
+  if (view.n === 'fire') fwStart();
   const bal = document.getElementById('bal');
   if (bal) requestAnimationFrame(() => requestAnimationFrame(() => bal.style.setProperty('--s', bal.dataset.s)));
   const mks = document.querySelectorAll('.mk[data-x]');
