@@ -74,6 +74,7 @@ strong{font-weight:800}
 
 /* home menu */
 .menu{display:flex; flex-direction:column; gap:12px}
+.menu h2{margin-top:14px}
 .game{
   display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px; width:100%; text-align:left;
   padding:16px 18px; min-height:84px; border-radius:20px; border:2px solid var(--line); background:var(--surface);
@@ -125,6 +126,7 @@ label.field{display:flex; flex-direction:column; gap:6px; font-weight:700}
 .big.sm{font-size:1.75rem}
 .huge{font-size:3.4rem; line-height:1.05; font-weight:800; overflow-wrap:anywhere}
 .tag{display:inline-block; padding:6px 16px; border-radius:20px; background:var(--tint); font-weight:800}
+main>.tag{align-self:flex-start}
 .tag.bad{background:var(--accent); color:var(--on-accent)}
 .tag.good{background:var(--green); color:var(--bg)}
 .hold{
@@ -162,6 +164,87 @@ label.field{display:flex; flex-direction:column; gap:6px; font-weight:700}
 .seg.four button:nth-child(n+3){border-top:2px solid var(--ink)}
 button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 0 3px var(--gold)}
 
+.nums{display:grid; grid-template-columns:repeat(5,1fr); gap:8px}
+.nums button{min-height:58px; border-radius:14px; border:2px solid var(--line); background:var(--surface); font-size:1.3rem; font-weight:800; font-variant-numeric:tabular-nums}
+.nums button.on{background:var(--ink); border-color:var(--ink); color:var(--bg)}
+.nums button:disabled{opacity:.3; text-decoration:line-through; cursor:default}
+
+.bld{background:#2A3442; border-top:12px solid #19202A; border-radius:16px 16px 6px 6px; padding:16px 14px 0}
+.wins{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:10px}
+.win{position:relative; aspect-ratio:5/6; padding:0; border:3px solid #C9D2DC; border-radius:6px; background:#141C26; overflow:hidden; display:block}
+.win.lit{background:#F3CF73} .win.cool{background:#A9D3E0} .win.dim{background:#8A6B3C}
+.win::after{content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(#C9D2DC,#C9D2DC) center/3px 100% no-repeat, linear-gradient(#C9D2DC,#C9D2DC) center/100% 3px no-repeat}
+.win .cl,.win .cr{position:absolute; top:0; bottom:0; width:27%; background:#A8475A}
+.win .cl{left:0} .win .cr{right:0}
+.win em{position:absolute; left:0; right:0; bottom:2px; text-align:center; font-style:normal; font-size:1.15rem; line-height:1}
+.win svg{position:absolute; left:15%; width:70%; bottom:0; height:auto}
+.win svg.h{left:0; top:0; bottom:auto; width:100%; height:100%}
+.win .bl{animation:blink 5s infinite; animation-delay:var(--d)}
+.win .sw{animation:sway 4s ease-in-out infinite; animation-delay:var(--d)}
+.win .gl{position:absolute; left:40%; top:42%; width:5px; height:5px; border-radius:50%; background:#fff; opacity:0; animation:glint 7s infinite; animation-delay:var(--d)}
+.win.tw .cr{animation:twitch 8s infinite; animation-delay:var(--d)}
+.win.flick{animation:flick 3.4s infinite; animation-delay:var(--d)}
+.win.on{box-shadow:0 0 0 4px var(--gold); background:#3B4B5F}
+.win.open{background:#0B1017; border-style:dashed; opacity:.9}
+.win.open::after{display:none}
+.win:disabled{cursor:default}
+.door{width:48px; height:52px; margin:16px auto 0; background:#6B4A32; border:3px solid #C9D2DC; border-bottom:0; border-radius:6px 6px 0 0}
+.peek{width:150px; aspect-ratio:5/6; position:relative; border:4px solid #C9D2DC; border-radius:8px; background:#0B1017; display:flex; align-items:center; justify-content:center; font-size:4rem}
+.peek svg{width:80%; height:auto}
+@keyframes blink{0%,88%,100%{opacity:1} 92%{opacity:0}}
+@keyframes sway{0%,100%{transform:translateX(-2px)} 50%{transform:translateX(2px)}}
+@keyframes glint{0%,90%,100%{opacity:0} 94%{opacity:.8}}
+@keyframes twitch{0%,91%,100%{transform:none} 95%{transform:translateX(-3px)}}
+@keyframes flick{0%,38%,50%,58%,100%{background:#F3CF73} 42%,54%{background:#141C26}}
+@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw{animation:none}}
+
+.grid{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:6px}
+.gc{aspect-ratio:1; padding:0; border:2px solid var(--line); border-radius:12px; background:var(--surface); font-weight:800; line-height:1;
+  font-size:clamp(1rem, calc(56vw / var(--c)), 3.4rem); display:flex; align-items:center; justify-content:center}
+.gc.p0{color:var(--accent)} .gc.p1{color:var(--green)}
+.grid.four{background:var(--tint); padding:8px; border-radius:16px}
+.grid.four .gc{border-radius:50%}
+.grid.four .gc.p0{background:var(--accent); border-color:var(--accent)}
+.grid.four .gc.p1{background:var(--gold); border-color:var(--gold)}
+.gc.hit{box-shadow:0 0 0 4px var(--ink)}
+.cards{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.card{aspect-ratio:3/4; padding:0; border:2px solid var(--ink); border-radius:12px; background:var(--ink); color:var(--bg); font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center}
+.card.up{background:var(--surface); border-color:var(--line); font-size:2.4rem}
+.card.gone{background:var(--tint); border-color:var(--tint); opacity:.45}
+.word{display:flex; flex-wrap:wrap; gap:6px 6px; justify-content:center; font-size:1.9rem; font-weight:800; line-height:1.2}
+.word span{min-width:1.05em; text-align:center; border-bottom:3px solid var(--ink)}
+.word span.sp{border:0; min-width:.7em}
+.keys{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
+.keys button{min-height:52px; padding:0; border-radius:12px; border:2px solid var(--line); background:var(--surface); font-size:1.2rem; font-weight:800}
+.keys button.ok{background:var(--green); border-color:var(--green); color:var(--bg); opacity:1}
+.keys button:disabled{opacity:.3; cursor:default}
+.keys button.ok:disabled{opacity:1}
+.snow{width:150px; height:180px}
+.snow *{fill:var(--surface); stroke:var(--ink); stroke-width:3; stroke-linecap:round}
+.snow .dk{fill:var(--ink)} .snow .nose{fill:#EE7F2D; stroke:none}
+
+.sky{position:relative; height:52vh; min-height:330px; border-radius:18px; overflow:hidden; display:grid; grid-template-columns:repeat(var(--c),1fr);
+  background:radial-gradient(1.5px 1.5px at 12% 18%,#fff 50%,transparent 51%), radial-gradient(1.5px 1.5px at 67% 9%,#fff 50%,transparent 51%), radial-gradient(1px 1px at 38% 30%,#fff 50%,transparent 51%),
+    radial-gradient(1.5px 1.5px at 85% 36%,#fff 50%,transparent 51%), radial-gradient(1px 1px at 24% 52%,#fff 50%,transparent 51%), linear-gradient(#090D22,#1D2756)}
+.lane{position:relative; border-left:1px dashed rgba(255,255,255,.12)}
+.lane:first-child{border-left:0}
+.rocket{position:absolute; left:50%; bottom:0; margin-left:-.85rem; font-size:1.7rem; line-height:1; transform:rotate(-45deg)}
+.burst{position:absolute; left:50%; width:6px; height:6px; margin:0 0 -3px -3px; border-radius:50%; background:currentColor; color:var(--pc); animation:boom .7s ease-out both;
+  box-shadow:0 -30px, 15px -26px, 26px -15px, 30px 0, 26px 15px, 15px 26px, 0 30px, -15px 26px, -26px 15px, -30px 0, -26px -15px, -15px -26px,
+    0 -16px, 11px -11px, 16px 0, 11px 11px, 0 16px, -11px 11px, -16px 0, -11px -11px}
+.lane .alt{position:absolute; left:0; right:0; margin-bottom:-56px; text-align:center; color:#fff; font-size:.8rem; font-weight:800}
+@keyframes boom{from{transform:scale(.1); opacity:1} to{transform:scale(1); opacity:.9}}
+.pads{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:8px}
+.pad2{min-height:64px; padding:6px 4px; border-radius:14px; border:3px solid var(--pc); background:var(--surface); font-weight:800; font-size:.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; touch-action:manipulation}
+.pads.big .pad2{min-height:110px; font-size:1.25rem; background:var(--pc); color:#10161E}
+.pad2:disabled{opacity:.35}
+.sig{min-height:150px; border-radius:18px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; font-size:2.2rem; font-weight:800; background:var(--tint)}
+.sig.wait{background:#7A1C22; color:#fff} .sig.fake{background:#D99A1C; color:#10161E} .sig.go{background:#1F9D5B; color:#fff}
+.balloonbox{height:280px; display:flex; align-items:center; justify-content:center}
+.balloon{font-size:calc(2.6rem * var(--s)); line-height:1; transition:font-size .25s}
+.three{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+
 /* clock and scores */
 .clock{display:flex; flex-direction:column; gap:12px; align-items:stretch; text-align:center}
 #clock{font-size:4.2rem; line-height:1; font-weight:800; font-variant-numeric:tabular-nums; padding:8px 0}
@@ -170,6 +253,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .board td{padding:10px 4px; border-top:2px solid var(--line)}
 .board tr:first-child td{border-top:0}
 .board td:last-child{text-align:right; font-weight:800; font-variant-numeric:tabular-nums}
+.ver{color:var(--muted); font-size:.8rem; text-align:center; opacity:.8}
 ol.steps{margin:0; padding-left:1.4em; display:flex; flex-direction:column; gap:8px}
 #toast{
   position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom)); transform:translateX(-50%); max-width:88vw;
@@ -195,7 +279,7 @@ const WORDS = {
       ['Penguin','A bird that swims but cannot fly','A bird that lives near cold water'],
       ['Elephant','Huge and grey, with a trunk','A very big animal'],
       ['Kiwi','New Zealand\'s night-time bird with a long beak','A bird that cannot fly'],
-      ['Giraffe','The tallest animal, with a very long neck','A tall animal from Africa'],
+      ['Giraffe','The tallest animal, with a very long neck','An animal from Africa'],
       ['Shark','A big fish with lots of sharp teeth','Something that lives in the sea']],
     hard: [
       ['Chameleon','A lizard that changes colour','A small reptile'],
@@ -203,7 +287,7 @@ const WORDS = {
       ['Octopus','Eight arms, and it squirts ink','A sea creature with no bones'],
       ['Hedgehog','Small and spiky, it rolls into a ball','A small animal that comes out at night'],
       ['Albatross','A seabird with enormous wings','A bird that lives by the ocean'],
-      ['Tuatara','An ancient New Zealand reptile, like a living dinosaur','A rare reptile']]
+      ['Tuatara','An ancient New Zealand reptile from the time of the dinosaurs','A rare reptile']]
   },
   'In the garden': {
     easy: [
@@ -244,7 +328,7 @@ const WORDS = {
       ['Couch','A big soft seat for the whole family','A piece of furniture'],
       ['Television','You watch shows on it','Something with a screen'],
       ['Pillow','Soft, and it goes under your head','Something on a bed'],
-      ['Vacuum cleaner','It sucks dirt up from the carpet','A cleaning machine']],
+      ['Vacuum cleaner','It sucks dirt up from the carpet','A noisy household machine']],
     hard: [
       ['Dishwasher','The machine that cleans plates and cups','A kitchen appliance'],
       ['Smoke alarm','It beeps loudly when it senses a fire','Something on the ceiling'],
@@ -258,7 +342,7 @@ const WORDS = {
       ['Football','Kick a round ball into a goal','A team sport'],
       ['Swimming','Racing through the water','A sport without a ball'],
       ['Hide and seek','One person counts and everyone else hides','A playground game'],
-      ['Basketball','Bounce the ball and shoot hoops','A sport with a ball'],
+      ['Basketball','Bounce the ball and shoot hoops','A fast team sport played on a court'],
       ['Skateboard','A board with four wheels','Something you ride'],
       ['Tag','Run away, or you are "it"','A running game']],
     hard: [
@@ -279,7 +363,7 @@ const WORDS = {
       ['Stocking','Hung up to be filled with small presents','Something filled on Christmas Eve']],
     hard: [
       ['Mistletoe','The plant people kiss under','A Christmas plant'],
-      ['Advent calendar','A door to open on each day of December','A countdown to Christmas'],
+      ['Advent calendar','A little door to open each day before Christmas','A countdown to Christmas'],
       ['Christmas cracker','Pull it for a bang, a paper hat and a bad joke','Something on the Christmas table'],
       ['Tinsel','Shiny, sparkly strands','A decoration'],
       ['Pōhutukawa','New Zealand\'s Christmas tree, with red flowers','A tree that blooms in summer'],
@@ -290,7 +374,7 @@ const WORDS = {
       ['Beach','Sand, waves and sandcastles','A place for a summer day'],
       ['School','Teachers, classrooms and lunch breaks','A place you go on weekdays'],
       ['Zoo','Where you visit lots of animals','A place for a day out'],
-      ['Playground','Swings, slides and monkey bars','A place to play'],
+      ['Playground','Swings, slides and monkey bars','A place kids love'],
       ['Supermarket','Trolleys and aisles of food','A kind of shop'],
       ['Library','Shelves full of books to borrow','A quiet place']],
     hard: [
@@ -307,7 +391,7 @@ const WORDS = {
       ['Teacher','Helps children learn at school','Someone who works with kids'],
       ['Doctor','Makes sick people better','Someone who helps people'],
       ['Chef','Cooks in a restaurant','Someone who works with food'],
-      ['Pilot','Flies a plane','Someone who works with machines'],
+      ['Pilot','Flies a plane','Someone who wears a uniform'],
       ['Farmer','Looks after animals and crops','Someone who works outdoors']],
     hard: [
       ['Astronaut','Works in space','Someone who travels for work'],
@@ -318,6 +402,329 @@ const WORDS = {
       ['Lifeguard','Watches over swimmers','Someone who works near water']]
   }
 };
+
+Object.assign(WORDS, {
+  'At the beach': {
+    easy: [
+      ['Sandcastle','Built with a bucket and spade','Something you make at the beach'],
+      ['Seagull','The bird that steals your chips','A noisy bird at the coast'],
+      ['Crab','Walks sideways and has pincers','A beach creature'],
+      ['Towel','You dry yourself with it','Something you take swimming'],
+      ['Seashell','A pretty thing you collect on the sand','Something found on the shore'],
+      ['Sunscreen','Rub it on so you do not burn','Something you pack for the beach']],
+    hard: [
+      ['Jellyfish','Wobbly, see-through and it stings','A sea creature'],
+      ['Surf lifesaver','Watches between the red and yellow flags','Someone at the beach'],
+      ['Rock pool','A small pool left when the tide goes out','A place to explore on the shore'],
+      ['Driftwood','Old wood washed up by the waves','Something found on the sand'],
+      ['Boogie board','A short board you lie on to ride waves','Something for the water'],
+      ['High tide','When the sea comes furthest up the beach','Something the sea does']]
+  },
+  'At school': {
+    easy: [
+      ['Pencil','You write with it and sharpen it','Something on a school desk'],
+      ['Lunchbox','It holds your sandwiches','Something in a school bag'],
+      ['Classroom','The room where your class learns','A place at school'],
+      ['Playtime','When the bell rings and you run outside','A part of the school day'],
+      ['Whiteboard','The teacher writes on it with a marker','Something in a classroom'],
+      ['School bag','You carry it on your back','Something you bring every day']],
+    hard: [
+      ['Assembly','When the whole school sits in the hall','A school event'],
+      ['Homework','School work you do at home','Something teachers give out'],
+      ['Principal','The person in charge of the school','Someone who works at a school'],
+      ['Report card','It tells your parents how you are doing','Something sent home'],
+      ['Science fair','Projects, posters and volcanoes','A school event'],
+      ['Calculator','It does the sums for you','Something used in maths']]
+  },
+  'Getting around': {
+    easy: [
+      ['Bus','Big, with lots of seats and a driver','Something on the road'],
+      ['Aeroplane','It has wings and flies through the sky','A way to travel far'],
+      ['Bicycle','Two wheels and pedals','Something you ride'],
+      ['Train','It runs on tracks','A way to travel'],
+      ['Boat','It floats on the water','Something on the sea'],
+      ['Scooter','You stand on it and push with one foot','Something with wheels']],
+    hard: [
+      ['Helicopter','It has spinning blades on top','Something that flies'],
+      ['Ferry','A boat that carries cars and people across','A way to cross water'],
+      ['Motorbike','Two wheels and an engine','Something fast on the road'],
+      ['Hot air balloon','A basket under a giant balloon','A slow way to fly'],
+      ['Campervan','A van with beds and a kitchen','A holiday vehicle'],
+      ['Tram','It runs on rails along city streets','A way to get around town']]
+  },
+  'Clothes': {
+    easy: [
+      ['Gumboots','Rubber boots for puddles and mud','Something for wet days'],
+      ['Pyjamas','You wear them to bed','Clothes for a certain time of day'],
+      ['Hat','It goes on your head','Something you wear outside'],
+      ['Socks','They go on your feet, under your shoes','Something that comes in pairs'],
+      ['Raincoat','It keeps you dry in the rain','Something for bad weather'],
+      ['Jandals','Flat summer shoes that go flip flop','Something for your feet']],
+    hard: [
+      ['Wetsuit','A tight rubber suit for cold water','Something worn for a sport'],
+      ['Dressing gown','You put it on over your pyjamas','Something worn at home'],
+      ['Tie','It goes around a shirt collar','Something worn to look smart'],
+      ['Onesie','An all-in-one outfit, often with a hood','Something cosy'],
+      ['Apron','It keeps your clothes clean while you cook','Something worn for a job'],
+      ['Swanndri','A thick woollen bush shirt','Something warm to wear outdoors']]
+  },
+  'Weather': {
+    easy: [
+      ['Rainbow','Colours in the sky after rain','Something in the sky'],
+      ['Snow','Cold, white and falls in flakes','A kind of weather'],
+      ['Thunder','The loud rumble in a storm','Something from a storm'],
+      ['Wind','You cannot see it, but it blows your hat off','A kind of weather'],
+      ['Puddle','Water on the ground you can jump in','Something left after rain'],
+      ['Sunshine','It makes the day warm and bright','A kind of weather']],
+    hard: [
+      ['Lightning','A bright flash in a storm','Something from a storm'],
+      ['Hail','Balls of ice that fall from the sky','Something that falls'],
+      ['Fog','A cloud so low you cannot see far','A kind of weather'],
+      ['Frost','White ice on the grass on a cold morning','Something from winter'],
+      ['Nor\'wester','A hot, dry wind in Canterbury','A kind of wind'],
+      ['Tornado','A spinning funnel of wind','A kind of storm']]
+  },
+  'Space': {
+    easy: [
+      ['Moon','It shines at night and changes shape','Something in the night sky'],
+      ['Rocket','It blasts off into space','Something that flies very high'],
+      ['Star','A tiny twinkling light at night','Something in the night sky'],
+      ['Sun','The big hot light in the daytime sky','Something in the sky'],
+      ['Telescope','You look through it to see the stars up close','Something for looking at the sky'],
+      ['Alien','A creature from another planet','Something from a space story']],
+    hard: [
+      ['Saturn','The planet famous for its rings','A planet'],
+      ['Black hole','Nothing can escape it, not even light','Something in deep space'],
+      ['Comet','A ball of ice with a glowing tail','Something that moves through space'],
+      ['Matariki','The star cluster that marks the Māori new year','Something in the night sky'],
+      ['Satellite','It circles the Earth and sends signals','Something in orbit'],
+      ['Milky Way','Our galaxy, a pale band across the sky','Something seen on a dark night']]
+  },
+  'Under the sea': {
+    easy: [
+      ['Dolphin','Clever, friendly and jumps out of the water','A sea animal'],
+      ['Whale','The biggest animal in the ocean','A sea animal'],
+      ['Starfish','It has five arms','A small sea creature'],
+      ['Turtle','It carries a shell and swims slowly','An animal with a shell'],
+      ['Mermaid','Half person, half fish','Someone from a sea story'],
+      ['Seaweed','Slimy plants that grow in the sea','Something growing in the water']],
+    hard: [
+      ['Seahorse','A tiny fish shaped like a horse','A small sea creature'],
+      ['Stingray','Flat, with a long tail','A sea animal'],
+      ['Coral reef','A colourful underwater home for fish','A place in the ocean'],
+      ['Submarine','A ship that travels underwater','Something people ride in'],
+      ['Shipwreck','A sunken ship on the sea floor','Something a diver might find'],
+      ['Crayfish','A spiny shellfish people love to eat','A sea creature with a shell']]
+  },
+  'Music': {
+    easy: [
+      ['Drum','You hit it with sticks','An instrument'],
+      ['Guitar','It has strings you strum','An instrument'],
+      ['Piano','It has black and white keys','An instrument'],
+      ['Singing','Making music with your voice','A way to make music'],
+      ['Recorder','A school instrument you blow','An instrument'],
+      ['Trumpet','Shiny, loud and you blow into it','An instrument']],
+    hard: [
+      ['Ukulele','Like a tiny guitar with four strings','A string instrument'],
+      ['Violin','Played with a bow, under your chin','A string instrument'],
+      ['Bagpipes','A bag, pipes and a very loud sound','An instrument you blow'],
+      ['Conductor','Waves a stick to lead the orchestra','Someone in music'],
+      ['Choir','A big group singing together','A group of performers'],
+      ['Saxophone','A curved, shiny instrument, big in jazz','An instrument you blow']]
+  },
+  'The body': {
+    easy: [
+      ['Nose','You smell with it','A part of your face'],
+      ['Teeth','You chew with them and brush them','Something in your mouth'],
+      ['Knee','It bends in the middle of your leg','A part of your leg'],
+      ['Ears','You hear with them','A part of your head'],
+      ['Hair','It grows on your head and gets cut','Something on your head'],
+      ['Thumb','The short, fat finger','A part of your hand']],
+    hard: [
+      ['Elbow','It bends in the middle of your arm','A part of your arm'],
+      ['Heart','It pumps blood around your body','Something inside you'],
+      ['Eyebrow','The strip of hair above your eye','A part of your face'],
+      ['Skeleton','All of your bones together','Something inside you'],
+      ['Belly button','The little dent in your tummy','A part of your tummy'],
+      ['Funny bone','It tingles when you bump your elbow','A part of your arm']]
+  },
+  'Toys and games': {
+    easy: [
+      ['Teddy bear','A soft, cuddly bear','A toy for bedtime'],
+      ['Ball','Round, and you throw or kick it','A toy for outside'],
+      ['Kite','It flies on a string in the wind','A toy for a windy day'],
+      ['Jigsaw puzzle','Lots of pieces that make a picture','A quiet game'],
+      ['Building blocks','You stack and click them together','A toy you make things with'],
+      ['Bubbles','You blow them and they pop','Something fun outside']],
+    hard: [
+      ['Yo-yo','It goes up and down on a string','A toy you hold'],
+      ['Rubik\'s cube','Twist it until each side is one colour','A puzzle toy'],
+      ['Board game','Dice, counters and taking turns','Something played at a table'],
+      ['Remote control car','You drive it from a distance','A toy with batteries'],
+      ['Pogo stick','You bounce along on it','A toy for jumping'],
+      ['Marbles','Small glass balls you flick','An old-fashioned game']]
+  },
+  'On the farm': {
+    easy: [
+      ['Cow','It moos and gives us milk','A farm animal'],
+      ['Sheep','Woolly, and it says baa','A farm animal'],
+      ['Pig','Pink, and it loves mud','A farm animal'],
+      ['Tractor','The farmer drives it across the paddock','A farm machine'],
+      ['Chicken','It clucks and lays eggs','A farm bird'],
+      ['Horse','You can ride it, and it gallops','A big farm animal']],
+    hard: [
+      ['Sheepdog','It rounds up the flock','A working animal'],
+      ['Shearing shed','Where the wool comes off','A farm building'],
+      ['Hay bale','Dried grass rolled up for winter feed','Something in a paddock'],
+      ['Electric fence','It gives a zap to keep stock in','Something around a paddock'],
+      ['Milking shed','Where the cows go twice a day','A farm building'],
+      ['Quad bike','Four wheels, used to get around the farm','A farm vehicle']]
+  },
+  'In the kitchen': {
+    easy: [
+      ['Spoon','You eat soup or cereal with it','Something in the cutlery drawer'],
+      ['Toaster','It pops up warm bread','A kitchen machine'],
+      ['Oven','You bake cakes in it','Something hot in the kitchen'],
+      ['Cup','You drink from it','Something kept on a kitchen shelf'],
+      ['Kettle','It boils water for a cup of tea','A kitchen machine'],
+      ['Plate','You put your dinner on it','Something on the table']],
+    hard: [
+      ['Whisk','It beats eggs and cream','A baking tool'],
+      ['Microwave','It heats food fast, then beeps','A kitchen appliance'],
+      ['Rolling pin','It flattens pastry and dough','A baking tool'],
+      ['Colander','A bowl with holes for draining pasta','A cooking tool'],
+      ['Tea towel','You dry the dishes with it','Something hanging in the kitchen'],
+      ['Recipe book','It tells you how to make a meal','Something a cook reads']]
+  },
+  'Fairy tales': {
+    easy: [
+      ['Dragon','It breathes fire and guards treasure','A storybook creature'],
+      ['Princess','She lives in a castle and wears a crown','Someone in a fairy tale'],
+      ['Giant','A huge person at the top of a beanstalk','Someone in a fairy tale'],
+      ['Witch','She has a broomstick and a pointy hat','Someone in a spooky story'],
+      ['Unicorn','A horse with one horn','A magical animal'],
+      ['Castle','A big stone home with towers','A place in a fairy tale']],
+    hard: [
+      ['Fairy godmother','She grants wishes with a wand','Someone magical in a story'],
+      ['Glass slipper','The shoe left behind at the ball','Something from a fairy tale'],
+      ['Troll','It lives under a bridge','A storybook creature'],
+      ['Magic beans','Planted, they grow a giant beanstalk','Something from a fairy tale'],
+      ['Big bad wolf','He huffs and puffs','A storybook villain'],
+      ['Spinning wheel','The princess pricked her finger on it','Something from a fairy tale']]
+  },
+  'New Zealand': {
+    easy: [
+      ['Kiwifruit','Brown and fuzzy outside, green inside','A fruit'],
+      ['Haka','A powerful dance done before the rugby','Something people perform'],
+      ['Pūkeko','A blue bird with a red beak and long legs','A bird'],
+      ['Hokey pokey','Vanilla ice cream with crunchy toffee bits','A sweet treat'],
+      ['All Blacks','Our rugby team in the black jersey','A sports team'],
+      ['Silver fern','The leaf on our sports teams\' shirts','A plant']],
+    hard: [
+      ['Marae','A meeting place with a carved house','A special place'],
+      ['Hāngī','Food cooked in a pit in the ground','A way of cooking'],
+      ['Pounamu','Greenstone, often carved and worn','A treasured stone'],
+      ['Kea','A cheeky mountain parrot','A bird'],
+      ['Cook Strait','The water between the two main islands','A stretch of sea'],
+      ['Bach','A small holiday house','A place to stay']]
+  },
+  'Birthday party': {
+    easy: [
+      ['Cake','It has candles you blow out','Something sweet at a party'],
+      ['Balloon','You blow it up and it can pop','A party decoration'],
+      ['Present','Wrapped in paper with a bow','Something you are given'],
+      ['Party hat','A pointy paper hat','Something you wear at a party'],
+      ['Candles','You blow them out and make a wish','Something on the cake'],
+      ['Musical chairs','When the music stops, grab a seat','A party game']],
+    hard: [
+      ['Piñata','Hit it with a stick and lollies fall out','A party game'],
+      ['Pass the parcel','Unwrap a layer when the music stops','A party game'],
+      ['Invitation','It tells you when and where the party is','Something sent before a party'],
+      ['Fairy bread','White bread, butter and sprinkles','A party food'],
+      ['Goody bag','A little bag of treats to take home','Something from a party'],
+      ['Sleepover','Staying the night at a friend\'s house','A kind of party']]
+  },
+  'Camping': {
+    easy: [
+      ['Tent','You sleep in it outdoors','Something you take camping'],
+      ['Campfire','You sit around it and toast marshmallows','Something warm outdoors'],
+      ['Torch','It lights the way in the dark','Something with batteries'],
+      ['Sleeping bag','A warm bag you zip yourself into','Something for bedtime'],
+      ['Marshmallow','Soft, sweet and toasted on a stick','A camping treat'],
+      ['Backpack','You carry your gear in it','Something you take on a walk']],
+    hard: [
+      ['Compass','Its needle always points north','Something for finding your way'],
+      ['Sandfly','A tiny biting insect near water','A camping pest'],
+      ['Gas cooker','A small stove for cooking outdoors','Something you take camping'],
+      ['Long drop','An outdoor toilet over a deep hole','Something at a campsite'],
+      ['Chilly bin','It keeps the food and drinks cold','Something you take on a picnic'],
+      ['Tramping hut','A simple cabin in the bush','A place to sleep outdoors']]
+  },
+  'Creepy crawlies': {
+    easy: [
+      ['Spider','Eight legs and it spins a web','A small creature'],
+      ['Ant','Tiny, and it marches in a line','An insect'],
+      ['Ladybird','Red with black spots','A small beetle'],
+      ['Snail','It carries its house on its back','A slow garden creature'],
+      ['Bee','It buzzes and makes honey','A flying insect'],
+      ['Caterpillar','It munches leaves and becomes a butterfly','A small crawling creature']],
+    hard: [
+      ['Wētā','A big, spiny New Zealand insect','A large insect'],
+      ['Praying mantis','A green insect with folded front legs','An insect that hunts'],
+      ['Centipede','Long, with a great many legs','A fast crawling creature'],
+      ['Cicada','Its loud song fills summer days','A noisy insect'],
+      ['Glow-worm','It lights up cave ceilings','A tiny creature found in dark places'],
+      ['Dragonfly','Long body and four shiny wings, near ponds','A flying insect']]
+  },
+  'Dinosaurs and prehistoric': {
+    easy: [
+      ['T. rex','Huge teeth and tiny arms','A meat-eating dinosaur'],
+      ['Fossil','Old bones turned to stone','Something dug out of the ground'],
+      ['Dinosaur egg','A baby dinosaur hatched from it','Something from long ago'],
+      ['Caveman','A person from the Stone Age','Someone from long ago'],
+      ['Cave painting','Pictures drawn on rock walls long ago','Something very old'],
+      ['Footprint','A mark left where an animal walked','Something left behind']],
+    hard: [
+      ['Triceratops','Three horns and a big frill','A plant-eating dinosaur'],
+      ['Pterodactyl','A flying reptile with skin wings','A prehistoric flyer'],
+      ['Woolly mammoth','A hairy relative of the elephant from the Ice Age','An extinct animal'],
+      ['Moa','A giant New Zealand bird, now extinct','An extinct bird'],
+      ['Stegosaurus','Plates along its back and a spiky tail','A plant-eating dinosaur'],
+      ['Asteroid','The space rock that ended the dinosaurs','Something from space']]
+  },
+  'Sweet treats and drinks': {
+    easy: [
+      ['Chocolate','Brown, sweet and melts in your hand','A sweet treat'],
+      ['Lollipop','A sweet on a stick','A sweet treat'],
+      ['Milkshake','A cold, frothy drink through a straw','A drink'],
+      ['Biscuit','Crunchy, and good dunked in milk','A snack'],
+      ['Jelly','It wobbles on the plate','A dessert'],
+      ['Hot chocolate','A warm, sweet drink for cold days','A drink']],
+    hard: [
+      ['Candy floss','Fluffy spun sugar on a stick','A treat from the show'],
+      ['Lamington','Sponge cake dipped in icing and coconut','A cake'],
+      ['Smoothie','Fruit blended into a thick drink','A drink'],
+      ['Afghan biscuit','Chocolate and cornflakes with a walnut on top','A home baking classic'],
+      ['Pineapple lumps','Chewy pineapple sweets covered in chocolate','A sweet'],
+      ['Lemonade','Fizzy, sweet and a bit sour','A drink']]
+  },
+  'Feelings and actions': {
+    easy: [
+      ['Sneezing','Achoo!','Something your body does'],
+      ['Laughing','What you do when something is funny','Something people do'],
+      ['Sleeping','What you do in bed at night','Something everyone does'],
+      ['Dancing','Moving your body to music','Something fun to do'],
+      ['Hugging','Wrapping your arms around someone','Something friendly'],
+      ['Yawning','Your mouth opens wide when you are tired','Something your body does']],
+    hard: [
+      ['Hiccups','Little jumps in your chest that will not stop','Something your body does'],
+      ['Daydreaming','Staring out the window, thinking of other things','Something people do'],
+      ['Tiptoeing','Walking very quietly on your toes','A way of moving'],
+      ['Whistling','Making a tune with your lips','A way to make a sound'],
+      ['Sleepwalking','Getting out of bed without waking up','Something that happens at night'],
+      ['Blushing','Going red in the face','Something that shows on your face']]
+  }
+});
 
 const TOD = {
   easy: {
@@ -410,6 +817,83 @@ const THEMES = {
     nudge:'straighten it up', caught:'Caught with crumbs on their face', items: PARTY}
 };
 
+const SPOTS = {
+  easy: ['The beach','School','The zoo','The supermarket','A playground','The library','A swimming pool','A farm','The cinema','A birthday party','A hospital','The circus'],
+  hard: ['An airport','A space station','A pirate ship','A submarine','A museum','A ski field','A campground','A restaurant','A train station','A castle','A film set','A police station','A hotel','A rugby stadium']
+};
+
+// [question, right answer, three wrong answers]
+const QUIZ = {
+  easy: [
+    ['How many legs does a spider have?','8','6','10','4'],
+    ['What colour do you get when you mix blue and yellow?','Green','Purple','Orange','Brown'],
+    ['Which planet do we live on?','Earth','Mars','Venus','Jupiter'],
+    ['How many days are in a week?','7','5','6','10'],
+    ['What do bees make?','Honey','Milk','Jam','Butter'],
+    ['Which animal is the tallest?','Giraffe','Elephant','Horse','Camel'],
+    ['What is frozen water called?','Ice','Steam','Fog','Sand'],
+    ['How many sides does a triangle have?','3','4','5','6'],
+    ['Which of these birds cannot fly?','Kiwi','Seagull','Sparrow','Eagle'],
+    ['What do caterpillars turn into?','Butterflies','Frogs','Bees','Worms'],
+    ['Which season comes straight after summer?','Autumn','Spring','Winter','Easter'],
+    ['What is the biggest animal in the sea?','Blue whale','Great white shark','Dolphin','Octopus'],
+    ['How many months are in a year?','12','10','11','52'],
+    ['What is a baby dog called?','Puppy','Kitten','Cub','Calf'],
+    ['Which of these is a fruit?','Apple','Carrot','Potato','Broccoli'],
+    ['What colour is an emerald?','Green','Red','Blue','Yellow'],
+    ['Where does the sun rise?','In the east','In the west','In the north','In the south'],
+    ['How many wheels does a tricycle have?','3','2','4','1'],
+    ['What is a house made of ice blocks called?','Igloo','Tent','Hut','Castle'],
+    ['How many colours are in a rainbow?','7','5','6','8']],
+  hard: [
+    ['What is the capital of Australia?','Canberra','Sydney','Melbourne','Perth'],
+    ['How many bones are in an adult human body?','206','106','186','306'],
+    ['Which planet is closest to the sun?','Mercury','Venus','Mars','Earth'],
+    ['What is the tallest mountain in New Zealand?','Aoraki / Mount Cook','Mount Ruapehu','Mount Taranaki','Mount Aspiring'],
+    ['Which gas do plants take in from the air?','Carbon dioxide','Oxygen','Nitrogen','Helium'],
+    ['Who painted the Mona Lisa?','Leonardo da Vinci','Michelangelo','Pablo Picasso','Vincent van Gogh'],
+    ['How many players does a rugby union team have on the field?','15','11','13','7'],
+    ['Which is the largest ocean?','Pacific','Atlantic','Indian','Arctic'],
+    ['In which year did people first walk on the Moon?','1969','1959','1965','1979'],
+    ['What is the chemical symbol for gold?','Au','Ag','Go','Gd'],
+    ['What is the longest river in New Zealand?','Waikato','Clutha','Whanganui','Waitaki'],
+    ['How many strings does a standard guitar have?','6','4','5','8'],
+    ['What is the hardest natural substance?','Diamond','Gold','Iron','Granite'],
+    ['What is the smallest prime number?','2','0','1','3'],
+    ['Which is the largest planet in our solar system?','Jupiter','Saturn','Neptune','Earth'],
+    ['Who first reached the summit of Everest with Tenzing Norgay?','Sir Edmund Hillary','Captain Scott','Ernest Shackleton','Sir Peter Blake'],
+    ['What is the capital of Japan?','Tokyo','Kyoto','Osaka','Beijing'],
+    ['How many sides does a hexagon have?','6','5','7','8'],
+    ['Which blood cells carry oxygen?','Red blood cells','White blood cells','Platelets','Plasma'],
+    ['At what temperature does water freeze, in degrees Celsius?','0','32','100','-10'],
+    ['Which is the largest lake in New Zealand?','Lake Taupō','Lake Te Anau','Lake Wakatipu','Lake Wānaka'],
+    ['What does a thermometer measure?','Temperature','Speed','Weight','Rainfall']]
+};
+
+const WYR = {
+  easy: [['be able to fly','be invisible'],['have a pet dragon','have a pet unicorn'],['eat only pizza','eat only ice cream'],
+    ['live in a treehouse','live on a boat'],['be as tall as a giraffe','be as small as a mouse'],['have Christmas every week','have a birthday every month'],
+    ['swim with dolphins','ride an elephant'],['talk to animals','speak every language'],['have a slide instead of stairs','have a trampoline for a floor'],
+    ['be a superhero','be a wizard'],['eat broccoli ice cream','eat chocolate-covered carrots'],['have a tail','have wings'],
+    ['go to space','go to the bottom of the sea'],['never have a bath again','never brush your hair again']],
+  hard: [['always be ten minutes late','always be twenty minutes early'],['give up your phone for a month','give up sweets for a year'],
+    ['speak every language','play every instrument'],['live without music','live without films'],
+    ['be famous for something embarrassing','never be known at all'],['have a rewind button for your life','have a pause button for your life'],
+    ['only be able to whisper','only be able to shout'],['cook every family meal for a year','wash every dish for a year'],
+    ['travel 100 years into the past','travel 100 years into the future'],['be the funniest person in the room','be the smartest person in the room'],
+    ['never be cold again','never be hot again'],['have free flights for life','have free food for life'],
+    ['read minds','see one day into the future'],['live in a big city forever','live deep in the country forever']]
+};
+
+const MLT = {
+  easy: ['fall asleep in front of the TV','eat the last biscuit','lose their shoes','laugh at their own joke','talk to a pet like it is a person',
+    'sing in the shower','be first up on Christmas morning','forget where they put something','win a dance competition','make a huge mess while baking',
+    'get the giggles at the wrong time','eat dessert first','become a famous singer','tell the best stories'],
+  hard: ['sleep through an alarm','get lost with a map in their hand','become prime minister','start a food fight','cry at a film',
+    'survive a zombie apocalypse','forget a birthday','go viral by accident','win a reality TV show','argue with a referee',
+    'move overseas','burn the toast','talk their way out of a parking ticket','pack far too much for a weekend away']
+};
+
 const ROLE = {
   wolf: ['🐺','Werewolf','At night, silently agree with any other werewolves on one villager to catch. By day, pretend to be a villager.'],
   seer: ['🔮','Seer','Each night, point at one player. The narrator nods if that player is a werewolf.'],
@@ -423,8 +907,26 @@ const GAMES = {
   grinch: {t:'Grinch', min:3, lv:['12 things to remember','15 things to remember']},
   wolf: {t:'Werewolf', min:4, lv:['Werewolves and villagers only','Adds a seer and a doctor']},
   who: {t:'Who am I?', min:2, lv:['Characters young players know','Famous people and odd jobs']},
-  tod: {t:'Truth or dare', min:2, lv:['Gentle questions and silly dares','Braver questions and bigger dares']}
+  tod: {t:'Truth or dare', min:2, lv:['Gentle questions and silly dares','Braver questions and bigger dares']},
+  spy: {t:'Spot the spy', min:3, lv:['Everyday places','More unusual places']},
+  char: {t:'Charades', min:2, lv:['Simpler words to act out','Trickier words to act out']},
+  quiz: {t:'Quick quiz', min:1, lv:['Questions for younger players','General knowledge']},
+  mlt: {t:'Most likely to', min:3, lv:['Gentle and silly','A bit cheekier']},
+  wyr: {t:'Would you rather', min:2, lv:['Silly choices','Harder choices']},
+  num: {t:'Guess the number', min:2, lv:['A number from 1 to 20','A number from 1 to 50']},
+  agent: {t:'Find the agent', min:2, lv:['20 windows and gentle tricks','30 windows and sneakier tricks']},
+  hang: {t:'Hangman', min:2, lv:['Eight wrong guesses allowed','Six wrong guesses allowed']},
+  oxo: {t:'Noughts and crosses', min:2, lv:['Three in a row on a 3 by 3 board','Four in a row on a 5 by 5 board']},
+  four: {t:'Four in a row', min:2, lv:['Four in a row, 7 columns wide','Five in a row, 9 columns wide']},
+  pairs: {t:'Pairs', min:2, lv:['12 cards','20 cards']},
+  rps: {t:'Rock paper scissors', min:2, lv:['First to 3 wins','First to 5 wins']},
+  fire: {t:'Fireworks', min:2, max:5},
+  pump: {t:'Balloon pump', min:2, lv:['A small balloon','A bigger balloon and longer nerves']},
+  stopc: {t:'Stop the clock', min:2, lv:['Stop at 5 seconds. The clock hides after 3','Stop at 10 seconds. The clock hides after 2']},
+  quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
+
+const VERSION = '1.9'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -481,6 +983,12 @@ const clock = () =>
   `<button class="btn alt" data-act="clockTog" ${view.left === 0 ? 'disabled' : ''}>${view.left === 0 ? 'Time is up' : view.run ? 'Pause' : 'Start the timer'}</button>` +
   `<button class="btn quiet" data-act="clockReset">Reset</button></div></div>`;
 
+const pts = k => S.scores[k] || (S.scores[k] = {});
+function wordList(){
+  let list = [];
+  Object.keys(WORDS).forEach(c => { if (S.cat === 'any' || S.cat === c) list = list.concat(WORDS[c][S.level]); });
+  return list.length ? list : WORDS['Animals'][S.level];
+}
 function board(key){
   const e = Object.entries(S.scores[key] || {}).sort((a, b) => b[1] - a[1]);
   if (!e.length) return '';
@@ -512,15 +1020,32 @@ V.home = () => {
     ['grinch','🎄','Grinch','Something goes missing. Christmas, Easter, Halloween and birthday versions.'],
     ['wolf','🐺','Werewolf','Secret roles, sleepy nights and noisy votes.'],
     ['who','🤔','Who am I?','Twenty questions to guess the name on your forehead.'],
-    ['tod','🎲','Truth or dare','Family-friendly questions and challenges.']];
+    ['tod','🎲','Truth or dare','Family-friendly questions and challenges.'],
+    ['spy','🕶️','Spot the spy','Everyone knows where you are, except the spy.'],
+    ['char','🎭','Charades','Act out as many words as you can in a minute.'],
+    ['quiz','❓','Quick quiz','A question each, and the phone keeps score.'],
+    ['mlt','👉','Most likely to','Count to three and point at the likeliest person.'],
+    ['wyr','⚖️','Would you rather','Vote in secret, then see how the room split.'],
+    ['num','🔢','Guess the number','One player picks a secret number. The phone only says yes or no.'],
+    ['agent','🏢','Find the agent','An agent hides behind one window. Look closely, and do not trust everything you see.']];
+  const minis = [['fire','🎆','Fireworks','Up to five rockets go up. Luck decides whose flies highest.'],
+    ['pump','🎈','Balloon pump','Take turns pumping. Do not be the one who pops it.'],
+    ['stopc','⏱️','Stop the clock','Stop a hidden clock as close to the target as you can.'],
+    ['quick','⚡','Quick draw','Up to five players. First to tap when the screen says go.']];
+  const classics = [['hang','⛄','Hangman','Guess the word a letter at a time, before the snowman is built.'],
+    ['oxo','❌','Noughts and crosses','Three in a row wins.'],
+    ['four','🔴','Four in a row','Drop counters and line up four.'],
+    ['pairs','🃏','Pairs','Turn over two cards and find the matches.'],
+    ['rps','✊','Rock paper scissors','Choose in secret, then reveal together.']];
+  const row = g => `<button class="game" data-act="open" data-g="${g[0]}"><div><b>${g[2]}</b><span>${g[3]}</span></div><i aria-hidden="true">${g[1]}</i></button>`;
   const standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
   const install = standalone ? '' : deferred
     ? `<button class="btn alt" data-act="install">Install on this phone</button>`
     : `<p class="muted">To keep saved draws safe, add this page to your home screen: open the browser's share or menu button, then choose Add to Home Screen.</p>`;
   return `<header class="hero"><h1>Pass the Phone</h1><p>Secret Santa and party games for one phone and a room full of people.</p></header><main><nav class="menu">` +
     `<button class="game main" data-act="open" data-g="santa"><div><b>Secret Santa</b><span>Draw names, then reveal them one person at a time.</span></div><i aria-hidden="true">🎁</i></button>` +
-    games.map(g => `<button class="game" data-act="open" data-g="${g[0]}"><div><b>${g[2]}</b><span>${g[3]}</span></div><i aria-hidden="true">${g[1]}</i></button>`).join('') +
-    `</nav>${install}</main>`;
+    games.map(row).join('') + `<h2>Quick-fire minigames</h2>` + minis.map(row).join('') + `<h2>Two-player classics</h2>` + classics.map(row).join('') +
+    `</nav>${install}<p class="ver">Version ${VERSION}</p></main>`;
 };
 
 /* Secret Santa */
@@ -608,17 +1133,18 @@ V.setup = () => {
     (p.length ? `<p class="muted">${sel.length} playing. Tap a name to add or drop it for this game.</p>` : '') +
     (S.lastPlayers.length ? `<button class="btn alt" data-act="sameAgain">Use the same players as last game</button>` : '') +
     (S.extras.length ? `<button class="btn quiet" data-act="clearExtras" data-confirm="Tap again to remove the extra names">Remove the extra names</button>` : '') + `</section>`;
-  h += `<section><h2>Level</h2><div class="seg"><button class="${S.level === 'easy' ? 'on' : ''}" data-act="level" data-l="easy" aria-pressed="${S.level === 'easy'}">Easy</button>` +
+  if (g.lv) h += `<section><h2>Level</h2><div class="seg"><button class="${S.level === 'easy' ? 'on' : ''}" data-act="level" data-l="easy" aria-pressed="${S.level === 'easy'}">Easy</button>` +
     `<button class="${S.level === 'hard' ? 'on' : ''}" data-act="level" data-l="hard" aria-pressed="${S.level === 'hard'}">Hard</button></div>` +
     `<p class="muted">${g.lv[S.level === 'easy' ? 0 : 1]}. Easy suits the youngest players.</p></section>`;
   if (view.game === 'grinch') h += `<section><h2>Version</h2><div class="seg four">${Object.keys(THEMES).map(k => `<button class="${S.theme === k ? 'on' : ''}" data-act="theme" data-k="${k}" aria-pressed="${S.theme === k}">${THEMES[k].t}</button>`).join('')}</div>` +
     `<p class="muted">${(t => `${t.Crew} guard what is ${t.place}. One of them is secretly ${t.thief}.`)(THEMES[S.theme])}</p></section>`;
-  if (view.game === 'imp') h += `<section><h2>Category</h2><select data-chg="cat" aria-label="Category"><option value="any">Any category</option>` +
+  if (view.game === 'imp' || view.game === 'char' || view.game === 'hang') h += `<section><h2>Category</h2><select data-chg="cat" aria-label="Category"><option value="any">Any category</option>` +
     Object.keys(WORDS).map(c => `<option${S.cat === c ? ' selected' : ''}>${esc(c)}</option>`).join('') + `</select></section>`;
-  if (view.game === 'imp' || view.game === 'wolf') h += `<section><h2>Discussion timer</h2><select data-chg="timer" aria-label="Discussion timer">` +
+  if (view.game === 'imp' || view.game === 'wolf' || view.game === 'spy') h += `<section><h2>Discussion timer</h2><select data-chg="timer" aria-label="Discussion timer">` +
     [60,120,180,300].map(t => `<option value="${t}"${S.timer === t ? ' selected' : ''}>${t / 60} minute${t > 60 ? 's' : ''}</option>`).join('') + `</select></section>`;
-  h += `<section><button class="btn" data-act="start" ${sel.length < g.min ? 'disabled' : ''}>Start</button>` +
-    (sel.length < g.min ? `<p class="muted">This game needs at least ${g.min} players.</p>` : '') + `</section>`;
+  const over = g.max && sel.length > g.max;
+  h += `<section><button class="btn" data-act="start" ${sel.length < g.min || over ? 'disabled' : ''}>Start</button>` +
+    (sel.length < g.min ? `<p class="muted">This game needs at least ${g.min} players.</p>` : over ? `<p class="muted">This game takes up to ${g.max} players. Tap a name to drop it.</p>` : '') + `</section>`;
   return page(view.game === 'grinch' ? THEMES[S.theme].name : g.t, h);
 };
 
@@ -633,20 +1159,20 @@ V.pass = () => {
   return G.type === 'santa' ? page('Secret Santa', body, 'santa') : page(G.th ? G.th.name : GAMES[G.type].t, body, 'home', true);
 };
 
-/* Imposter */
-V.impTalk = () => page('Imposter', `<div class="center"><p class="tag">${esc(G.starter)} starts</p>` +
-  `<p class="lead">Go around the circle. Each player says one thing about the word without giving it away.</p></div>` +
-  clock() + `<button class="btn" data-act="nav" data-to="impVote">Time to vote</button>`, 'home', true);
+/* Imposter and Spot the spy share these */
+V.impTalk = () => page(G.L.t, `<div class="center"><p class="tag">${esc(G.starter)} starts</p><p class="lead">${G.L.talk}</p></div>` +
+  clock() + `<button class="btn" data-act="nav" data-to="impVote">Time to vote</button>` +
+  (G.L.list ? `<section><h2>Possible places</h2><p class="muted">${G.L.list.map(esc).join(', ')}</p></section>` : ''), 'home', true);
 
-V.impVote = () => page('Imposter', `<p class="lead">Count to three and all point. Who got the most votes?</p>` +
+V.impVote = () => page(G.L.t, `<p class="lead">Count to three and all point. Who got the most votes?</p>` +
   `<div class="list">${G.players.map((n, i) => `<button class="row" data-act="impVoted" data-i="${i}"><span>${esc(n)}</span></button>`).join('')}</div>`, 'home', true);
 
 V.impResult = () => {
   const imp = G.players[G.imp], caught = view.vote === G.imp;
-  return page('Imposter', `<div class="center"><p class="tag ${caught ? 'good' : 'bad'}">${caught ? 'Caught' : 'Got away with it'}</p>` +
-    `<p class="lead">The imposter was</p><p class="big">${esc(imp)}</p><p class="lead">The word was <strong>${esc(G.word)}</strong></p>` +
+  return page(G.L.t, `<div class="center"><p class="tag ${caught ? 'good' : 'bad'}">${caught ? 'Caught' : 'Got away with it'}</p>` +
+    `<p class="lead">The ${G.L.who} was</p><p class="big">${esc(imp)}</p><p class="lead">${G.L.secret} was <strong>${esc(G.word)}</strong></p>` +
     `<p class="muted">${caught ? 'Everyone else gets a point.' : `${esc(imp)} gets two points.`}</p></div>` +
-    againBtns('imp') + board('imp'));
+    againBtns(G.type) + board(G.L.key));
 };
 
 /* Grinch */
@@ -728,17 +1254,329 @@ V.tod = () => {
   return page('Truth or dare', b, 'home', true);
 };
 
+/* Charades */
+V.char = () => {
+  const name = G.players[G.turn];
+  let b;
+  if (view.ph === 'ready') b = `<div class="center"><p class="lead">Next to act</p><p class="big">${esc(name)}</p>` +
+    `<p class="lead">Act out each word with no talking and no pointing at things. You have one minute.</p></div><button class="btn" data-act="charStart">Start</button>`;
+  else if (view.ph === 'go') b = `<div class="center"><p class="muted">Only ${esc(name)} looks at the screen</p><p class="huge">${esc(G.deck[G.k % G.deck.length][0])}</p>` +
+    `<div id="clock" role="timer">${mmss(view.left)}</div></div>` +
+    `<div class="pair"><button class="btn" data-act="charGot">Got it</button><button class="btn alt" data-act="charSkip">Skip</button></div><p class="muted">${view.got} so far</p>`;
+  else b = `<div class="center"><p class="tag good">Time is up</p><p class="lead">${esc(name)} got</p><p class="huge">${view.got}</p></div>` +
+    `<button class="btn" data-act="charNext">Next: ${esc(G.players[(G.turn + 1) % G.players.length])}</button>` +
+    `<button class="btn quiet" data-act="open" data-g="char">Change players or settings</button>` + board('char');
+  return page('Charades', b, 'home', true);
+};
+
+/* Quick quiz */
+V.quiz = () => {
+  const name = G.players[G.turn], q = G.deck[G.k % G.deck.length];
+  const b = view.ph === 'ask'
+    ? `<p class="tag">${esc(name)}, this one is yours</p><p class="big sm">${esc(q[0])}</p>` +
+      `<div class="list">${view.opts.map((o, i) => `<button class="row" data-act="quizPick" data-i="${i}"><span>${esc(o)}</span></button>`).join('')}</div>`
+    : `<div class="center"><p class="tag ${view.ok ? 'good' : 'bad'}">${view.ok ? 'Correct' : 'Not quite'}</p><p class="lead">${esc(q[0])}</p><p class="big sm">${esc(q[1])}</p></div>` +
+      `<button class="btn" data-act="quizNext">Next: ${esc(G.players[(G.turn + 1) % G.players.length])}</button>` +
+      `<button class="btn quiet" data-act="open" data-g="quiz">Change players or settings</button>` + board('quiz');
+  return page('Quick quiz', b, 'home', true);
+};
+
+/* Most likely to */
+V.mlt = () => {
+  const q = G.deck[G.k % G.deck.length];
+  const b = view.who == null
+    ? `<div class="center"><p class="lead">Who is most likely to</p><p class="big sm">${esc(q)}?</p></div>` +
+      `<p class="muted">Count to three and all point. Then tap whoever got the most fingers.</p>` +
+      `<div class="list">${G.players.map((n, i) => `<button class="row" data-act="mltPick" data-i="${i}"><span>${esc(n)}</span></button>`).join('')}</div>` +
+      `<button class="btn quiet" data-act="mltNext">Skip this one</button>`
+    : `<div class="center"><p class="lead">Most likely to ${esc(q)}</p><p class="big">${esc(G.players[view.who])}</p></div>` +
+      `<button class="btn" data-act="mltNext">Next one</button>` +
+      `<button class="btn quiet" data-act="open" data-g="mlt">Change players or settings</button>` + board('mlt');
+  return page('Most likely to', b, 'home', true);
+};
+
+/* Would you rather */
+V.wyr = () => {
+  const q = G.deck[G.k % G.deck.length];
+  let b;
+  if (view.votes.length < G.players.length) {
+    const name = G.players[view.votes.length];
+    b = `<div class="center"><p class="tag">${esc(name)}, your choice</p><p class="lead">Would you rather</p></div>` +
+      `<button class="btn" data-act="wyrVote" data-v="0">${esc(q[0])}</button><p class="lead" style="text-align:center">or</p>` +
+      `<button class="btn alt" data-act="wyrVote" data-v="1">${esc(q[1])}</button>` +
+      `<p class="muted">Choose without showing anyone, then pass the phone on. Vote ${view.votes.length + 1} of ${G.players.length}.</p>`;
+  } else {
+    const side = v => G.players.filter((_, i) => view.votes[i] === v);
+    b = [0, 1].map(v => `<section><h2>${side(v).length} would rather ${esc(q[v])}</h2><p class="lead">${side(v).length ? side(v).map(esc).join(', ') : 'Nobody'}</p></section>`).join('') +
+      `<section><button class="btn" data-act="wyrNext">Next question</button><button class="btn quiet" data-act="open" data-g="wyr">Change players or settings</button></section>`;
+  }
+  return page('Would you rather', b, 'home', true);
+};
+
+/* Guess the number */
+// Guessing goes round the circle, starting with the player after the chooser.
+const numGuessers = () => G.players.slice(G.chooser + 1).concat(G.players.slice(0, G.chooser));
+V.num = () => {
+  const chooser = G.players[G.chooser], guessers = numGuessers(), who = guessers[G.g % guessers.length];
+  const grid = (act, off) => `<div class="nums">${Array.from({length: G.max}, (_, i) => i + 1).map(n =>
+    `<button data-act="${act}" data-n="${n}" class="${view.pick === n ? 'on' : ''}" ${off && G.tried.includes(n) ? 'disabled' : ''}>${n}</button>`).join('')}</div>`;
+  let b;
+  if (view.ph === 'hand') b = `<div class="center"><p class="lead">Hand the phone to</p><p class="big">${esc(chooser)}</p>` +
+    `<p class="lead">${esc(chooser)} chooses a secret number from 1 to ${G.max}. Everyone else looks away.</p></div><button class="btn" data-act="numBegin">Choose a number</button>`;
+  else if (view.ph === 'choose') b = `<p class="tag">${esc(chooser)}, choose your number</p>` + grid('numSet') +
+    `<button class="btn" id="lockBtn" data-act="numLock" ${view.pick == null ? 'disabled' : ''}>Lock it in and hide it</button>`;
+  else if (view.ph === 'guess') b = `<p class="tag">${esc(who)}, your guess</p><p class="muted">Guess ${G.tried.length + 1}. Numbers already tried are crossed out.</p>` + grid('numGuess', true);
+  else if (view.ok) b = `<div class="center"><p class="tag good">Yes</p><p class="huge">${view.val}</p><p class="lead">${esc(who)} found ${esc(chooser)}'s number in ${G.tried.length} guess${G.tried.length === 1 ? '' : 'es'}.</p></div>` +
+    `<button class="btn" data-act="numRound">Next round: ${esc(G.players[(G.chooser + 1) % G.players.length])} chooses</button>` +
+    `<button class="btn quiet" data-act="open" data-g="num">Change players or settings</button>` + board('num');
+  else b = `<div class="center"><p class="tag bad">No</p><p class="huge">${view.val}</p><p class="lead">That is not ${esc(chooser)}'s number.</p></div>` +
+    `<button class="btn" data-act="numOn">Next guess: ${esc(guessers[(G.g + 1) % guessers.length])}</button>`;
+  return page('Guess the number', b, 'home', true);
+};
+
+/* Find the agent */
+const agGuessers = () => G.players.slice(G.chooser + 1).concat(G.players.slice(0, G.chooser));
+// A resident's eyes drift towards the agent's window. dx and dy are -1 to 1.
+const faceSVG = (dx, dy, asleep) => `<svg viewBox="0 0 30 34" aria-hidden="true"><path d="M3 34c0-8 5-11 12-11s12 3 12 11z" fill="#4E7FA8"/><circle cx="15" cy="14" r="9.5" fill="#E7B98C"/>` +
+  (asleep ? `<path d="M9 14h5M16 14h5" stroke="#3A2A1E" stroke-width="1.4" stroke-linecap="round"/>`
+    : `<circle cx="11.2" cy="13.5" r="2.9" fill="#fff"/><circle cx="18.8" cy="13.5" r="2.9" fill="#fff"/>` +
+      `<circle cx="${(11.2 + dx * 1.5).toFixed(2)}" cy="${(13.5 + dy * 1.5).toFixed(2)}" r="1.4" fill="#22180F"/><circle cx="${(18.8 + dx * 1.5).toFixed(2)}" cy="${(13.5 + dy * 1.5).toFixed(2)}" r="1.4" fill="#22180F"/>`) + `</svg>`;
+const SIL = `<svg viewBox="0 0 30 34" aria-hidden="true"><path d="M3 34c0-8 5-11 12-11s12 3 12 11z" fill="#141C26"/><circle cx="15" cy="14" r="8" fill="#141C26"/><path d="M6 10h18l-3-3H9z" fill="#141C26"/></svg>`;
+// Red herrings: each looks like someone hiding, and turns out to be something ordinary.
+const H = (body) => `<svg class="h" viewBox="0 0 50 60" preserveAspectRatio="none" aria-hidden="true">${body}</svg>`;
+const HER = {
+  shoes: {set: {bg: 'lit', curt: true}, vis: H('<ellipse cx="4.5" cy="57" rx="3.4" ry="2.2" fill="#15110E"/><ellipse cx="10.5" cy="57" rx="3.4" ry="2.2" fill="#15110E"/>'),
+    inside: ['🥾', 'A pair of boots left to dry under the curtain.']},
+  eyes: {set: {bg: '', curt: false}, vis: H('<g class="bl" fill="#C4F36B"><circle cx="20.5" cy="27" r="1.7"/><circle cx="29.5" cy="27" r="1.7"/></g>'),
+    inside: ['🦉', 'A toy owl with glow-in-the-dark eyes.']},
+  scope: {set: {bg: 'cool', curt: false}, vis: H('<path d="M17 47L37 37" stroke="#1B222C" stroke-width="4.5" stroke-linecap="round"/><path d="M26 44l-5 14M26 44l6 14" stroke="#1B222C" stroke-width="1.6"/>'),
+    inside: ['🔭', 'A telescope pointed at the moon. Nobody is using it.']},
+  sway: {set: {bg: 'lit', curt: false}, vis: H('<g class="sw"><ellipse cx="25" cy="24" rx="8" ry="10" fill="#141C26"/><path d="M19 33h12v27H19z" fill="#141C26" opacity="0"/></g>'),
+    inside: ['🎈', 'A balloon left over from a party, bobbing about.']},
+  paper: {set: {bg: 'lit', curt: false}, vis: H('<rect x="11" y="17" width="28" height="27" fill="#ECE8DC"/><path d="M14 36h22M14 39h22M14 42h14" stroke="#9A958A" stroke-width="1"/><circle cx="20" cy="26" r="1.9" fill="#141C26"/><circle cx="30" cy="26" r="1.9" fill="#141C26"/>'),
+    inside: ['📰', 'Grandad behind his newspaper. The holes are from moths.']},
+  glove: {set: {bg: 'dim', curt: true}, vis: H('<path d="M33 27h5v8h-5a3 3 0 0 1 0-8z" fill="#E7B98C"/><path d="M33 29h4M33 31h4M33 33h4" stroke="#B98A61" stroke-width=".7"/>'),
+    inside: ['🧤', 'A rubber glove pegged to the curtain to dry.']}
+};
+function agInside(c){
+  if (c.her) return [`<span aria-hidden="true">${HER[c.her].inside[0]}</span>`, HER[c.her].inside[1]];
+  if (c.sil) return ['<span aria-hidden="true">🧥</span>', 'Only a coat and hat on a stand.'];
+  if (c.deco === 'cat') return ['<span aria-hidden="true">🐈</span>', 'Only the cat.'];
+  if (c.res === 'asleep') return [faceSVG(0, 0, true), 'Someone fast asleep. Not the agent.'];
+  if (c.res) return [faceSVG(c.dx, c.dy), 'Someone is home, but it is not the agent.'];
+  if (c.deco === 'plant') return ['<span aria-hidden="true">🪴</span>', 'Just a pot plant.'];
+  return ['', 'An empty room.'];
+}
+function agBuild(pos){
+  const hard = G.cols === 5, n = G.cols * G.rows, bgs = ['', '', 'lit', 'lit', 'cool', 'dim'];
+  const ar = Math.floor(pos / G.cols), ac = pos % G.cols;
+  const cells = Array.from({length: n}, (_, i) => {
+    const r = Math.floor(i / G.cols), c = i % G.cols, len = Math.hypot(ac - c, ar - r) || 1;
+    const deco = [null, null, null, 'plant', 'cat'][rnd(5)];
+    return {bg: bgs[rnd(bgs.length)], curt: Math.random() < .5, deco, res: deco === 'cat' ? null : Math.random() < .55 ? (hard && Math.random() < .3 ? 'asleep' : 'awake') : null,
+      dx: (ac - c) / len, dy: (ar - r) / len, d: (-Math.random() * 8).toFixed(1), open: false};
+  });
+  Object.assign(cells[pos], {curt: true, tw: true, gl: true, deco: null, res: null, bg: bgs[rnd(bgs.length)]});
+  const rest = shuffle(cells.map((_, i) => i).filter(i => i !== pos));
+  let k = 0;
+  const take = (count, props) => { for (let j = 0; j < count; j++) Object.assign(cells[rest[k++]], props); };
+  take(hard ? 3 : 2, {sil: true, bg: 'lit', curt: false, deco: null, res: null});   // a figure that turns out to be a coat stand
+  take(hard ? 2 : 1, {flick: true, bg: 'lit'});
+  shuffle(Object.keys(HER)).slice(0, hard ? 5 : 3).forEach(h => take(1, Object.assign({her: h, deco: null, res: null}, HER[h].set)));                                        // a light on the blink
+  if (hard) { take(2, {tw: true, curt: true}); take(1, {gl: true}); }                 // half of the real giveaway, never both
+  return cells;
+}
+function agBuilding(play){
+  const cell = (c, i) => {
+    const lab = `Window ${i % G.cols + 1}, floor ${G.rows - Math.floor(i / G.cols)}`;
+    if (!play) return `<button class="win${view.pick === i ? ' on' : ''}" data-act="agSet" data-i="${i}" aria-label="${lab}"></button>`;
+    if (c.open) return `<button class="win open" disabled aria-label="${lab}, already checked">${agInside(c)[0].replace('<span', '<em').replace('</span>', '</em>')}</button>`;
+    return `<button class="win ${c.bg}${c.flick ? ' flick' : ''}${c.tw ? ' tw' : ''}" style="--d:${c.d}s" data-act="agGuess" data-i="${i}" aria-label="${lab}">` +
+      (c.curt ? '<i class="cl"></i><i class="cr"></i>' : '') + (c.sil ? SIL : '') + (c.her ? HER[c.her].vis : '') + (c.deco ? `<em aria-hidden="true">${c.deco === 'cat' ? '🐈' : '🪴'}</em>` : '') + (c.gl ? '<b class="gl"></b>' : '') + `</button>`;
+  };
+  const cells = play ? G.cells : Array.from({length: G.cols * G.rows});
+  return `<div class="bld"><div class="wins" style="--c:${G.cols}">${cells.map(cell).join('')}</div><div class="door"></div></div>`;
+}
+V.agent = () => {
+  const chooser = G.players[G.chooser], gs = agGuessers(), who = gs[G.g % gs.length];
+  let b;
+  if (view.ph === 'hand') b = `<div class="center"><p class="lead">Hand the phone to</p><p class="big">${esc(chooser)}</p>` +
+    `<p class="lead">${esc(chooser)} hides the agent behind one window. Everyone else looks away.</p></div><button class="btn" data-act="agBegin">Choose a window</button>`;
+  else if (view.ph === 'choose') b = `<p class="tag">${esc(chooser)}, choose a window</p>` + agBuilding(false) +
+    `<button class="btn" id="lockBtn" data-act="agLock" ${view.pick == null ? 'disabled' : ''}>Hide the agent here</button>`;
+  else if (view.ph === 'guess') b = `<p class="tag">${esc(who)}, your guess</p>` +
+    `<p class="muted">Watch the building for a while. One window gives the agent away, and some windows are trying to fool you.</p>` + agBuilding(true);
+  else if (view.ok) b = `<div class="center"><p class="tag good">Found</p><p class="huge" aria-hidden="true">🕵️</p>` +
+    `<p class="lead">${esc(who)} found the agent in ${G.tries} guess${G.tries === 1 ? '' : 'es'}.</p></div>` +
+    `<button class="btn" data-act="agRound">Next round: ${esc(G.players[(G.chooser + 1) % G.players.length])} hides</button>` +
+    `<button class="btn quiet" data-act="open" data-g="agent">Change players or settings</button>` + board('agent');
+  else { const ins = agInside(G.cells[view.val]);
+    b = `<div class="center"><p class="tag bad">Not here</p><div class="peek">${ins[0]}</div><p class="lead">${ins[1]}</p></div>` +
+      `<button class="btn" data-act="agOn">Next guess: ${esc(gs[(G.g + 1) % gs.length])}</button>`; }
+  return page('Find the agent', b, 'home', true);
+};
+
+/* ----- Two-player classics ----- */
+// With more than two players the winner stays on and the next player steps in.
+const duelPeek = loser => G.bench.length ? [G.pair[1 - Math.max(loser, 0)], G.bench[0]] : [G.pair[1], G.pair[0]];
+function duelNext(loser){
+  if (G.bench.length) { const l = Math.max(loser, 0); G.bench.push(G.pair[l]); G.pair = [G.pair[1 - l], G.bench.shift()]; }
+  else G.pair.reverse();
+}
+const duelBtns = (loser, key) => { const nx = duelPeek(loser);
+  return `<button class="btn" data-act="duelAgain">Next game: ${esc(nx[0])} v ${esc(nx[1])}</button>` +
+    `<button class="btn quiet" data-act="open" data-g="${G.type}">Change players or settings</button>` + board(key); };
+
+/* Noughts and crosses, and Four in a row */
+function gridNew(){
+  const hard = S.level === 'hard';
+  Object.assign(G, G.type === 'four' ? {w: hard ? 9 : 7, h: hard ? 7 : 6, k: hard ? 5 : 4} : {w: hard ? 5 : 3, h: hard ? 5 : 3, k: hard ? 4 : 3});
+  G.cells = Array(G.w * G.h).fill(null); G.turn = 0; G.done = false; G.hit = []; G.winner = -1;
+}
+function gridWin(i){
+  const x = i % G.w, y = Math.floor(i / G.w), p = G.cells[i];
+  for (const [dx, dy] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+    const line = [i];
+    for (const sg of [1, -1]) { let cx = x + dx * sg, cy = y + dy * sg;
+      while (cx >= 0 && cx < G.w && cy >= 0 && cy < G.h && G.cells[cy * G.w + cx] === p) { line.push(cy * G.w + cx); cx += dx * sg; cy += dy * sg; } }
+    if (line.length >= G.k) return line;
+  }
+  return null;
+}
+V.grid = () => {
+  const four = G.type === 'four', mark = four ? ['red', 'yellow'] : ['✕', '○'], name = G.pair[G.turn];
+  const head = G.done ? `<p class="tag ${G.winner >= 0 ? 'good' : ''}">${G.winner >= 0 ? esc(G.pair[G.winner]) + ' wins' : 'A draw'}</p>`
+    : `<p class="tag">${esc(name)}, your turn (${mark[G.turn]})</p>`;
+  const b = head + `<div class="grid ${four ? 'four' : 'oxo'}" style="--c:${G.w}">${G.cells.map((v, i) =>
+      `<button class="gc${v === null ? '' : ' p' + v}${G.hit.includes(i) ? ' hit' : ''}" data-act="gridTap" data-i="${i}" aria-label="Column ${i % G.w + 1}, row ${Math.floor(i / G.w) + 1}${v === null ? '' : ', ' + esc(G.pair[v])}">${four || v === null ? '' : mark[v]}</button>`).join('')}</div>` +
+    `<p class="muted">${esc(G.pair[0])} is ${mark[0]}, ${esc(G.pair[1])} is ${mark[1]}. ${G.k} in a row wins.${four ? ' Tap a column to drop a counter.' : ''}</p>` +
+    (G.done ? duelBtns(G.winner < 0 ? -1 : 1 - G.winner, G.type) : '');
+  return page(GAMES[G.type].t, b, 'home', true);
+};
+
+/* Pairs */
+V.pairs = () => {
+  const name = G.players[G.turn % G.players.length];
+  const tally = G.players.map(n => `${esc(n)} ${G.got[n] || 0}`).join(', ');
+  const b = (G.done ? `<p class="tag good">${esc(G.winners.join(' and '))} ${G.winners.length > 1 ? 'share the win' : 'wins'}</p>` : `<p class="tag">${esc(name)}, turn over two cards</p>`) +
+    `<div class="cards">${G.cards.map((c, i) => `<button class="card${c.gone ? ' up gone' : c.up ? ' up' : ''}" data-act="pairTap" data-i="${i}" aria-label="Card ${i + 1}${c.up || c.gone ? ', ' + c.e[1] : ''}" ${c.gone ? 'disabled' : ''}>${c.up || c.gone ? c.e[0] : '?'}</button>`).join('')}</div>` +
+    `<p class="lead">Pairs found: ${tally}</p>` +
+    (G.done ? `<button class="btn" data-act="again">Play again with the same players</button><button class="btn quiet" data-act="open" data-g="pairs">Change players or settings</button>` + board('pairs') : `<p class="muted">Find a pair and you go again.</p>`);
+  return page('Pairs', b, 'home', true);
+};
+
+/* Rock paper scissors */
+const RPS = [['✊', 'Rock'], ['✋', 'Paper'], ['✌️', 'Scissors']];
+V.rps = () => {
+  let b;
+  if (view.ph === 'pick') { const name = G.pair[G.picks.length];
+    b = `<div class="center"><p class="tag">${esc(name)}, choose in secret</p><p class="muted">${G.picks.length ? 'Your opponent has chosen.' : 'Then pass the phone across.'} First to ${G.target}.</p></div>` +
+      RPS.map((r, i) => `<button class="btn alt" data-act="rpsPick" data-i="${i}"><span aria-hidden="true">${r[0]}</span>&nbsp; ${r[1]}</button>`).join(''); }
+  else { const [a, c] = G.picks, w = view.w, over = G.sc[0] >= G.target || G.sc[1] >= G.target;
+    b = `<div class="center"><p class="tag ${w < 0 ? '' : 'good'}">${w < 0 ? 'Same again, no point' : esc(G.pair[w]) + (over ? ' wins the match' : ' takes it')}</p>` +
+      `<div class="pair"><div><p class="huge" aria-hidden="true">${RPS[a][0]}</p><p class="lead">${esc(G.pair[0])}<br>${RPS[a][1]}</p></div><div><p class="huge" aria-hidden="true">${RPS[c][0]}</p><p class="lead">${esc(G.pair[1])}<br>${RPS[c][1]}</p></div></div>` +
+      `<p class="big sm">${G.sc[0]} to ${G.sc[1]}</p></div>` +
+      (over ? duelBtns(G.sc[0] > G.sc[1] ? 1 : 0, 'rps') : `<button class="btn" data-act="rpsOn">Next throw</button>`); }
+  return page('Rock paper scissors', b, 'home', true);
+};
+
+/* Hangman, drawn as a snowman that gets built with each wrong guess */
+const isLetter = ch => /\p{L}/u.test(ch);
+const flat = ch => ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+const hangGuessers = () => G.auto ? G.players : G.players.slice(G.setter + 1).concat(G.players.slice(0, G.setter));
+function snowman(stage){
+  const parts = ['<circle cx="50" cy="96" r="21"/>', '<circle cx="50" cy="63" r="15"/>', '<circle cx="50" cy="40" r="11"/>', '<path d="M36 60L18 47"/>', '<path d="M64 60L82 47"/>',
+    '<circle class="dk" cx="46" cy="38" r="1"/><circle class="dk" cx="54" cy="38" r="1"/>', '<path class="nose" d="M50 41l11 3-11 2z"/>', '<path class="dk" d="M39 30h22M42 30V18h16v12z"/>'];
+  return `<svg class="snow" viewBox="0 0 100 120" role="img" aria-label="Snowman, ${stage} of 8 parts built">${parts.slice(0, stage).join('')}</svg>`;
+}
+V.hang = () => {
+  const setter = G.players[G.setter];
+  let b;
+  if (view.ph === 'hand') b = `<div class="center"><p class="lead">Hand the phone to</p><p class="big">${esc(setter)}</p><p class="lead">${esc(setter)} sets the word. Everyone else looks away.</p></div>` +
+    `<button class="btn" data-act="hangType">Type a secret word</button><button class="btn alt" data-act="hangAuto">Let the phone choose, and everyone guesses</button>`;
+  else if (view.ph === 'type') b = `<p class="tag">${esc(setter)}, type your word</p>` +
+    `<input id="hw" type="text" maxlength="24" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-enter="hangSet" aria-label="Secret word or short phrase">` +
+    `<p class="muted">A word or short phrase, up to 24 letters.</p><button class="btn" data-act="hangSet">Hide it and start</button>`;
+  else {
+    const gs = hangGuessers(), who = gs[G.g % gs.length], left = G.max - G.wrong, letters = [...G.word];
+    const word = `<div class="word" aria-label="The word so far">${letters.map(ch => ch === ' ' ? '<span class="sp"></span>' : `<span>${!isLetter(ch) || G.done || G.tried.includes(flat(ch)) ? esc(ch.toUpperCase()) : '&nbsp;'}</span>`).join('')}</div>`;
+    const inWord = L => letters.some(ch => isLetter(ch) && flat(ch) === L);
+    const head = G.done ? `<p class="tag ${G.solved ? 'good' : 'bad'}">${G.solved ? 'Solved' : 'The snowman is finished'}</p>` : `<p class="tag">${esc(who)}, pick a letter</p>`;
+    b = `<div class="center">${head}${snowman(Math.ceil(G.wrong / G.max * 8))}</div>` + word +
+      (G.done ? `<p class="lead" style="text-align:center">${G.solved ? 'The guessers get a point each.' : G.auto ? 'Nobody scores this time.' : esc(setter) + ' gets a point.'}</p>` +
+          `<button class="btn" data-act="hangNext">Next word: ${esc(G.players[(G.setter + 1) % G.players.length])} sets it</button>` +
+          `<button class="btn quiet" data-act="open" data-g="hang">Change players or settings</button>` + board('hang')
+        : `<p class="muted" style="text-align:center">${left} wrong guess${left === 1 ? '' : 'es'} left</p>` +
+          `<div class="keys">${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(L => `<button data-act="hangKey" data-k="${L}" class="${G.tried.includes(L) && inWord(L) ? 'ok' : ''}" ${G.tried.includes(L) ? 'disabled' : ''}>${L}</button>`).join('')}</div>`);
+  }
+  return page('Hangman', b, 'home', true);
+};
+
+/* ----- Quick-fire minigames ----- */
+const COL = ['#FF6B6B', '#FFD166', '#6BCB77', '#4D96FF', '#C77DFF'];
+
+/* Fireworks */
+function fireNew(){
+  const pool = shuffle(Array.from({length: 66}, (_, i) => i + 28));   // every height is different, so there is never a tie
+  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.round = (G.round || 0) + 1;
+}
+const fireBurst = i => `<div class="burst" style="bottom:${G.h[i]}%"></div><span class="alt" style="bottom:${G.h[i]}%">${G.h[i]} m${G.done && i === G.win ? ' 👑' : ''}</span>`;
+V.fire = () => {
+  const n = G.players.length;
+  const b = `<p class="tag ${G.done ? 'good' : ''}">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : 'Everyone, launch your rocket'}</p>` +
+    `<div class="sky" style="--c:${n}">${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}</div>` +
+    `<div class="pads" style="--c:${n}">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="fireGo" data-i="${i}" ${G.st[i] ? 'disabled' : ''}>${esc(p)}</button>`).join('')}</div>` +
+    (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name to launch. Nobody knows how high each rocket will go.</p>`);
+  return page('Fireworks', b, 'home', true);
+};
+
+/* Balloon pump */
+V.pump = () => {
+  const name = G.players[G.turn % G.players.length];
+  const b = G.done
+    ? `<div class="center"><p class="tag bad">${esc(G.loser)} popped it</p><p class="huge" aria-hidden="true">💥</p><p class="lead">It burst on pump ${G.size}. Everyone else gets a point.</p></div>` + againBtns('pump') + board('pump')
+    : `<p class="tag">${esc(name)}, how many pumps?</p><div class="balloonbox"><div class="balloon" style="--s:${(1 + G.size * (S.level === 'easy' ? .13 : .07)).toFixed(2)}" aria-hidden="true">🎈</div></div>` +
+      `<div class="three">${[1, 2, 3].map(k => `<button class="btn${k === 1 ? '' : ' alt'}" data-act="pumpGo" data-k="${k}">${k}</button>`).join('')}</div>` +
+      `<p class="muted">Pump one, two or three times, then pass the phone on. ${G.size} pump${G.size === 1 ? '' : 's'} so far.</p>`;
+  return page('Balloon pump', b, 'home', true);
+};
+
+/* Stop the clock */
+V.stopc = () => {
+  const name = G.players[G.i], T = G.target;
+  let b;
+  if (view.ph === 'ready') b = `<div class="center"><p class="lead">Next up</p><p class="big">${esc(name)}</p><p class="lead">Stop the clock as close to ${T} seconds as you can.</p>` +
+    `<p class="muted">The clock disappears after ${G.hide} seconds, so keep counting in your head.</p></div><button class="btn" data-down="stopGo">Start the clock</button>`;
+  else if (view.ph === 'run') b = `<div class="center"><p class="tag">${esc(name)}, aim for ${T}.00</p><div id="clock" role="timer">0.00</div></div><button class="btn" style="min-height:120px" data-down="stopHit">Stop</button>`;
+  else if (view.ph === 'shown') { const t = G.times[G.i], d = t - T;
+    b = `<div class="center"><p class="lead">${esc(name)} stopped at</p><p class="huge">${t.toFixed(2)}</p><p class="tag">${Math.abs(d) < .005 ? 'Dead on' : Math.abs(d).toFixed(2) + (d > 0 ? ' over' : ' under')}</p></div>` +
+      `<button class="btn" data-act="stopNext">${G.i + 1 < G.players.length ? 'Next: ' + esc(G.players[G.i + 1]) : 'See who was closest'}</button>`; }
+  else { const rank = G.players.map((p, i) => ({p, t: G.times[i], d: Math.abs(G.times[i] - T)})).sort((a, c) => a.d - c.d);
+    b = `<div class="center"><p class="tag good">${esc(rank[0].p)} was closest</p></div><table class="board">${rank.map(r => `<tr><td>${esc(r.p)}</td><td>${r.t.toFixed(2)}</td></tr>`).join('')}</table>` +
+      `<p class="muted">The target was ${T}.00 seconds.</p>` + againBtns('stopc') + board('stopc'); }
+  return page('Stop the clock', b, 'home', true);
+};
+
+/* Quick draw */
+V.quick = () => {
+  const st = G.state, sig = {idle: 'Fingers ready', wait: 'Wait for it', fake: 'Not yet', go: 'Go!'}[st];
+  const head = st === 'done' ? `<p class="tag ${G.win >= 0 ? 'good' : 'bad'}">${G.win >= 0 ? `${esc(G.players[G.win])} was fastest, in ${G.ms} ms` : 'Everyone jumped the gun'}</p>` : `<div class="sig ${st}" aria-live="assertive">${sig}</div>`;
+  const b = head + `<div class="pads big" style="--c:2">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="quickTap" data-i="${i}" ${G.out.includes(i) ? 'disabled' : ''}>${esc(p)}${G.out.includes(i) ? ' (too soon)' : ''}</button>`).join('')}</div>` +
+    (st === 'idle' ? `<button class="btn" data-act="quickStart">Start</button><p class="muted">Each player rests a finger near their own name. Tap when the screen says go. Tap early and you are out.</p>` : '') +
+    (st === 'done' ? againBtns('quick') + board('quick') : '');
+  return page('Quick draw', b, 'home', true);
+};
+
 /* ---------- game starters ---------- */
 function startGame(type, players){
   if (type === 'imp') {
-    let list = [];
-    Object.keys(WORDS).forEach(c => { if (S.cat === 'any' || S.cat === c) list = list.concat(WORDS[c][S.level]); });
-    if (!list.length) list = WORDS['Animals'][S.level];
+    const list = wordList();
     let fresh = list.filter(e => !used.has(e[0]));
     if (!fresh.length) { list.forEach(e => used.delete(e[0])); fresh = list; }
     const e = fresh[rnd(fresh.length)]; used.add(e[0]);
     const imp = rnd(players.length);
     G = {type, players, word: e[0], imp, starter: players[rnd(players.length)], scored: false,
+      L: {t:'Imposter', who:'imposter', secret:'The word', key:'imp', talk:'Go around the circle. Each player says one thing about the word without giving it away.'},
       cards: players.map((name, i) => ({name, html: i === imp
         ? `<p class="tag bad">You are the imposter</p><p class="lead">You do not get the word. Your clue is</p><p class="big sm">${esc(e[2])}</p><p class="muted">Blend in, and try to work out the word.</p>`
         : `<p class="tag">The secret word</p><p class="big">${esc(e[0])}</p><p class="lead">${esc(e[1])}</p><p class="muted">One of the others is an imposter with a different clue.</p>`})),
@@ -774,6 +1612,39 @@ function startGame(type, players){
       after: () => go('wolf', {left: S.timer, total: S.timer, run: false, roles: false})};
     return go('pass', {i: 0, shown: false, pick: null});
   }
+  if (type === 'spy') {
+    const list = SPOTS[S.level];
+    let fresh = list.filter(x => !used.has(x));
+    if (!fresh.length) { list.forEach(x => used.delete(x)); fresh = list; }
+    const place = fresh[rnd(fresh.length)]; used.add(place);
+    const spy = rnd(players.length);
+    G = {type, players, word: place, imp: spy, starter: players[rnd(players.length)], scored: false,
+      L: {t:'Spot the spy', who:'spy', secret:'The place', key:'spy', list,
+        talk:'Take turns asking each other questions about where you are. Answer without giving the place away.'},
+      cards: players.map((name, i) => ({name, html: i === spy
+        ? `<p class="tag bad">You are the spy</p><p class="lead">Everyone else knows where you all are. You do not.</p><p class="muted">Listen to the answers, work out the place, and do not get caught.</p>`
+        : `<p class="tag">You are all at</p><p class="big">${esc(place)}</p><p class="muted">One player is a spy who does not know this. Answer questions without making it obvious.</p>`})),
+      after: () => go('impTalk', {left: S.timer, total: S.timer, run: false})};
+    return go('pass', {i: 0, shown: false, pick: null});
+  }
+  if (type === 'char') { G = {type, players, turn: 0, k: 0, deck: shuffle(wordList())}; return go('char', {ph: 'ready'}); }
+  if (type === 'quiz') { G = {type, players, turn: 0, k: 0, deck: shuffle(QUIZ[S.level])}; return go('quiz', {ph: 'ask', opts: shuffle(G.deck[0].slice(1))}); }
+  if (type === 'mlt') { G = {type, players, k: 0, deck: shuffle(MLT[S.level])}; return go('mlt', {who: null}); }
+  if (type === 'wyr') { G = {type, players, k: 0, deck: shuffle(WYR[S.level])}; return go('wyr', {votes: []}); }
+  if (type === 'num') { G = {type, players, chooser: 0, g: 0, tried: [], secret: null, max: S.level === 'easy' ? 20 : 50}; return go('num', {ph: 'hand', pick: null}); }
+  if (type === 'agent') { const hard = S.level === 'hard'; G = {type, players, chooser: 0, g: 0, tries: 0, cols: hard ? 5 : 4, rows: hard ? 6 : 5, cells: null, pos: null}; return go('agent', {ph: 'hand', pick: null}); }
+  if (type === 'oxo' || type === 'four') { G = {type, pair: [players[0], players[1]], bench: players.slice(2)}; gridNew(); return go('grid', {}); }
+  if (type === 'rps') { G = {type, pair: [players[0], players[1]], bench: players.slice(2), target: S.level === 'easy' ? 3 : 5, sc: [0, 0], picks: []}; return go('rps', {ph: 'pick'}); }
+  if (type === 'pairs') {
+    const n = S.level === 'easy' ? 6 : 10, pick = shuffle(GIFTS).slice(0, n);
+    G = {type, players, turn: 0, open: [], lock: false, got: {}, done: false, winners: [], cards: shuffle(pick.concat(pick)).map(e => ({e, up: false, gone: false}))};
+    return go('pairs', {});
+  }
+  if (type === 'hang') { G = {type, players, setter: 0, word: '', tried: [], wrong: 0, g: 0, max: S.level === 'easy' ? 8 : 6, auto: false, done: false}; return go('hang', {ph: 'hand'}); }
+  if (type === 'fire') { G = {type, players}; fireNew(); return go('fire', {}); }
+  if (type === 'pump') { const easy = S.level === 'easy'; G = {type, players, turn: 0, size: 0, pop: easy ? 6 + rnd(10) : 10 + rnd(21), done: false}; return go('pump', {}); }
+  if (type === 'stopc') { const easy = S.level === 'easy'; G = {type, players, i: 0, times: [], target: easy ? 5 : 10, hide: easy ? 3 : 2}; return go('stopc', {ph: 'ready'}); }
+  if (type === 'quick') { G = {type, players, out: [], state: 'idle', win: -1, ms: 0, round: (G && G.round || 0) + 1}; return go('quick', {}); }
   if (type === 'who') {
     G = {type, players, turn: 0, k: 0, deck: shuffle(WHO[S.level])};
     return go('who', {ph: 'ready', q: 0});
@@ -876,7 +1747,7 @@ A.addExtra = () => {
 A.sameAgain = () => { const p = pool(); S.lastPlayers.forEach(n => { if (!has(p, n)) S.extras.push(n); }); S.selected = S.lastPlayers.slice(); save(); toast('Same players as last game'); render(); };
 A.clearExtras = () => { S.extras = []; save(); render(); };
 A.level = el => { S.level = el.dataset.l; save(); render(); };
-A.start = () => { const players = selected(); if (players.length < GAMES[view.game].min) return; S.lastPlayers = players.slice(); save(); startGame(view.game, players); };
+A.start = () => { const players = selected(); if (players.length < GAMES[view.game].min || players.length > (GAMES[view.game].max || 99)) return; S.lastPlayers = players.slice(); save(); startGame(view.game, players); };
 A.again = () => startGame(G.type, G.players);
 
 // clock
@@ -896,7 +1767,7 @@ A.clockReset = () => { clearInterval(tick); tick = null; view.left = view.total;
 A.impVoted = el => {
   const v = +el.dataset.i;
   if (!G.scored) {
-    G.scored = true; const sc = S.scores.imp;
+    G.scored = true; const sc = pts(G.L.key);
     if (v === G.imp) G.players.forEach((n, i) => { if (i !== G.imp) sc[n] = (sc[n] || 0) + 1; });
     else sc[G.players[G.imp]] = (sc[G.players[G.imp]] || 0) + 2;
     save();
@@ -935,10 +1806,209 @@ A.whoStart = () => {
 A.whoQ = () => { if (view.q < 20) view.q++; render(); };
 A.whoEnd = el => {
   view.ok = el.dataset.ok === '1'; view.ph = 'done';
-  if (view.ok) { const n = G.players[G.turn]; S.scores.who[n] = (S.scores.who[n] || 0) + 1; save(); }
+  if (view.ok) { const n = G.players[G.turn]; pts('who')[n] = (pts('who')[n] || 0) + 1; save(); }
   render();
 };
 A.whoNext = () => { G.turn = (G.turn + 1) % G.players.length; G.k++; if (G.k % G.deck.length === 0) G.deck = shuffle(G.deck); go('who', {ph: 'ready', q: 0}); };
+
+// charades
+A.charStart = () => {
+  view.ph = 'go'; view.left = 60; view.got = 0; render();
+  tick = setInterval(() => {
+    view.left--;
+    if (view.left <= 0) {
+      clearInterval(tick); tick = null; view.ph = 'done'; G.k++;
+      const n = G.players[G.turn]; pts('char')[n] = (pts('char')[n] || 0) + view.got; save(); buzz(); render();
+    } else { const c = document.getElementById('clock'); if (c) c.textContent = mmss(view.left); }
+  }, 1000);
+};
+A.charGot = () => { view.got++; G.k++; render(); };
+A.charSkip = () => { G.k++; render(); };
+A.charNext = () => { G.turn = (G.turn + 1) % G.players.length; go('char', {ph: 'ready'}); };
+
+// quiz
+A.quizPick = el => {
+  const q = G.deck[G.k % G.deck.length];
+  view.ok = view.opts[+el.dataset.i] === q[1]; view.ph = 'ans';
+  if (view.ok) { const n = G.players[G.turn]; pts('quiz')[n] = (pts('quiz')[n] || 0) + 1; save(); }
+  render(); window.scrollTo(0, 0);
+};
+A.quizNext = () => { G.turn = (G.turn + 1) % G.players.length; G.k++; go('quiz', {ph: 'ask', opts: shuffle(G.deck[G.k % G.deck.length].slice(1))}); };
+
+// most likely to
+A.mltPick = el => { view.who = +el.dataset.i; const n = G.players[view.who]; pts('mlt')[n] = (pts('mlt')[n] || 0) + 1; save(); render(); window.scrollTo(0, 0); };
+A.mltNext = () => { G.k++; go('mlt', {who: null}); };
+
+// would you rather
+A.wyrVote = el => { view.votes.push(+el.dataset.v); render(); };
+A.wyrNext = () => { G.k++; go('wyr', {votes: []}); };
+
+// guess the number
+A.numBegin = () => { view.ph = 'choose'; view.pick = null; render(); };
+A.numSet = el => {
+  view.pick = +el.dataset.n;
+  document.querySelectorAll('.nums .on').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  const b = document.getElementById('lockBtn'); if (b) b.disabled = false;
+};
+A.numLock = () => { if (view.pick == null) return; G.secret = view.pick; G.tried = []; G.g = 0; go('num', {ph: 'guess', pick: null}); };
+A.numGuess = el => {
+  const n = +el.dataset.n; G.tried.push(n);
+  const ok = n === G.secret;
+  if (ok) { const gs = numGuessers(), w = gs[G.g % gs.length]; pts('num')[w] = (pts('num')[w] || 0) + 1; save(); }
+  go('num', {ph: 'ans', ok, val: n, pick: null});
+};
+A.numOn = () => { G.g++; go('num', {ph: 'guess', pick: null}); };
+A.numRound = () => { G.chooser = (G.chooser + 1) % G.players.length; G.secret = null; G.tried = []; G.g = 0; go('num', {ph: 'hand', pick: null}); };
+
+// find the agent
+A.agBegin = () => { view.ph = 'choose'; view.pick = null; render(); };
+A.agSet = el => {
+  view.pick = +el.dataset.i;
+  document.querySelectorAll('.win.on').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  const b = document.getElementById('lockBtn'); if (b) b.disabled = false;
+};
+A.agLock = () => { if (view.pick == null) return; G.pos = view.pick; G.cells = agBuild(G.pos); G.g = 0; G.tries = 0; go('agent', {ph: 'guess', pick: null}); };
+A.agGuess = el => {
+  const i = +el.dataset.i, ok = i === G.pos; G.tries++;
+  if (ok) { const gs = agGuessers(), w = gs[G.g % gs.length]; pts('agent')[w] = (pts('agent')[w] || 0) + 1; save(); }
+  else G.cells[i].open = true;
+  go('agent', {ph: 'ans', ok, val: i, pick: null});
+};
+A.agOn = () => { G.g++; go('agent', {ph: 'guess', pick: null}); };
+A.agRound = () => { G.chooser = (G.chooser + 1) % G.players.length; G.cells = null; G.pos = null; go('agent', {ph: 'hand', pick: null}); };
+
+// two-player classics
+A.duelAgain = () => {
+  if (G.type === 'rps') { duelNext(G.sc[0] > G.sc[1] ? 1 : 0); G.sc = [0, 0]; G.picks = []; return go('rps', {ph: 'pick'}); }
+  duelNext(G.winner < 0 ? -1 : 1 - G.winner); gridNew(); go('grid', {});
+};
+A.gridTap = el => {
+  if (G.done) return;
+  let i = +el.dataset.i;
+  if (G.type === 'four') { const col = i % G.w; i = -1; for (let r = G.h - 1; r >= 0; r--) if (G.cells[r * G.w + col] === null) { i = r * G.w + col; break; } if (i < 0) return; }
+  else if (G.cells[i] !== null) return;
+  G.cells[i] = G.turn;
+  const line = gridWin(i);
+  if (line) { G.done = true; G.hit = line; G.winner = G.turn; const n = G.pair[G.turn]; pts(G.type)[n] = (pts(G.type)[n] || 0) + 1; save(); }
+  else if (G.cells.every(v => v !== null)) G.done = true;
+  else G.turn = 1 - G.turn;
+  render();
+};
+A.pairTap = el => {
+  const i = +el.dataset.i, c = G.cards[i];
+  if (G.lock || G.done || c.up || c.gone) return;
+  c.up = true; G.open.push(i);
+  if (G.open.length === 2) {
+    const [a, b] = G.open.map(k => G.cards[k]);
+    if (a.e === b.e) {
+      a.gone = b.gone = true; G.open = [];
+      const n = G.players[G.turn % G.players.length]; G.got[n] = (G.got[n] || 0) + 1;
+      if (G.cards.every(x => x.gone)) {
+        G.done = true; const best = Math.max(...G.players.map(p => G.got[p] || 0));
+        G.winners = G.players.filter(p => (G.got[p] || 0) === best);
+        G.winners.forEach(p => { pts('pairs')[p] = (pts('pairs')[p] || 0) + 1; }); save();
+      }
+    } else {
+      G.lock = true;
+      tick = setTimeout(() => { tick = null; a.up = b.up = false; G.open = []; G.lock = false; G.turn++; if (view.n === 'pairs') render(); }, 1200);
+    }
+  }
+  render();
+};
+A.rpsPick = el => {
+  G.picks.push(+el.dataset.i);
+  if (G.picks.length < 2) return render();
+  const [a, b] = G.picks, w = a === b ? -1 : (a - b + 3) % 3 === 1 ? 0 : 1;
+  if (w >= 0) { G.sc[w]++; if (G.sc[w] >= G.target) { const n = G.pair[w]; pts('rps')[n] = (pts('rps')[n] || 0) + 1; save(); } }
+  view.ph = 'show'; view.w = w; render();
+};
+A.rpsOn = () => { G.picks = []; go('rps', {ph: 'pick'}); };
+A.hangType = () => { view.ph = 'type'; view.focus = 'hw'; render(); };
+const hangBegin = () => { G.tried = []; G.wrong = 0; G.g = 0; G.done = false; G.solved = false; go('hang', {ph: 'play'}); };
+A.hangAuto = () => { const l = wordList(); G.word = l[rnd(l.length)][0]; G.auto = true; hangBegin(); };
+A.hangSet = () => {
+  const inp = document.getElementById('hw'), w = inp.value.replace(/\s+/g, ' ').trim().slice(0, 24);
+  if ([...w].filter(isLetter).length < 2) { toast('Type a word with at least two letters'); return inp.focus(); }
+  G.word = w; G.auto = false; hangBegin();
+};
+A.hangKey = el => {
+  if (G.done) return;
+  const L = el.dataset.k, need = [...G.word].filter(isLetter).map(flat);
+  G.tried.push(L);
+  if (!need.includes(L)) G.wrong++;
+  if (need.every(x => G.tried.includes(x))) { G.done = true; G.solved = true; hangGuessers().forEach(n => { pts('hang')[n] = (pts('hang')[n] || 0) + 1; }); save(); }
+  else if (G.wrong >= G.max) { G.done = true; if (!G.auto) { const n = G.players[G.setter]; pts('hang')[n] = (pts('hang')[n] || 0) + 1; save(); } }
+  else G.g++;
+  render();
+};
+A.hangNext = () => { G.setter = (G.setter + 1) % G.players.length; G.word = ''; go('hang', {ph: 'hand'}); };
+
+// fireworks
+A.fireGo = el => {
+  const i = +el.dataset.i;
+  if (G.st[i]) return;
+  G.st[i] = 1; el.disabled = true;
+  const rk = document.getElementById('rk' + i), h = G.h[i], dur = h / 38, round = G.round;
+  rk.style.transition = `bottom ${dur}s linear`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.bottom = `calc(${h}% - .85rem)`; }));
+  setTimeout(() => {
+    if (view.n !== 'fire' || !G || G.type !== 'fire' || G.round !== round) return;
+    G.st[i] = 2; buzz1();
+    const ln = document.getElementById('ln' + i); if (ln) ln.innerHTML = fireBurst(i);
+    if (G.st.every(x => x === 2)) setTimeout(() => {
+      if (view.n !== 'fire' || !G || G.type !== 'fire' || G.round !== round) return;
+      G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
+      const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
+    }, 1100);
+  }, dur * 1000 + 60);
+};
+const buzz1 = () => { try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} };
+
+// balloon pump
+A.pumpGo = el => {
+  if (G.done) return;
+  const k = +el.dataset.k, name = G.players[G.turn % G.players.length];
+  if (G.size + k >= G.pop) {
+    G.size = G.pop; G.done = true; G.loser = name; buzz();
+    G.players.forEach(p => { if (p !== name) pts('pump')[p] = (pts('pump')[p] || 0) + 1; }); save();
+  } else { G.size += k; G.turn++; }
+  render();
+};
+
+// stop the clock
+A.stopGo = () => {
+  view.ph = 'run'; render(); G.t0 = performance.now();
+  tick = setInterval(() => { const e = (performance.now() - G.t0) / 1000, c = document.getElementById('clock'); if (c) c.textContent = e < G.hide ? e.toFixed(2) : '?.??'; }, 40);
+};
+A.stopHit = () => { if (view.ph !== 'run') return; G.times[G.i] = (performance.now() - G.t0) / 1000; clearInterval(tick); tick = null; view.ph = 'shown'; render(); };
+A.stopNext = () => {
+  if (G.i + 1 < G.players.length) { G.i++; return go('stopc', {ph: 'ready'}); }
+  let best = 0; G.times.forEach((t, i) => { if (Math.abs(t - G.target) < Math.abs(G.times[best] - G.target)) best = i; });
+  const n = G.players[best]; pts('stopc')[n] = (pts('stopc')[n] || 0) + 1; save(); go('stopc', {ph: 'end'});
+};
+
+// quick draw
+A.quickStart = () => {
+  const round = G.round, alive = () => view.n === 'quick' && G && G.type === 'quick' && G.round === round && G.state !== 'done';
+  let fakes = S.level === 'hard' ? 1 + rnd(2) : 0;
+  const step = () => {
+    tick = setTimeout(() => {
+      if (!alive()) return;
+      if (fakes > 0) { fakes--; G.state = 'fake'; render(); tick = setTimeout(() => { if (!alive()) return; G.state = 'wait'; render(); step(); }, 550); }
+      else { G.state = 'go'; G.t0 = performance.now(); buzz1(); render(); }
+    }, 1600 + rnd(3200));
+  };
+  G.state = 'wait'; render(); step();
+};
+A.quickTap = el => {
+  const i = +el.dataset.i, st = G.state;
+  if (st === 'idle' || st === 'done' || G.out.includes(i)) return;
+  if (st === 'go') { G.ms = Math.round(performance.now() - G.t0); G.win = i; G.state = 'done'; const n = G.players[i]; pts('quick')[n] = (pts('quick')[n] || 0) + 1; save(); }
+  else { G.out.push(i); if (G.out.length === G.players.length) { clearTimeout(tick); tick = null; G.win = -1; G.state = 'done'; } }
+  render();
+};
 
 // truth or dare
 A.todPick = el => { const k = el.dataset.kind, d = G.deck[k]; view.kind = k; view.text = d[G.at[k] % d.length]; G.at[k]++; render(); };
@@ -993,6 +2063,8 @@ document.addEventListener('click', e => {
   armed = null;
   const f = A[el.dataset.act]; if (f) f(el);
 });
+// Games where speed matters react on touch down, not on release.
+document.addEventListener('pointerdown', e => { const el = e.target.closest('[data-down]'); if (el && !el.disabled && A[el.dataset.down]) { e.preventDefault(); A[el.dataset.down](el); } });
 document.addEventListener('change', e => { const el = e.target.closest('[data-chg]'); if (el && C[el.dataset.chg]) C[el.dataset.chg](el); });
 document.addEventListener('keydown', e => { const t = e.target; if (e.key === 'Enter' && t && t.dataset && t.dataset.enter) { e.preventDefault(); A[t.dataset.enter](t); } });
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferred = e; if (view.n === 'home') render(); });
