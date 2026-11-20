@@ -197,7 +197,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 @keyframes glint{0%,90%,100%{opacity:0} 94%{opacity:.8}}
 @keyframes twitch{0%,91%,100%{transform:none} 95%{transform:translateX(-3px)}}
 @keyframes flick{0%,38%,50%,58%,100%{background:#F3CF73} 42%,54%{background:#141C26}}
-@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw{animation:none}}
+@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw,.rocket.hover{animation:none}}
 
 .grid{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:6px}
 .gc{aspect-ratio:1; padding:0; border:2px solid var(--line); border-radius:12px; background:var(--surface); font-weight:800; line-height:1;
@@ -230,6 +230,8 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .lane{position:relative; border-left:1px dashed rgba(255,255,255,.12)}
 .lane:first-child{border-left:0}
 .rocket{position:absolute; left:50%; bottom:0; margin-left:-.85rem; font-size:1.7rem; line-height:1; transform:rotate(-45deg)}
+.rocket.hover{animation:hover .6s ease-in-out infinite alternate}
+@keyframes hover{from{transform:translateY(2px) rotate(-45deg)} to{transform:translateY(-3px) rotate(-45deg)}}
 .burst{position:absolute; left:50%; width:6px; height:6px; margin:0 0 -3px -3px; border-radius:50%; background:currentColor; color:var(--pc); animation:boom .7s ease-out both;
   box-shadow:0 -30px, 15px -26px, 26px -15px, 30px 0, 26px 15px, 15px 26px, 0 30px, -15px 26px, -26px 15px, -30px 0, -26px -15px, -15px -26px,
     0 -16px, 11px -11px, 16px 0, 11px 11px, 0 16px, -11px 11px, -16px 0, -11px -11px}
@@ -926,7 +928,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.9'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.10'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1526,7 +1528,7 @@ V.fire = () => {
   const b = `<p class="tag ${G.done ? 'good' : ''}">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : 'Everyone, launch your rocket'}</p>` +
     `<div class="sky" style="--c:${n}">${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}</div>` +
     `<div class="pads" style="--c:${n}">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="fireGo" data-i="${i}" ${G.st[i] ? 'disabled' : ''}>${esc(p)}</button>`).join('')}</div>` +
-    (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name to launch. Nobody knows how high each rocket will go.</p>`);
+    (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name whenever you like. Once every rocket is up, they all climb together and burst at secret heights.</p>`);
   return page('Fireworks', b, 'home', true);
 };
 
@@ -1946,23 +1948,36 @@ A.hangKey = el => {
 A.hangNext = () => { G.setter = (G.setter + 1) % G.players.length; G.word = ''; go('hang', {ph: 'hand'}); };
 
 // fireworks
+// A tap lifts that rocket to a low hover. Once every rocket is up they all climb together at the same speed,
+// so the order they burst in depends only on the secret heights, never on who tapped first.
+const FIRE_HOLD = 12, FIRE_SPEED = 26;
 A.fireGo = el => {
   const i = +el.dataset.i;
   if (G.st[i]) return;
   G.st[i] = 1; el.disabled = true;
-  const rk = document.getElementById('rk' + i), h = G.h[i], dur = h / 38, round = G.round;
-  rk.style.transition = `bottom ${dur}s linear`;
-  requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.bottom = `calc(${h}% - .85rem)`; }));
+  const round = G.round, live = () => view.n === 'fire' && G && G.type === 'fire' && G.round === round;
+  const rk = document.getElementById('rk' + i);
+  rk.style.transition = 'bottom .5s ease-out';
+  requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.bottom = FIRE_HOLD + '%'; rk.classList.add('hover'); }));
+  if (!G.st.every(x => x >= 1)) return;
+  const tag = document.querySelector('main .tag'); if (tag) tag.textContent = 'Here they go';
   setTimeout(() => {
-    if (view.n !== 'fire' || !G || G.type !== 'fire' || G.round !== round) return;
-    G.st[i] = 2; buzz1();
-    const ln = document.getElementById('ln' + i); if (ln) ln.innerHTML = fireBurst(i);
-    if (G.st.every(x => x === 2)) setTimeout(() => {
-      if (view.n !== 'fire' || !G || G.type !== 'fire' || G.round !== round) return;
-      G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
-      const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
-    }, 1100);
-  }, dur * 1000 + 60);
+    if (!live()) return;
+    G.players.forEach((_, j) => {
+      const r = document.getElementById('rk' + j), h = G.h[j], dur = (h - FIRE_HOLD) / FIRE_SPEED;
+      r.classList.remove('hover'); r.style.transition = `bottom ${dur}s linear`; r.style.bottom = `calc(${h}% - .85rem)`;
+      setTimeout(() => {
+        if (!live()) return;
+        G.st[j] = 2; buzz1();
+        const ln = document.getElementById('ln' + j); if (ln) ln.innerHTML = fireBurst(j);
+        if (G.st.every(x => x === 2)) setTimeout(() => {
+          if (!live()) return;
+          G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
+          const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
+        }, 1100);
+      }, dur * 1000 + 60);
+    });
+  }, 1000);
 };
 const buzz1 = () => { try { navigator.vibrate && navigator.vibrate(60); } catch (e) {} };
 
