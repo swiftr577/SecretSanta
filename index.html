@@ -232,11 +232,11 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .rocket{position:absolute; left:50%; bottom:0; margin-left:-.85rem; font-size:1.7rem; line-height:1; transform:rotate(-45deg)}
 .rocket.hover{animation:hover .6s ease-in-out infinite alternate}
 @keyframes hover{from{transform:translateY(2px) rotate(-45deg)} to{transform:translateY(-3px) rotate(-45deg)}}
-.burst{position:absolute; left:50%; width:6px; height:6px; margin:0 0 -3px -3px; border-radius:50%; background:currentColor; color:var(--pc); animation:boom .7s ease-out both;
-  box-shadow:0 -30px, 15px -26px, 26px -15px, 30px 0, 26px 15px, 15px 26px, 0 30px, -15px 26px, -26px 15px, -30px 0, -26px -15px, -15px -26px,
-    0 -16px, 11px -11px, 16px 0, 11px 11px, 0 16px, -11px 11px, -16px 0, -11px -11px}
-.lane .alt{position:absolute; left:0; right:0; margin-bottom:-56px; text-align:center; color:#fff; font-size:.8rem; font-weight:800}
-@keyframes boom{from{transform:scale(.1); opacity:1} to{transform:scale(1); opacity:.9}}
+.burst{position:absolute; left:50%; width:10px; height:10px; margin:0 0 -5px -5px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px var(--pc), 0 0 14px 6px var(--pc); animation:boom .35s ease-out both}
+.burst.best{width:14px; height:14px; margin:0 0 -7px -7px; box-shadow:0 0 0 4px var(--pc), 0 0 22px 10px #FFD166}
+#fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+.lane .alt{position:absolute; left:0; right:0; margin-bottom:-34px; text-align:center; color:#fff; font-size:.8rem; font-weight:800}
+@keyframes boom{from{transform:scale(3); opacity:.2} to{transform:scale(1); opacity:1}}
 .pads{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:8px}
 .pad2{min-height:64px; padding:6px 4px; border-radius:14px; border:3px solid var(--pc); background:var(--surface); font-weight:800; font-size:.95rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; touch-action:manipulation}
 .pads.big .pad2{min-height:110px; font-size:1.25rem; background:var(--pc); color:#10161E}
@@ -928,7 +928,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.10'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.11'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1520,13 +1520,13 @@ const COL = ['#FF6B6B', '#FFD166', '#6BCB77', '#4D96FF', '#C77DFF'];
 /* Fireworks */
 function fireNew(){
   const pool = shuffle(Array.from({length: 66}, (_, i) => i + 28));   // every height is different, so there is never a tie
-  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.round = (G.round || 0) + 1;
+  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.climb = false; G.round = (G.round || 0) + 1;
 }
-const fireBurst = i => `<div class="burst" style="bottom:${G.h[i]}%"></div><span class="alt" style="bottom:${G.h[i]}%">${G.h[i]} m${G.done && i === G.win ? ' 👑' : ''}</span>`;
+const fireBurst = i => `<div class="burst${G.done && i === G.win ? ' best' : ''}" style="bottom:${G.h[i]}%"></div><span class="alt" style="bottom:${G.h[i]}%">${G.h[i]} m${G.done && i === G.win ? ' 👑' : ''}</span>`;
 V.fire = () => {
   const n = G.players.length;
   const b = `<p class="tag ${G.done ? 'good' : ''}">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : 'Everyone, launch your rocket'}</p>` +
-    `<div class="sky" style="--c:${n}">${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}</div>` +
+    `<div class="sky" style="--c:${n}">${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}<canvas id="fx" aria-hidden="true"></canvas></div>` +
     `<div class="pads" style="--c:${n}">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="fireGo" data-i="${i}" ${G.st[i] ? 'disabled' : ''}>${esc(p)}</button>`).join('')}</div>` +
     (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name whenever you like. Once every rocket is up, they all climb together and burst at secret heights.</p>`);
   return page('Fireworks', b, 'home', true);
@@ -1948,6 +1948,66 @@ A.hangKey = el => {
 A.hangNext = () => { G.setter = (G.setter + 1) % G.players.length; G.word = ''; go('hang', {ph: 'hand'}); };
 
 // fireworks
+// Sparks, smoke and bursts are drawn on a canvas laid over the sky.
+const FX = {p: [], raf: 0, last: 0};
+const calm = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const R = () => Math.random();
+function fxLoop(t){
+  const cv = document.getElementById('fx');
+  if (!cv || view.n !== 'fire' || !G || G.type !== 'fire') { FX.raf = 0; FX.p = []; return; }
+  const sky = cv.parentElement, w = sky.clientWidth, h = sky.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const ctx = cv.getContext('2d'), dt = Math.min(Math.max((t - FX.last) / 1000, .001), .05); FX.last = t;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
+  // a trail of sparks under every rocket that is in the air
+  const sr = sky.getBoundingClientRect(); let flying = false;
+  if (!G.done) G.st.forEach((st, i) => {
+    if (st !== 1) return;
+    flying = true;
+    const r = document.getElementById('rk' + i); if (!r) return;
+    const b = r.getBoundingClientRect(), x = b.left + b.width / 2 - sr.left, y = b.bottom - sr.top - 5;
+    for (let k = 0; k < (G.climb ? 3 : 1); k++) FX.p.push({k: 'spark', x: x + (R() - .5) * 6, y, vx: (R() - .5) * 34, vy: 50 + R() * (G.climb ? 110 : 50), g: 30, d: .96,
+      life: 0, max: .25 + R() * (G.climb ? .45 : .25), c: R() < .5 ? '#FFD166' : R() < .5 ? '#FF9F43' : '#FFF3C4', s: 1.3 + R() * 2});
+  });
+  FX.p = FX.p.filter(q => {
+    q.life += dt; if (q.life >= q.max) return false;
+    const drag = Math.pow(q.d, dt * 60); q.vx *= drag; q.vy = q.vy * drag + q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
+    const a = 1 - q.life / q.max;
+    if (q.k === 'smoke') { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = a * .3; ctx.fillStyle = '#C9D2DC'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + q.life * 2.5), 0, 7); ctx.fill(); return true; }
+    ctx.globalCompositeOperation = 'lighter';
+    if (q.k === 'flash') { ctx.globalAlpha = a * .85; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + (1 - a) * 3.5), 0, 7); ctx.fill(); return true; }
+    ctx.globalAlpha = a * (q.tw ? .55 + .45 * Math.sin(q.life * 38 + q.ph) : 1);
+    ctx.strokeStyle = ctx.fillStyle = q.c; ctx.lineWidth = q.s * .9; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(q.x - q.vx * .045, q.y - q.vy * .045); ctx.lineTo(q.x, q.y); ctx.stroke();
+    ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (.55 + .45 * a), 0, 7); ctx.fill();
+    return true;
+  });
+  ctx.globalAlpha = 1;
+  FX.raf = FX.p.length || flying ? requestAnimationFrame(fxLoop) : 0;
+}
+const fxKick = () => { if (!FX.raf && !calm()) { FX.last = performance.now(); FX.raf = requestAnimationFrame(fxLoop); } };
+function fxSpot(i, pct){
+  const sky = document.querySelector('.sky'), ln = document.getElementById('ln' + i); if (!sky || !ln) return null;
+  const sr = sky.getBoundingClientRect(), lr = ln.getBoundingClientRect();
+  return {x: lr.left + lr.width / 2 - sr.left, y: sr.height * (1 - pct / 100)};
+}
+function fxSmoke(i){
+  const o = fxSpot(i, 2); if (!o || calm()) return;
+  for (let k = 0; k < 14; k++) FX.p.push({k: 'smoke', x: o.x + (R() - .5) * 14, y: o.y, vx: (R() - .5) * 90, vy: -10 - R() * 35, g: -8, d: .93, life: 0, max: .6 + R() * .5, s: 4 + R() * 5});
+  fxKick();
+}
+function fxBoom(i, big, dx, dy){
+  const o = fxSpot(i, G.h[i]); if (!o || calm()) return;
+  const x = o.x + (dx || 0), y = o.y + (dy || 0), S = big ? 185 : 135, c = COL[i];
+  FX.p.push({k: 'flash', x, y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .28, s: big ? 16 : 11});
+  const bit = (sp, col, life, size, tw) => { const an = R() * 6.283;
+    FX.p.push({k: 'star', x, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 70, d: .955, life: 0, max: life, c: col, s: size, tw, ph: R() * 6}); };
+  for (let k = 0; k < (big ? 46 : 30); k++) bit(S * (.9 + R() * .18), c, 1.1 + R() * .5, 2 + R() * 1.2, false);          // outer shell
+  for (let k = 0; k < (big ? 34 : 22); k++) bit(S * (.25 + R() * .55), R() < .5 ? c : '#FFFFFF', .8 + R() * .5, 1.5 + R(), true);   // glittery middle
+  for (let k = 0; k < (big ? 16 : 8); k++) bit(S * (.5 + R() * .6), '#FFD166', 1.5 + R() * .7, 1.6 + R(), true);         // gold streamers that drift down
+  fxKick();
+}
+
 // A tap lifts that rocket to a low hover. Once every rocket is up they all climb together at the same speed,
 // so the order they burst in depends only on the secret heights, never on who tapped first.
 const FIRE_HOLD = 12, FIRE_SPEED = 26;
@@ -1959,22 +2019,27 @@ A.fireGo = el => {
   const rk = document.getElementById('rk' + i);
   rk.style.transition = 'bottom .5s ease-out';
   requestAnimationFrame(() => requestAnimationFrame(() => { rk.style.bottom = FIRE_HOLD + '%'; rk.classList.add('hover'); }));
+  fxSmoke(i); fxKick();
   if (!G.st.every(x => x >= 1)) return;
   const tag = document.querySelector('main .tag'); if (tag) tag.textContent = 'Here they go';
   setTimeout(() => {
     if (!live()) return;
+    G.climb = true;
     G.players.forEach((_, j) => {
       const r = document.getElementById('rk' + j), h = G.h[j], dur = (h - FIRE_HOLD) / FIRE_SPEED;
       r.classList.remove('hover'); r.style.transition = `bottom ${dur}s linear`; r.style.bottom = `calc(${h}% - .85rem)`;
       setTimeout(() => {
         if (!live()) return;
         G.st[j] = 2; buzz1();
+        fxBoom(j, false);
         const ln = document.getElementById('ln' + j); if (ln) ln.innerHTML = fireBurst(j);
         if (G.st.every(x => x === 2)) setTimeout(() => {
           if (!live()) return;
           G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
           const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
-        }, 1100);
+          // a bigger finale over the winner
+          fxBoom(G.win, true); setTimeout(() => { if (live()) fxBoom(G.win, true, -26, 22); }, 380); setTimeout(() => { if (live()) fxBoom(G.win, true, 24, -14); }, 760);
+        }, 1300);
       }, dur * 1000 + 60);
     });
   }, 1000);
