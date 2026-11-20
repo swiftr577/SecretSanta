@@ -197,7 +197,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 @keyframes glint{0%,90%,100%{opacity:0} 94%{opacity:.8}}
 @keyframes twitch{0%,91%,100%{transform:none} 95%{transform:translateX(-3px)}}
 @keyframes flick{0%,38%,50%,58%,100%{background:#F3CF73} 42%,54%{background:#141C26}}
-@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw,.rocket.hover{animation:none}}
+@media (prefers-reduced-motion: reduce){.win .gl{animation:none; opacity:.35} .win.flick,.win .bl,.win .sw,.rocket.hover,.rocket.climb,.sky .st,.balloon svg,.sig.wait,.dial.hid .dtrk,.dial.hid #clock,.shake,.pad2.won{animation:none}}
 
 .grid{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:6px}
 .gc{aspect-ratio:1; padding:0; border:2px solid var(--line); border-radius:12px; background:var(--surface); font-weight:800; line-height:1;
@@ -225,8 +225,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .snow .dk{fill:var(--ink)} .snow .nose{fill:#EE7F2D; stroke:none}
 
 .sky{position:relative; height:52vh; min-height:330px; border-radius:18px; overflow:hidden; display:grid; grid-template-columns:repeat(var(--c),1fr);
-  background:radial-gradient(1.5px 1.5px at 12% 18%,#fff 50%,transparent 51%), radial-gradient(1.5px 1.5px at 67% 9%,#fff 50%,transparent 51%), radial-gradient(1px 1px at 38% 30%,#fff 50%,transparent 51%),
-    radial-gradient(1.5px 1.5px at 85% 36%,#fff 50%,transparent 51%), radial-gradient(1px 1px at 24% 52%,#fff 50%,transparent 51%), linear-gradient(#090D22,#1D2756)}
+  background:linear-gradient(#070A1C,#1A2452 70%,#2A2F66)}
 .lane{position:relative; border-left:1px dashed rgba(255,255,255,.12)}
 .lane:first-child{border-left:0}
 .rocket{position:absolute; left:50%; bottom:0; margin-left:-.85rem; font-size:1.7rem; line-height:1; transform:rotate(-45deg)}
@@ -234,7 +233,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 @keyframes hover{from{transform:translateY(2px) rotate(-45deg)} to{transform:translateY(-3px) rotate(-45deg)}}
 .burst{position:absolute; left:50%; width:10px; height:10px; margin:0 0 -5px -5px; border-radius:50%; background:#fff; box-shadow:0 0 0 3px var(--pc), 0 0 14px 6px var(--pc); animation:boom .35s ease-out both}
 .burst.best{width:14px; height:14px; margin:0 0 -7px -7px; box-shadow:0 0 0 4px var(--pc), 0 0 22px 10px #FFD166}
-#fx{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+#fx{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:5}
 .lane .alt{position:absolute; left:0; right:0; margin-bottom:-34px; text-align:center; color:#fff; font-size:.8rem; font-weight:800}
 @keyframes boom{from{transform:scale(3); opacity:.2} to{transform:scale(1); opacity:1}}
 .pads{display:grid; grid-template-columns:repeat(var(--c),1fr); gap:8px}
@@ -242,9 +241,49 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .pads.big .pad2{min-height:110px; font-size:1.25rem; background:var(--pc); color:#10161E}
 .pad2:disabled{opacity:.35}
 .sig{min-height:150px; border-radius:18px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; font-size:2.2rem; font-weight:800; background:var(--tint)}
-.sig.wait{background:#7A1C22; color:#fff} .sig.fake{background:#D99A1C; color:#10161E} .sig.go{background:#1F9D5B; color:#fff}
-.balloonbox{height:280px; display:flex; align-items:center; justify-content:center}
-.balloon{font-size:calc(2.6rem * var(--s)); line-height:1; transition:font-size .25s}
+.sig.wait{background:#7A1C22; color:#fff; animation:beat .9s ease-in-out infinite}
+.sig.fake{background:#D99A1C; color:#10161E; animation:shake .4s}
+.sig.go{background:#1F9D5B; color:#fff; font-size:3.4rem; animation:popin .3s cubic-bezier(.3,1.9,.5,1)}
+.sig.wait::after{content:"..."; display:inline-block; width:1.2em; text-align:left; overflow:hidden; animation:dots 1.2s steps(4,end) infinite}
+.pad2.won{animation:won .5s ease-in-out 4 alternate; box-shadow:0 0 0 5px var(--gold)}
+.pad2.nope{animation:shake .4s}
+.pad2.lost{opacity:.4}
+.balloonbox{height:330px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px}
+.balloon{width:72px; transform:scale(var(--s)); transform-origin:50% 88%; transition:transform .5s cubic-bezier(.3,1.9,.5,1)}
+.balloon svg{display:block; width:100%; height:auto; transform-origin:50% 90%; animation:sway var(--w,2.4s) ease-in-out infinite alternate}
+.popword{font-size:5rem; font-weight:800; color:var(--accent); letter-spacing:-.02em; align-self:center; animation:popword .45s cubic-bezier(.3,2,.5,1) both; transform-origin:50% 60%}
+.sky .st{position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:twinkle 2.4s ease-in-out infinite alternate; animation-delay:var(--d)}
+.sky .moon{position:absolute; right:9%; top:7%; width:38px; height:38px; border-radius:50%; background:#F4EBC8; box-shadow:0 0 22px 6px rgba(244,235,200,.35), inset -9px -5px 0 0 #D9CFA8}
+.sky .city{position:absolute; left:0; right:0; bottom:0; width:100%; height:44px}
+.sky::after{content:""; position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none}
+.sky.flash::after{animation:skyflash .4s ease-out}
+.rocket.climb{animation:wiggle .18s ease-in-out infinite alternate}
+.shake{animation:shake .45s}
+.dial{position:relative; width:240px; height:240px; display:flex; align-items:center; justify-content:center}
+.dial svg{position:absolute; inset:0; width:100%; height:100%; transform:rotate(-90deg)}
+.dial circle{fill:none; stroke-width:9}
+.dial .dtrk{stroke:var(--line)}
+.dial .darc{stroke:var(--accent); stroke-linecap:round; stroke-dasharray:339.3; stroke-dashoffset:339.3; transition:opacity .4s}
+.dial.hid .darc{opacity:0}
+.dial.hid .dtrk{stroke-dasharray:3 12; stroke-linecap:round; transform-origin:60px 60px; animation:spin 4s linear infinite}
+.dial.hid #clock{animation:beat .7s ease-in-out infinite; color:var(--muted)}
+.gauge{position:relative; height:34px; border-radius:17px; background:linear-gradient(90deg,var(--tint),var(--surface) 50%,var(--tint)); border:2px solid var(--line); width:100%}
+.gauge .mid{position:absolute; left:50%; top:-6px; bottom:-6px; width:4px; margin-left:-2px; border-radius:2px; background:var(--green)}
+.gauge .mk{position:absolute; left:0; top:50%; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:var(--pc,var(--accent)); border:3px solid var(--surface); box-shadow:0 0 0 2px var(--ink); transition:left .9s cubic-bezier(.2,1.3,.4,1)}
+.gends{display:flex; justify-content:space-between; width:100%; font-size:.85rem; color:var(--muted); font-weight:700}
+.grow{display:grid; grid-template-columns:5.5em 1fr 3.4em; align-items:center; gap:10px; font-weight:700}
+.grow span:last-child{text-align:right; font-variant-numeric:tabular-nums}
+@keyframes twinkle{from{opacity:.25; transform:scale(.8)} to{opacity:1; transform:scale(1.4)}}
+@keyframes skyflash{from{opacity:.35} to{opacity:0}}
+@keyframes wiggle{from{transform:rotate(-48deg)} to{transform:rotate(-42deg)}}
+@keyframes shake{0%,100%{transform:translate(0,0)} 20%{transform:translate(-5px,2px)} 40%{transform:translate(5px,-2px)} 60%{transform:translate(-4px,-1px)} 80%{transform:translate(3px,1px)}}
+@keyframes beat{0%,100%{transform:scale(1)} 50%{transform:scale(1.04)}}
+@keyframes popin{from{transform:scale(.5)} to{transform:scale(1)}}
+@keyframes dots{from{width:0} to{width:1.2em}}
+@keyframes won{from{transform:scale(1)} to{transform:scale(1.07)}}
+@keyframes sway{from{transform:rotate(-3deg)} to{transform:rotate(3deg)}}
+@keyframes popword{from{transform:scale(.2) rotate(-14deg); opacity:0} to{transform:scale(1) rotate(-6deg); opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
 .three{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
 
 /* clock and scores */
@@ -267,6 +306,7 @@ ol.steps{margin:0; padding-left:1.4em; display:flex; flex-direction:column; gap:
 </head>
 <body>
 <div id="app"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
 <div id="toast" role="status" aria-live="polite"></div>
 <script>
 (() => {
@@ -928,7 +968,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.11'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.12'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -969,7 +1009,7 @@ function drawPairs(names){
 /* ---------- state and routing ---------- */
 let view = {n:'home'}, G = null, unlocked = false, tick = null, armed = null, deferred = null;
 const used = new Set();
-function go(n, d){ clearInterval(tick); tick = null; armed = null; view = Object.assign({n}, d || {}); render(); window.scrollTo(0, 0); }
+function go(n, d){ clearInterval(tick); tick = null; armed = null; FX.p = []; view = Object.assign({n}, d || {}); render(); window.scrollTo(0, 0); }
 function render(){ app.innerHTML = V[view.n](); after(); }
 
 const page = (title, body, back, quit) =>
@@ -1518,52 +1558,69 @@ V.hang = () => {
 const COL = ['#FF6B6B', '#FFD166', '#6BCB77', '#4D96FF', '#C77DFF'];
 
 /* Fireworks */
+const SKY = [[8,12],[19,31],[27,8],[36,22],[44,40],[52,14],[61,29],[69,6],[74,45],[83,24],[92,37],[14,48],[48,55],[88,58]].map((p, i) =>
+    `<i class="st" style="left:${p[0]}%;top:${p[1]}%;--d:-${(i * .37 % 2.4).toFixed(2)}s"></i>`).join('') + `<i class="moon"></i>` +
+  `<svg class="city" viewBox="0 0 200 30" preserveAspectRatio="none" aria-hidden="true"><path fill="#05071A" d="M0 30V18h10V10h9v8h7V5h12v13h8V12h10v6h6V8h4V2h3v6h5v10h9V14h11v4h7V7h13v11h8V11h9v7h6V4h11v14h9V13h10v5h13v12z"/>` +
+  `<g fill="#F3CF73"><rect x="29" y="8" width="2" height="2"/><rect x="33" y="13" width="2" height="2"/><rect x="74" y="11" width="2" height="2"/><rect x="113" y="10" width="2" height="2"/><rect x="118" y="14" width="2" height="2"/><rect x="153" y="8" width="2" height="2"/><rect x="158" y="13" width="2" height="2"/><rect x="89" y="18" width="2" height="2"/></g></svg>`;
+const SHAPES = ['peony', 'ring', 'star', 'heart', 'willow'];
 function fireNew(){
   const pool = shuffle(Array.from({length: 66}, (_, i) => i + 28));   // every height is different, so there is never a tie
-  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.climb = false; G.round = (G.round || 0) + 1;
+  G.h = G.players.map((_, i) => pool[i]); G.st = G.players.map(() => 0); G.done = false; G.climb = false; G.shape = shuffle(SHAPES); G.round = (G.round || 0) + 1;
 }
 const fireBurst = i => `<div class="burst${G.done && i === G.win ? ' best' : ''}" style="bottom:${G.h[i]}%"></div><span class="alt" style="bottom:${G.h[i]}%">${G.h[i]} m${G.done && i === G.win ? ' 👑' : ''}</span>`;
 V.fire = () => {
   const n = G.players.length;
   const b = `<p class="tag ${G.done ? 'good' : ''}">${G.done ? esc(G.players[G.win]) + "'s rocket flew highest" : 'Everyone, launch your rocket'}</p>` +
-    `<div class="sky" style="--c:${n}">${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}<canvas id="fx" aria-hidden="true"></canvas></div>` +
+    `<div class="sky" style="--c:${n}">${SKY}${G.players.map((_, i) => `<div class="lane" id="ln${i}" style="--pc:${COL[i]}">${G.st[i] === 2 ? fireBurst(i) : `<div class="rocket" id="rk${i}" aria-hidden="true">🚀</div>`}</div>`).join('')}</div>` +
     `<div class="pads" style="--c:${n}">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="fireGo" data-i="${i}" ${G.st[i] ? 'disabled' : ''}>${esc(p)}</button>`).join('')}</div>` +
     (G.done ? againBtns('fire') + board('fire') : `<p class="muted">Tap your own name whenever you like. Once every rocket is up, they all climb together and burst at secret heights.</p>`);
   return page('Fireworks', b, 'home', true);
 };
 
 /* Balloon pump */
+const BALLOON = `<svg viewBox="0 0 100 130" aria-hidden="true"><defs><radialGradient id="balg" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#FF9AA2"/><stop offset=".45" stop-color="#E63946"/><stop offset="1" stop-color="#A4161A"/></radialGradient></defs>` +
+  `<path d="M50 104q-9 10 0 17t0 9" fill="none" stroke="#8A8F98" stroke-width="1.5"/><ellipse cx="50" cy="52" rx="40" ry="48" fill="url(#balg)"/><ellipse cx="33" cy="31" rx="8" ry="14" fill="#fff" opacity=".4" transform="rotate(-25 33 31)"/><path d="M44 104l6-7 6 7z" fill="#A4161A"/></svg>`;
+const pumpScale = n => 1 + n * (S.level === 'easy' ? .13 : .07);
 V.pump = () => {
   const name = G.players[G.turn % G.players.length];
-  const b = G.done
-    ? `<div class="center"><p class="tag bad">${esc(G.loser)} popped it</p><p class="huge" aria-hidden="true">💥</p><p class="lead">It burst on pump ${G.size}. Everyone else gets a point.</p></div>` + againBtns('pump') + board('pump')
-    : `<p class="tag">${esc(name)}, how many pumps?</p><div class="balloonbox"><div class="balloon" style="--s:${(1 + G.size * (S.level === 'easy' ? .13 : .07)).toFixed(2)}" aria-hidden="true">🎈</div></div>` +
-      `<div class="three">${[1, 2, 3].map(k => `<button class="btn${k === 1 ? '' : ' alt'}" data-act="pumpGo" data-k="${k}">${k}</button>`).join('')}</div>` +
-      `<p class="muted">Pump one, two or three times, then pass the phone on. ${G.size} pump${G.size === 1 ? '' : 's'} so far.</p>`;
+  let b;
+  if (G.done) b = `<div class="center"><p class="tag bad">${esc(G.loser)} popped it</p><p class="huge" aria-hidden="true">💥</p><p class="lead">It burst on pump ${G.size}. Everyone else gets a point.</p></div>` + againBtns('pump') + board('pump');
+  else if (G.popping) b = `<p class="tag bad">${esc(name)}...</p><div class="balloonbox" style="align-items:center"><div class="popword">POP!</div></div>`;
+  else b = `<p class="tag">${esc(name)}, how many pumps?</p>` +
+    // the wobble quickens as the balloon grows, which depends only on its size, never on the hidden bursting point
+    `<div class="balloonbox"><div class="balloon" id="bal" data-s="${pumpScale(G.size).toFixed(2)}" style="--s:${pumpScale(G.prev || 0).toFixed(2)};--w:${Math.max(.35, 2.4 - G.size * .11).toFixed(2)}s">${BALLOON}</div></div>` +
+    `<div class="three">${[1, 2, 3].map(k => `<button class="btn${k === 1 ? '' : ' alt'}" data-act="pumpGo" data-k="${k}">${k}</button>`).join('')}</div>` +
+    `<p class="muted">Pump one, two or three times, then pass the phone on. ${G.size} pump${G.size === 1 ? '' : 's'} so far.</p>`;
   return page('Balloon pump', b, 'home', true);
 };
 
 /* Stop the clock */
+const stopRange = () => S.level === 'easy' ? 2 : 3;
+const stopPos = t => Math.max(3, Math.min(97, 50 + (t - G.target) / stopRange() * 50)).toFixed(1);
 V.stopc = () => {
   const name = G.players[G.i], T = G.target;
   let b;
   if (view.ph === 'ready') b = `<div class="center"><p class="lead">Next up</p><p class="big">${esc(name)}</p><p class="lead">Stop the clock as close to ${T} seconds as you can.</p>` +
     `<p class="muted">The clock disappears after ${G.hide} seconds, so keep counting in your head.</p></div><button class="btn" data-down="stopGo">Start the clock</button>`;
-  else if (view.ph === 'run') b = `<div class="center"><p class="tag">${esc(name)}, aim for ${T}.00</p><div id="clock" role="timer">0.00</div></div><button class="btn" style="min-height:120px" data-down="stopHit">Stop</button>`;
+  else if (view.ph === 'run') b = `<div class="center"><p class="tag">${esc(name)}, aim for ${T}.00</p><div class="dial" id="dial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="dtrk" cx="60" cy="60" r="54"/><circle class="darc" id="darc" cx="60" cy="60" r="54"/></svg><div id="clock" role="timer">0.00</div></div></div>` +
+    `<button class="btn" style="min-height:120px" data-down="stopHit">Stop</button>`;
   else if (view.ph === 'shown') { const t = G.times[G.i], d = t - T;
-    b = `<div class="center"><p class="lead">${esc(name)} stopped at</p><p class="huge">${t.toFixed(2)}</p><p class="tag">${Math.abs(d) < .005 ? 'Dead on' : Math.abs(d).toFixed(2) + (d > 0 ? ' over' : ' under')}</p></div>` +
+    b = `<div class="center"><p class="lead">${esc(name)} stopped at</p><p class="huge">${t.toFixed(2)}</p><p class="tag ${Math.abs(d) < .15 ? 'good' : ''}">${Math.abs(d) < .005 ? 'Dead on' : Math.abs(d).toFixed(2) + (d > 0 ? ' over' : ' under')}</p>` +
+      `<div class="gauge"><i class="mid"></i><b class="mk" data-x="${stopPos(t)}"></b></div><div class="gends"><span>too early</span><span>${T}.00</span><span>too late</span></div></div>` +
       `<button class="btn" data-act="stopNext">${G.i + 1 < G.players.length ? 'Next: ' + esc(G.players[G.i + 1]) : 'See who was closest'}</button>`; }
-  else { const rank = G.players.map((p, i) => ({p, t: G.times[i], d: Math.abs(G.times[i] - T)})).sort((a, c) => a.d - c.d);
-    b = `<div class="center"><p class="tag good">${esc(rank[0].p)} was closest</p></div><table class="board">${rank.map(r => `<tr><td>${esc(r.p)}</td><td>${r.t.toFixed(2)}</td></tr>`).join('')}</table>` +
-      `<p class="muted">The target was ${T}.00 seconds.</p>` + againBtns('stopc') + board('stopc'); }
+  else { const rank = G.players.map((p, i) => ({p, i, t: G.times[i], d: Math.abs(G.times[i] - T)})).sort((a, c) => a.d - c.d);
+    b = `<div class="center"><p class="tag good">${esc(rank[0].p)} was closest</p></div>` +
+      rank.map(r => `<div class="grow"><span>${esc(r.p)}</span><div class="gauge"><i class="mid"></i><b class="mk" style="--pc:${COL[r.i % COL.length]}" data-x="${stopPos(r.t)}"></b></div><span>${r.t.toFixed(2)}</span></div>`).join('') +
+      `<p class="muted">The green line is ${T}.00 seconds.</p>` + againBtns('stopc') + board('stopc'); }
   return page('Stop the clock', b, 'home', true);
 };
 
 /* Quick draw */
 V.quick = () => {
   const st = G.state, sig = {idle: 'Fingers ready', wait: 'Wait for it', fake: 'Not yet', go: 'Go!'}[st];
-  const head = st === 'done' ? `<p class="tag ${G.win >= 0 ? 'good' : 'bad'}">${G.win >= 0 ? `${esc(G.players[G.win])} was fastest, in ${G.ms} ms` : 'Everyone jumped the gun'}</p>` : `<div class="sig ${st}" aria-live="assertive">${sig}</div>`;
-  const b = head + `<div class="pads big" style="--c:2">${G.players.map((p, i) => `<button class="pad2" style="--pc:${COL[i]}" data-down="quickTap" data-i="${i}" ${G.out.includes(i) ? 'disabled' : ''}>${esc(p)}${G.out.includes(i) ? ' (too soon)' : ''}</button>`).join('')}</div>` +
+  const head = st === 'done' ? `<p class="tag ${G.win >= 0 ? 'good' : 'bad'}">${G.win >= 0 ? `${esc(G.players[G.win])} was fastest, in ${G.ms} ms` : 'Everyone jumped the gun'}</p>` : `<div class="sig ${st}" id="sig" aria-live="assertive">${sig}</div>`;
+  const cls = i => G.out.includes(i) ? (G.lastOut === i ? ' nope' : '') : st === 'done' && G.win >= 0 ? (i === G.win ? ' won' : ' lost') : '';
+  const b = head + `<div class="pads big" style="--c:2">${G.players.map((p, i) => `<button class="pad2${cls(i)}" id="pd${i}" style="--pc:${COL[i]}" data-down="quickTap" data-i="${i}" ${G.out.includes(i) ? 'disabled' : ''}>${esc(p)}${G.out.includes(i) ? ' (too soon)' : ''}</button>`).join('')}</div>` +
     (st === 'idle' ? `<button class="btn" data-act="quickStart">Start</button><p class="muted">Each player rests a finger near their own name. Tap when the screen says go. Tap early and you are out.</p>` : '') +
     (st === 'done' ? againBtns('quick') + board('quick') : '');
   return page('Quick draw', b, 'home', true);
@@ -1948,65 +2005,113 @@ A.hangKey = el => {
 A.hangNext = () => { G.setter = (G.setter + 1) % G.players.length; G.word = ''; go('hang', {ph: 'hand'}); };
 
 // fireworks
-// Sparks, smoke and bursts are drawn on a canvas laid over the sky.
+// Sparks, smoke, bursts and confetti are drawn on one canvas laid over the whole screen.
 const FX = {p: [], raf: 0, last: 0};
 const calm = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const R = () => Math.random();
+const CONF = ['#FF6B6B', '#FFD166', '#6BCB77', '#4D96FF', '#C77DFF', '#FFFFFF'];
 function fxLoop(t){
-  const cv = document.getElementById('fx');
-  if (!cv || view.n !== 'fire' || !G || G.type !== 'fire') { FX.raf = 0; FX.p = []; return; }
-  const sky = cv.parentElement, w = sky.clientWidth, h = sky.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cv = document.getElementById('fx'); if (!cv) { FX.raf = 0; return; }
+  const w = window.innerWidth, h = window.innerHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
   if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
   const ctx = cv.getContext('2d'), dt = Math.min(Math.max((t - FX.last) / 1000, .001), .05); FX.last = t;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
   // a trail of sparks under every rocket that is in the air
-  const sr = sky.getBoundingClientRect(); let flying = false;
-  if (!G.done) G.st.forEach((st, i) => {
+  let flying = false;
+  if (view.n === 'fire' && G && G.type === 'fire' && !G.done) G.st.forEach((st, i) => {
     if (st !== 1) return;
     flying = true;
-    const r = document.getElementById('rk' + i); if (!r) return;
-    const b = r.getBoundingClientRect(), x = b.left + b.width / 2 - sr.left, y = b.bottom - sr.top - 5;
-    for (let k = 0; k < (G.climb ? 3 : 1); k++) FX.p.push({k: 'spark', x: x + (R() - .5) * 6, y, vx: (R() - .5) * 34, vy: 50 + R() * (G.climb ? 110 : 50), g: 30, d: .96,
-      life: 0, max: .25 + R() * (G.climb ? .45 : .25), c: R() < .5 ? '#FFD166' : R() < .5 ? '#FF9F43' : '#FFF3C4', s: 1.3 + R() * 2});
+    const r = document.getElementById('rk' + i); if (!r || FX.p.length > 1500) return;
+    const b = r.getBoundingClientRect(), x = b.left + b.width / 2, y = b.bottom - 5;
+    for (let k = 0; k < (G.climb ? 4 : 1); k++) FX.p.push({k: 'spark', x: x + (R() - .5) * 6, y, vx: (R() - .5) * 38, vy: 50 + R() * (G.climb ? 130 : 50), g: 30, d: .96,
+      life: 0, max: .25 + R() * (G.climb ? .55 : .25), c: R() < .45 ? '#FFD166' : R() < .5 ? '#FF9F43' : R() < .5 ? '#FFF3C4' : COL[i], s: 1.3 + R() * 2.2});
   });
+  const born = [];
   FX.p = FX.p.filter(q => {
-    q.life += dt; if (q.life >= q.max) return false;
+    q.life += dt;
+    if (q.life < 0) return true;   // not started yet, used to stagger rings
+    if (q.life >= q.max) {   // some sparks crackle into smaller ones as they die
+      if (q.crk) for (let k = 0; k < 3; k++) { const an = R() * 6.283, sp = 30 + R() * 50; born.push({k: 'star', x: q.x, y: q.y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 40, d: .93, life: 0, max: .2 + R() * .25, c: '#FFFFFF', s: 1 + R(), tw: true, ph: R() * 6}); }
+      return false;
+    }
     const drag = Math.pow(q.d, dt * 60); q.vx *= drag; q.vy = q.vy * drag + q.g * dt; q.x += q.vx * dt; q.y += q.vy * dt;
     const a = 1 - q.life / q.max;
-    if (q.k === 'smoke') { ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = a * .3; ctx.fillStyle = '#C9D2DC'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + q.life * 2.5), 0, 7); ctx.fill(); return true; }
+    ctx.globalCompositeOperation = 'source-over';
+    if (q.k === 'smoke') { ctx.globalAlpha = a * .3; ctx.fillStyle = q.c || '#C9D2DC'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + q.life * 2.5), 0, 7); ctx.fill(); return true; }
+    if (q.k === 'conf') { q.r += q.vr * dt; ctx.globalAlpha = Math.min(1, a * 3); ctx.fillStyle = q.c; ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.r); ctx.scale(1, Math.cos(q.r * 1.7)); ctx.fillRect(-q.s, -q.s / 2, q.s * 2, q.s); ctx.restore(); return true; }
+    if (q.k === 'ring') { ctx.globalAlpha = a; ctx.strokeStyle = q.c; ctx.lineWidth = 1 + 5 * a; ctx.beginPath(); ctx.arc(q.x, q.y, q.s + (1 - a) * q.grow, 0, 7); ctx.stroke(); return true; }
     ctx.globalCompositeOperation = 'lighter';
     if (q.k === 'flash') { ctx.globalAlpha = a * .85; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (1 + (1 - a) * 3.5), 0, 7); ctx.fill(); return true; }
     ctx.globalAlpha = a * (q.tw ? .55 + .45 * Math.sin(q.life * 38 + q.ph) : 1);
     ctx.strokeStyle = ctx.fillStyle = q.c; ctx.lineWidth = q.s * .9; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(q.x - q.vx * .045, q.y - q.vy * .045); ctx.lineTo(q.x, q.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(q.x - q.vx * .05, q.y - q.vy * .05); ctx.lineTo(q.x, q.y); ctx.stroke();
     ctx.beginPath(); ctx.arc(q.x, q.y, q.s * (.55 + .45 * a), 0, 7); ctx.fill();
     return true;
   });
-  ctx.globalAlpha = 1;
-  FX.raf = FX.p.length || flying ? requestAnimationFrame(fxLoop) : 0;
+  if (born.length) FX.p = FX.p.concat(born);
+  ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  if (FX.p.length || flying) FX.raf = requestAnimationFrame(fxLoop); else { FX.raf = 0; ctx.clearRect(0, 0, w, h); }
 }
 const fxKick = () => { if (!FX.raf && !calm()) { FX.last = performance.now(); FX.raf = requestAnimationFrame(fxLoop); } };
+const fxCenter = el => { if (!el) return null; const b = el.getBoundingClientRect(); return {x: b.left + b.width / 2, y: b.top + b.height / 2}; };
+function pulse(el, cls){ if (!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 function fxSpot(i, pct){
   const sky = document.querySelector('.sky'), ln = document.getElementById('ln' + i); if (!sky || !ln) return null;
   const sr = sky.getBoundingClientRect(), lr = ln.getBoundingClientRect();
-  return {x: lr.left + lr.width / 2 - sr.left, y: sr.height * (1 - pct / 100)};
+  return {x: lr.left + lr.width / 2, y: sr.top + sr.height * (1 - pct / 100)};
 }
-function fxSmoke(i){
-  const o = fxSpot(i, 2); if (!o || calm()) return;
-  for (let k = 0; k < 14; k++) FX.p.push({k: 'smoke', x: o.x + (R() - .5) * 14, y: o.y, vx: (R() - .5) * 90, vy: -10 - R() * 35, g: -8, d: .93, life: 0, max: .6 + R() * .5, s: 4 + R() * 5});
+function fxPuff(o, n, col){
+  if (!o || calm()) return;
+  for (let k = 0; k < n; k++) FX.p.push({k: 'smoke', c: col, x: o.x + (R() - .5) * 14, y: o.y, vx: (R() - .5) * 90, vy: -10 - R() * 35, g: -8, d: .93, life: 0, max: .6 + R() * .5, s: 4 + R() * 5});
   fxKick();
 }
-function fxBoom(i, big, dx, dy){
-  const o = fxSpot(i, G.h[i]); if (!o || calm()) return;
-  const x = o.x + (dx || 0), y = o.y + (dy || 0), S = big ? 185 : 135, c = COL[i];
-  FX.p.push({k: 'flash', x, y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .28, s: big ? 16 : 11});
-  const bit = (sp, col, life, size, tw) => { const an = R() * 6.283;
-    FX.p.push({k: 'star', x, y, vx: Math.cos(an) * sp, vy: Math.sin(an) * sp, g: 70, d: .955, life: 0, max: life, c: col, s: size, tw, ph: R() * 6}); };
-  for (let k = 0; k < (big ? 46 : 30); k++) bit(S * (.9 + R() * .18), c, 1.1 + R() * .5, 2 + R() * 1.2, false);          // outer shell
-  for (let k = 0; k < (big ? 34 : 22); k++) bit(S * (.25 + R() * .55), R() < .5 ? c : '#FFFFFF', .8 + R() * .5, 1.5 + R(), true);   // glittery middle
-  for (let k = 0; k < (big ? 16 : 8); k++) bit(S * (.5 + R() * .6), '#FFD166', 1.5 + R() * .7, 1.6 + R(), true);         // gold streamers that drift down
+function fxRings(o, col, n){
+  if (!o || calm()) return;
+  for (let k = 0; k < n; k++) FX.p.push({k: 'ring', x: o.x, y: o.y, vx: 0, vy: 0, g: 0, d: 1, life: -k * .12, max: .7, c: col, s: 10, grow: 190});
   fxKick();
 }
+function fxConfetti(o, n, cols){
+  if (!o || calm()) return;
+  for (let k = 0; k < n; k++) FX.p.push({k: 'conf', x: o.x, y: o.y, vx: (R() - .5) * 420, vy: -(140 + R() * 330), g: 620, d: .985, life: 0, max: 1.5 + R() * 1.1, c: (cols || CONF)[rnd((cols || CONF).length)], s: 4 + R() * 3.5, r: R() * 6, vr: (R() - .5) * 14});
+  fxKick();
+}
+function fxRain(n, cols){
+  if (calm()) return;
+  for (let k = 0; k < n; k++) FX.p.push({k: 'conf', x: R() * window.innerWidth, y: -10 - R() * 260, vx: (R() - .5) * 70, vy: 70 + R() * 150, g: 150, d: .992, life: 0, max: 2.6 + R() * 1.6, c: (cols || CONF)[rnd((cols || CONF).length)], s: 4 + R() * 3.5, r: R() * 6, vr: (R() - .5) * 10});
+  fxKick();
+}
+// Points around a five-pointed star or a heart, used as launch directions so the burst keeps that outline as it grows.
+function shapePts(shape, n){
+  const out = [];
+  if (shape === 'heart') { for (let k = 0; k < n; k++) { const t = k / n * 6.283; out.push([16 * Math.pow(Math.sin(t), 3) / 17, -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 17]); } return out; }
+  const v = Array.from({length: 10}, (_, k) => { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? .42 : 1; return [Math.cos(a) * r, Math.sin(a) * r]; }), per = Math.max(2, Math.round(n / 10));
+  v.forEach((p, k) => { const q = v[(k + 1) % 10]; for (let j = 0; j < per; j++) out.push([p[0] + (q[0] - p[0]) * j / per, p[1] + (q[1] - p[1]) * j / per]); });
+  return out;
+}
+function fxBoomAt(o, c, big, shape){
+  if (!o || calm()) return;
+  const x = o.x, y = o.y, S = big ? 190 : 135, P = FX.p;
+  P.push({k: 'flash', x, y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .28, s: big ? 17 : 11});
+  P.push({k: 'ring', x, y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .45, c, s: 6, grow: S * .75});
+  const add = (vx, vy, col, life, size, o2) => P.push(Object.assign({k: 'star', x, y, vx, vy, g: 70, d: .955, life: 0, max: life, c: col, s: size, tw: false, ph: R() * 6}, o2));
+  const any = (sp, col, life, size, o2) => { const an = R() * 6.283; add(Math.cos(an) * sp, Math.sin(an) * sp, col, life, size, o2); };
+  if (shape === 'ring') {
+    const N = big ? 44 : 30;
+    for (let k = 0; k < N; k++) { const an = k / N * 6.283; add(Math.cos(an) * S, Math.sin(an) * S, c, 1.4, 2.5); if (k % 2) add(Math.cos(an) * S * .55, Math.sin(an) * S * .55, '#FFFFFF', 1.1, 1.8, {tw: true}); }
+  } else if (shape === 'star' || shape === 'heart') {
+    shapePts(shape, big ? 70 : 50).forEach(p => add(p[0] * S, p[1] * S, c, 1.6, 2.4));
+    for (let k = 0; k < 14; k++) any(S * (.1 + R() * .3), '#FFFFFF', .9 + R() * .4, 1.5, {tw: true});
+  } else if (shape === 'willow') {
+    for (let k = 0; k < (big ? 80 : 52); k++) any(S * (.4 + R() * .65), R() < .8 ? '#FFD166' : c, 1.9 + R() * .9, 1.8, {g: 125, d: .94, tw: true});
+  } else {
+    for (let k = 0; k < (big ? 48 : 32); k++) any(S * (.9 + R() * .18), c, 1.1 + R() * .5, 2 + R() * 1.2, {crk: big && k % 3 === 0});
+    for (let k = 0; k < (big ? 34 : 22); k++) any(S * (.25 + R() * .55), R() < .5 ? c : '#FFFFFF', .8 + R() * .5, 1.5 + R(), {tw: true});
+    for (let k = 0; k < (big ? 16 : 8); k++) any(S * (.5 + R() * .6), '#FFD166', 1.5 + R() * .7, 1.6 + R(), {tw: true});
+  }
+  fxKick();
+}
+const fxSmoke = i => fxPuff(fxSpot(i, 2), 14);
+const fxBoom = (i, big, dx, dy, shape) => { const o = fxSpot(i, G.h[i]); if (o) fxBoomAt({x: o.x + (dx || 0), y: o.y + (dy || 0)}, COL[i], big, shape || G.shape[i % G.shape.length]); };
 
 // A tap lifts that rocket to a low hover. Once every rocket is up they all climb together at the same speed,
 // so the order they burst in depends only on the secret heights, never on who tapped first.
@@ -2027,18 +2132,21 @@ A.fireGo = el => {
     G.climb = true;
     G.players.forEach((_, j) => {
       const r = document.getElementById('rk' + j), h = G.h[j], dur = (h - FIRE_HOLD) / FIRE_SPEED;
-      r.classList.remove('hover'); r.style.transition = `bottom ${dur}s linear`; r.style.bottom = `calc(${h}% - .85rem)`;
+      r.classList.remove('hover'); r.classList.add('climb'); r.style.transition = `bottom ${dur}s linear`; r.style.bottom = `calc(${h}% - .85rem)`;
       setTimeout(() => {
         if (!live()) return;
         G.st[j] = 2; buzz1();
-        fxBoom(j, false);
+        fxBoom(j, false); pulse(document.querySelector('.sky'), 'flash');
         const ln = document.getElementById('ln' + j); if (ln) ln.innerHTML = fireBurst(j);
         if (G.st.every(x => x === 2)) setTimeout(() => {
           if (!live()) return;
           G.win = G.h.indexOf(Math.max(...G.h)); G.done = true;
           const n = G.players[G.win]; pts('fire')[n] = (pts('fire')[n] || 0) + 1; save(); render();
-          // a bigger finale over the winner
-          fxBoom(G.win, true); setTimeout(() => { if (live()) fxBoom(G.win, true, -26, 22); }, 380); setTimeout(() => { if (live()) fxBoom(G.win, true, 24, -14); }, 760);
+          // a finale over the winner: three big bursts in different shapes, a shake, and confetti in their colour
+          const sky = () => document.querySelector('.sky');
+          fxBoom(G.win, true, 0, 0, 'peony'); pulse(sky(), 'flash'); pulse(sky(), 'shake');
+          setTimeout(() => { if (live()) { fxBoom(G.win, true, -30, 26, 'star'); pulse(sky(), 'flash'); } }, 420);
+          setTimeout(() => { if (live()) { fxBoom(G.win, true, 26, -10, 'willow'); pulse(sky(), 'flash'); fxRain(70, [COL[G.win], '#FFD166', '#FFFFFF']); } }, 860);
         }, 1300);
       }, dur * 1000 + 60);
     });
@@ -2048,25 +2156,51 @@ const buzz1 = () => { try { navigator.vibrate && navigator.vibrate(60); } catch 
 
 // balloon pump
 A.pumpGo = el => {
-  if (G.done) return;
-  const k = +el.dataset.k, name = G.players[G.turn % G.players.length];
-  if (G.size + k >= G.pop) {
-    G.size = G.pop; G.done = true; G.loser = name; buzz();
-    G.players.forEach(p => { if (p !== name) pts('pump')[p] = (pts('pump')[p] || 0) + 1; }); save();
-  } else { G.size += k; G.turn++; }
-  render();
+  if (G.done || G.popping) return;
+  const k = +el.dataset.k, name = G.players[G.turn % G.players.length], bal = document.getElementById('bal');
+  G.prev = G.size;
+  if (G.size + k < G.pop) {
+    G.size += k; G.turn++;
+    const o = fxCenter(bal); if (o) fxPuff({x: o.x, y: bal.getBoundingClientRect().bottom - 8}, 4 + k * 2, '#FFFFFF');
+    return render();
+  }
+  // it bursts: one last swell, then shards, a shake and a comic POP before the result
+  G.size = G.pop; G.popping = true; G.loser = name;
+  const round = G, o = fxCenter(bal);
+  if (bal) bal.style.setProperty('--s', (pumpScale(G.pop) * 1.18).toFixed(2));
+  tick = setTimeout(() => {
+    if (G !== round || view.n !== 'pump') return;
+    buzz();
+    if (o) { FX.p.push({k: 'flash', x: o.x, y: o.y, vx: 0, vy: 0, g: 0, d: 1, life: 0, max: .25, s: 26}); fxRings(o, '#E63946', 2); fxConfetti(o, 70, ['#E63946', '#FF9AA2', '#A4161A', '#FFFFFF']); }
+    render(); pulse(document.getElementById('app'), 'shake');
+    tick = setTimeout(() => {
+      if (G !== round || view.n !== 'pump') return;
+      G.popping = false; G.done = true;
+      G.players.forEach(p => { if (p !== name) pts('pump')[p] = (pts('pump')[p] || 0) + 1; }); save(); render();
+    }, 1100);
+  }, 230);
 };
 
 // stop the clock
 A.stopGo = () => {
   view.ph = 'run'; render(); G.t0 = performance.now();
-  tick = setInterval(() => { const e = (performance.now() - G.t0) / 1000, c = document.getElementById('clock'); if (c) c.textContent = e < G.hide ? e.toFixed(2) : '?.??'; }, 40);
+  const arc = document.getElementById('darc'), dial = document.getElementById('dial'), c = document.getElementById('clock');
+  tick = setInterval(() => {
+    const e = (performance.now() - G.t0) / 1000;
+    if (e < G.hide) { if (c) c.textContent = e.toFixed(2); if (arc) arc.style.strokeDashoffset = (339.3 * (1 - e / G.target)).toFixed(1); }
+    else if (dial && !dial.classList.contains('hid')) { dial.classList.add('hid'); if (c) c.textContent = '?.??'; }
+  }, 30);
 };
-A.stopHit = () => { if (view.ph !== 'run') return; G.times[G.i] = (performance.now() - G.t0) / 1000; clearInterval(tick); tick = null; view.ph = 'shown'; render(); };
+A.stopHit = () => {
+  if (view.ph !== 'run') return;
+  const t = G.times[G.i] = (performance.now() - G.t0) / 1000; clearInterval(tick); tick = null; view.ph = 'shown'; render();
+  if (Math.abs(t - G.target) < .15) fxConfetti({x: window.innerWidth / 2, y: window.innerHeight * .4}, Math.abs(t - G.target) < .05 ? 110 : 50);
+};
 A.stopNext = () => {
   if (G.i + 1 < G.players.length) { G.i++; return go('stopc', {ph: 'ready'}); }
   let best = 0; G.times.forEach((t, i) => { if (Math.abs(t - G.target) < Math.abs(G.times[best] - G.target)) best = i; });
   const n = G.players[best]; pts('stopc')[n] = (pts('stopc')[n] || 0) + 1; save(); go('stopc', {ph: 'end'});
+  fxRain(80, [COL[best % COL.length], '#FFD166', '#FFFFFF']);
 };
 
 // quick draw
@@ -2076,17 +2210,24 @@ A.quickStart = () => {
   const step = () => {
     tick = setTimeout(() => {
       if (!alive()) return;
+      G.lastOut = -1;
       if (fakes > 0) { fakes--; G.state = 'fake'; render(); tick = setTimeout(() => { if (!alive()) return; G.state = 'wait'; render(); step(); }, 550); }
-      else { G.state = 'go'; G.t0 = performance.now(); buzz1(); render(); }
+      else { G.state = 'go'; G.t0 = performance.now(); buzz1(); render(); fxRings(fxCenter(document.getElementById('sig')), '#3DDC84', 3); }
     }, 1600 + rnd(3200));
   };
-  G.state = 'wait'; render(); step();
+  G.state = 'wait'; G.lastOut = -1; render(); step();
 };
 A.quickTap = el => {
   const i = +el.dataset.i, st = G.state;
   if (st === 'idle' || st === 'done' || G.out.includes(i)) return;
-  if (st === 'go') { G.ms = Math.round(performance.now() - G.t0); G.win = i; G.state = 'done'; const n = G.players[i]; pts('quick')[n] = (pts('quick')[n] || 0) + 1; save(); }
-  else { G.out.push(i); if (G.out.length === G.players.length) { clearTimeout(tick); tick = null; G.win = -1; G.state = 'done'; } }
+  G.lastOut = -1;
+  if (st === 'go') {
+    G.ms = Math.round(performance.now() - G.t0); G.win = i; G.state = 'done'; const n = G.players[i]; pts('quick')[n] = (pts('quick')[n] || 0) + 1; save(); render();
+    const o = fxCenter(document.getElementById('pd' + i)); fxConfetti(o, 90, [COL[i], '#FFD166', '#FFFFFF']); fxRings(o, COL[i], 2);
+    return;
+  }
+  G.out.push(i); G.lastOut = i;
+  if (G.out.length === G.players.length) { clearTimeout(tick); tick = null; G.win = -1; G.state = 'done'; }
   render();
 };
 
@@ -2134,6 +2275,10 @@ function after(){
     if (view.left <= 0) { buzz(); return A.grReady(); }
     const c = document.getElementById('clock'); if (c) c.textContent = mmss(view.left);
   }, 1000);
+  const bal = document.getElementById('bal');
+  if (bal) requestAnimationFrame(() => requestAnimationFrame(() => bal.style.setProperty('--s', bal.dataset.s)));
+  const mks = document.querySelectorAll('.mk[data-x]');
+  if (mks.length) requestAnimationFrame(() => requestAnimationFrame(() => mks.forEach((m, k) => { m.style.transitionDelay = (k * .12) + 's'; m.style.left = m.dataset.x + '%'; })));
   if (view.focus) { const f = document.getElementById(view.focus); view.focus = null; if (f) f.focus(); }
 }
 document.addEventListener('click', e => {
