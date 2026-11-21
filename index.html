@@ -1110,10 +1110,27 @@ const TOD = {
 
 const WHO = {
   easy: ['Santa','A pirate','An astronaut','A firefighter','A dinosaur','A mermaid','A kiwi bird','A snowman','A princess','A wizard',
-    'A robot','A lion','A teacher','A reindeer','A superhero','A dragon','A farmer','A penguin','The tooth fairy','A shark','An elf','A clown'],
-  hard: ['Cleopatra','Albert Einstein','William Shakespeare','Leonardo da Vinci','Sir Edmund Hillary','Neil Armstrong','Queen Victoria',
-    'Kate Sheppard','Marie Curie','Captain Cook','Ernest Rutherford','Julius Caesar','A Viking','A ninja','A lighthouse keeper','A vampire',
-    'A news reader','An Olympic swimmer','A weather forecaster','A sheep shearer','A ghost','A magician']
+    'A robot','A lion','A teacher','A reindeer','A superhero','A dragon','A farmer','A penguin','The tooth fairy','A shark','An elf','A clown',
+    'A doctor','A chef','A police officer','A pilot','A builder','A dentist','A vet','A postie','A bus driver','A lifeguard','A ballerina','A footballer',
+    'A rugby player','A magician','A king','A queen','A knight','A fairy','A giant','A witch','A ghost','A vampire','A mummy','A zombie','An alien','A unicorn',
+    'A monkey','An elephant','A giraffe','A kangaroo','A koala','A crocodile','A dolphin','A whale','An octopus','A butterfly','A bee','A spider','A frog',
+    'A rabbit','A cat','A dog','A horse','A cow','A sheep','A pig','A chicken','A duck','An owl','A parrot','A tiger','A zebra','A hippo','A polar bear',
+    'A panda','A sloth','A hedgehog','A snail','A tortoise','A T. rex','The Easter Bunny','Cinderella','Snow White','Little Red Riding Hood','Goldilocks',
+    'Pinocchio','Peter Pan','Robin Hood','Humpty Dumpty','The Gingerbread Man','The Big Bad Wolf','Jack Frost','A scarecrow','A cowboy','A ninja','A baby',
+    'A grandma','A baker','A train driver','A gardener','A scientist','A singer','A zookeeper','A cheerleader'],
+  hard: ['Cleopatra','Albert Einstein','William Shakespeare','Leonardo da Vinci','Sir Edmund Hillary','Neil Armstrong','Queen Victoria','Kate Sheppard',
+    'Marie Curie','Captain Cook','Ernest Rutherford','Julius Caesar','Isaac Newton','Charles Darwin','Galileo','Mozart','Beethoven','Vincent van Gogh',
+    'Pablo Picasso','Michelangelo','Florence Nightingale','Joan of Arc','Queen Elizabeth the First','King Henry the Eighth','Napoleon','Alexander the Great',
+    'Tutankhamun','Christopher Columbus','Marco Polo','Abraham Lincoln','George Washington','Winston Churchill','Nelson Mandela','Mahatma Gandhi',
+    'Martin Luther King Jr','Rosa Parks','Amelia Earhart','The Wright brothers','Thomas Edison','Alexander Graham Bell','Charles Dickens','Jane Austen',
+    'Agatha Christie','Beatrix Potter','Hans Christian Andersen','Charlie Chaplin','Elvis Presley','Harry Houdini','Pelé','Muhammad Ali','Jonah Lomu',
+    'Sir Peter Blake','Jean Batten','Dame Whina Cooper','Katherine Mansfield','Tenzing Norgay','Yuri Gagarin','Captain Scott','Ernest Shackleton','Blackbeard',
+    'King Arthur','Merlin','Sherlock Holmes','Dracula','Frankenstein\'s monster','Zeus','Hercules','Medusa','Thor','Māui','King Midas','Aladdin',
+    'Long John Silver','Robinson Crusoe','Ebenezer Scrooge','Oliver Twist','Alice in Wonderland','The Mad Hatter',
+    'A Viking','A lighthouse keeper','A news reader','An Olympic swimmer','A weather forecaster','A sheep shearer','A Roman gladiator','A court jester',
+    'A samurai','A pharaoh','A deep-sea diver','A beekeeper','An auctioneer','A tightrope walker','A ventriloquist','A mountain guide','A referee',
+    'A librarian','A taxi driver','An orchestra conductor','A lion tamer','A chimney sweep','A town crier','A stunt double','A mime artist','A ski instructor',
+    'A park ranger','A food critic','A customs officer','A detective','A spy','A lollipop person']
 };
 
 const GIFTS = [['🧸','Teddy'],['🚲','Bike'],['🎸','Guitar'],['⚽','Football'],['🎮','Video game'],['📚','Books'],['🧦','Socks'],['🪁','Kite'],
@@ -1164,8 +1181,12 @@ const THEMES = {
 };
 
 const SPOTS = {
-  easy: ['The beach','School','The zoo','The supermarket','A playground','The library','A swimming pool','A farm','The cinema','A birthday party','A hospital','The circus'],
-  hard: ['An airport','A space station','A pirate ship','A submarine','A museum','A ski field','A campground','A restaurant','A train station','A castle','A film set','A police station','A hotel','A rugby stadium']
+  easy: ['The beach','School','The zoo','The supermarket','A playground','The library','A swimming pool','A farm','The cinema','A birthday party','A hospital','The circus',
+    'A bakery','The dentist','A fire station','A petrol station','The post office','A toy shop','A bus','A school sports day','An ice cream shop','A pet shop','A bowling alley',
+    'A fairground','The dairy','A skate park'],
+  hard: ['An airport','A space station','A pirate ship','A submarine','A museum','A ski field','A campground','A restaurant','A train station','A castle','A film set',
+    'A police station','A hotel','A rugby stadium','A cruise ship','A wedding','A lighthouse','A haunted house','A theme park','A bank','A hair salon','A vineyard',
+    'A courtroom','A marae','An Antarctic base','A recording studio','A sheep station','A ferry']
 };
 
 // [question, right answer, three wrong answers]
@@ -1272,7 +1293,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.1'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.2'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
