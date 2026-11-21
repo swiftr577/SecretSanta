@@ -337,7 +337,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .peek .pk{display:flex; align-items:center; justify-content:center; width:100%; height:100%; animation:popin .45s cubic-bezier(.3,1.8,.5,1) .28s both}
 .peek .pk span{display:inline-block; animation:bobble 1.5s ease-in-out infinite alternate}
 .peek .pl,.peek .pr{position:absolute; top:0; bottom:0; width:52%; z-index:1; background:repeating-linear-gradient(90deg,#A8475A 0 9px,#8E3A4C 9px 13px); animation:partL .55s cubic-bezier(.5,0,.3,1) .05s both}
-.peek .pl{left:0} .peek .pr{right:0; animation-name:partR}
+.peek .pl{left:0; transform:translateX(-78%)} .peek .pr{right:0; transform:translateX(78%); animation-name:partR}
 .caught{position:relative; width:100%; height:240px; border-radius:18px; overflow:hidden; background:linear-gradient(#070A1C,#1A2452 80%,#2B3068)}
 .caught .cone{position:absolute; left:50%; top:-12px; width:340px; height:300px; margin-left:-170px; transform-origin:50% 0; animation:conesway 2.6s ease-in-out infinite alternate;
   background:conic-gradient(from 158deg at 50% 0,transparent 0deg,rgba(255,255,215,.55) 7deg,rgba(255,255,215,.55) 37deg,transparent 44deg)}
@@ -401,7 +401,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 /* classics */
 .gc{position:relative}
 .gc svg{width:68%; height:68%; fill:none; stroke:currentColor; stroke-width:5; stroke-linecap:round}
-.gc.new svg *{stroke-dasharray:90; stroke-dashoffset:90; animation:drawin .38s ease-out forwards}
+.gc.new svg *{stroke-dasharray:90; animation:drawin .38s ease-out}
 .gc .disc{position:absolute; inset:-2px; border-radius:50%; z-index:1}
 .gc .disc.p0{background:radial-gradient(circle at 35% 30%,#F0676E,var(--accent) 60%); box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
 .gc .disc.p1{background:radial-gradient(circle at 35% 30%,#FFE08A,var(--gold) 60%); box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
@@ -420,7 +420,7 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .spanel .sman *{stroke:#12332B} .spanel .sman .dk{fill:#12332B} .spanel .sman circle:not(.dk){fill:#fff}
 .word span.pop{animation:popin .4s cubic-bezier(.3,1.9,.5,1)}
 .word.wave span{animation:wave .5s ease-in-out calc(var(--i) * .06s) 2 alternate}
-@keyframes drawin{to{stroke-dashoffset:0}}
+@keyframes drawin{from{stroke-dashoffset:90} to{stroke-dashoffset:0}}
 @keyframes dropin{0%{transform:translateY(calc(var(--r) * -110%))} 68%{transform:translateY(0)} 82%{transform:translateY(-14%)} 100%{transform:none}}
 @keyframes hitpulse{from{box-shadow:0 0 0 3px var(--ink)} to{box-shadow:0 0 0 6px var(--gold), 0 0 18px 4px var(--gold)}}
 @keyframes flipin{from{transform:rotateY(90deg) scale(.92)} to{transform:none}}
@@ -1293,7 +1293,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.3'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.4'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
