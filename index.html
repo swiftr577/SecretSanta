@@ -136,11 +136,13 @@ main>.tag{align-self:flex-start}
 }
 .hold em{font-style:normal; font-size:2.6rem; line-height:1}
 .hold svg{position:absolute; inset:-12px; width:calc(100% + 24px); height:calc(100% + 24px); transform:rotate(-90deg); pointer-events:none}
-.hold circle{fill:none; stroke-width:5}
+.hold circle{fill:none; stroke-width:8}
 .hold .trk{stroke:var(--line)}
-.hold .rng{stroke:var(--gold); stroke-linecap:round; stroke-dasharray:302; stroke-dashoffset:302; transition:stroke-dashoffset .2s}
-.hold.on{transform:scale(.97)}
-.hold.on .rng{stroke-dashoffset:0; transition:stroke-dashoffset .9s linear}
+.hold .rng{stroke:var(--gold); stroke-linecap:round; stroke-dasharray:289; stroke-dashoffset:289}
+.hold{--p:0; transform:scale(calc(1 - var(--p) * .05))}
+.hold::after{content:""; position:absolute; inset:0; border-radius:50%; pointer-events:none; background:conic-gradient(rgba(255,255,255,.28) calc(var(--p) * 360deg), transparent 0)}
+.hold em,.hold .hl{position:relative; z-index:1}
+.hold.full{animation:popin .25s cubic-bezier(.3,1.9,.5,1)}
 .hold.small{width:150px; height:150px; font-size:1rem}
 
 /* pin */
@@ -1046,7 +1048,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.16'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.17'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1096,7 +1098,7 @@ const page = (title, body, back, quit) =>
     : `<button class="back arrow" data-act="nav" data-to="${back || 'home'}" aria-label="Back">‹</button>`}<h1>${esc(title)}</h1></header><main>${body}</main>`;
 
 const holdBtn = (label, small) =>
-  `<button class="hold${small ? ' small' : ''}" id="hold"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="48"/><circle class="rng" cx="50" cy="50" r="48"/></svg><em aria-hidden="true">${small ? '👁' : '🎁'}</em>${label}</button>`;
+  `<button class="hold${small ? ' small' : ''}" id="hold" data-l="${label}"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="46"/><circle class="rng" cx="50" cy="50" r="46"/></svg><em aria-hidden="true">${small ? '👁' : '🎁'}</em><span class="hl">${label}</span></button>`;
 
 const clock = () =>
   `<div class="clock${view.left === 0 ? ' done' : ''}"><div id="clock" role="timer">${mmss(view.left)}</div><div class="pair">` +
@@ -1216,6 +1218,13 @@ V.admin = () => {
   h += `<section><h2>New draw</h2><input id="drawName" type="text" maxlength="30" value="${esc(nm)}" aria-label="Name for this draw">` +
     `<button class="btn" data-act="runDraw" ${s.people.length < 3 ? 'disabled' : ''}>Draw names</button>` +
     (s.draws.length ? `<p class="muted">A new draw becomes the one people reveal. Earlier draws stay in the list below.</p>` : '') + `</section>`;
+  if (s.draws.length) { const d = s.draws[0];
+    h += `<section><h2>Current draw</h2><p class="lead"><strong>${esc(d.name)}</strong></p><p class="muted">${d.seen.length} of ${d.pairs.length} people have looked.</p>` +
+      `<button class="btn alt" data-act="resetSeen" data-confirm="Tap again to let everyone look again" ${d.seen.length ? '' : 'disabled'}>Reset who has looked</button>` +
+      `<p class="muted">Keeps the same matches. Everyone can reveal their name again.</p>` +
+      `<button class="btn alt" data-act="redraw" data-confirm="Tap again to draw new matches">Draw the names again</button>` +
+      `<p class="muted">Same people and spend limit, brand new matches.</p>` +
+      `<button class="btn quiet danger" data-act="delDraw" data-confirm="Tap again to delete this draw">Delete this draw</button></section>`; }
   h += `<section><h2>Draws</h2>` + (s.draws.length
     ? `<div class="list">${s.draws.map((d, i) => `<button class="row" data-act="openDraw" data-i="${i}"><span>${esc(d.name)}</span><span class="st">${fmtDate(d.date)}${i === 0 ? '<br>Current' : ''}</span></button>`).join('')}</div>`
     : `<p class="muted">Nothing drawn yet.</p>`) + `</section>`;
@@ -1854,9 +1863,10 @@ A.peek = el => { const i = +el.dataset.i, o = view.open || []; view.open = o.inc
 A.showAll = () => { const d = S.santa.draws[view.i], ad = d.admins || []; view.open = d.pairs.map((p, i) => ad.includes(p.r) ? -1 : i).filter(i => i >= 0); render(); };
 A.hideAll = () => { view.open = []; render(); };
 A.unsee = el => { const d = S.santa.draws[view.i], n = d.seen[+el.dataset.i]; d.seen.splice(+el.dataset.i, 1); save(); toast(`${n} can look again`); render(); };
-A.resetSeen = () => { const d = S.santa.draws[view.i]; d.seen = []; save(); toast('Everyone can look again'); render(); };
-A.redraw = () => { const d = S.santa.draws[view.i]; d.pairs = drawPairs(d.pairs.map(p => p.g)); d.seen = []; d.date = new Date().toISOString(); save(); view.open = []; toast('New matches drawn'); render(); };
-A.delDraw = () => { S.santa.draws.splice(view.i, 1); save(); toast('Draw deleted'); go('admin'); };
+const drawIdx = () => view.n === 'draw' ? view.i : 0;   // the Admin screen acts on the current draw
+A.resetSeen = () => { const d = S.santa.draws[drawIdx()]; d.seen = []; save(); toast('Everyone can look again'); render(); };
+A.redraw = () => { const d = S.santa.draws[drawIdx()]; d.pairs = drawPairs(d.pairs.map(p => p.g)); d.seen = []; d.date = new Date().toISOString(); save(); view.open = []; toast('New matches drawn'); render(); };
+A.delDraw = () => { S.santa.draws.splice(drawIdx(), 1); save(); toast('Draw deleted'); go('admin'); };
 A.export = () => {
   const name = `pass-the-phone-backup-${new Date().toISOString().slice(0, 10)}.json`, data = JSON.stringify(S, null, 1);
   try {
@@ -2561,9 +2571,21 @@ function holdDone(){
 function after(){
   const h = document.getElementById('hold');
   if (h) {
-    let t = null;
-    const stop = () => { clearTimeout(t); t = null; h.classList.remove('on'); };
-    const start = e => { e.preventDefault(); if (t) return; h.classList.add('on'); t = setTimeout(() => { t = null; holdDone(); }, 900); };
+    // The ring and the wedge inside the button fill steadily while it is held, and are full after two seconds.
+    // Letting go early winds them back down.
+    const ring = h.querySelector('.rng'), lab = h.querySelector('.hl'), HOLD = 2000, LEN = 289;
+    let down = false, t0 = 0, prog = 0, raf = 0, fired = false;
+    const paint = () => { ring.style.strokeDashoffset = (LEN * (1 - prog)).toFixed(1); h.style.setProperty('--p', prog.toFixed(3)); };
+    const frame = now => {
+      raf = 0;
+      if (fired || !document.body.contains(h)) return;
+      prog = down ? Math.min(1, (now - t0) / HOLD) : Math.max(0, prog - .05);
+      paint();
+      if (prog >= 1) { fired = true; h.classList.add('full'); buzz1(); return setTimeout(holdDone, 140); }
+      if (down || prog > 0) raf = requestAnimationFrame(frame);
+    };
+    const start = e => { e.preventDefault(); if (down || fired) return; down = true; t0 = performance.now() - prog * HOLD; h.classList.add('on'); lab.textContent = 'Keep holding'; if (!raf) raf = requestAnimationFrame(frame); };
+    const stop = () => { if (!down || fired) return; down = false; h.classList.remove('on'); lab.textContent = h.dataset.l; if (!raf) raf = requestAnimationFrame(frame); };
     h.addEventListener('pointerdown', start);
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(x => h.addEventListener(x, stop));
     h.addEventListener('contextmenu', e => e.preventDefault());

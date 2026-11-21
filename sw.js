@@ -1,5 +1,5 @@
 // Lets the app open with no signal. Network first, so updates show up straight away.
-const CACHE = 'pass-the-phone-1.16';
+const CACHE = 'pass-the-phone-1.17';
 const FILES = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
