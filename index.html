@@ -848,6 +848,116 @@ Object.assign(WORDS, {
   }
 });
 
+// A second descriptive clue for every word, so players in the same round can each be given a different one.
+const CLUE2 = {
+  'Lion':'It lives in a pride on the African plains','Penguin':'It waddles on ice in a black and white coat','Elephant':'It has big floppy ears and tusks','Kiwi':'A shy brown bird that lays a very big egg',
+  'Giraffe':'It has brown patches and eats leaves from the treetops','Shark':'A fin above the water means it is near','Chameleon':'Its eyes swivel separately and its tongue shoots out',
+  'Platypus':'It has webbed feet and a tail like a beaver','Octopus':'It can squeeze through tiny gaps and has three hearts','Hedgehog':'It snuffles around gardens after dark',
+  'Albatross':'It can glide for hours without flapping','Tuatara':'It has a spiny crest and lives on offshore islands',
+  'Worm':'It has no legs and comes up when it rains','Sunflower':'Its big head is full of seeds','Watering can':'It has a handle and a long spout','Butterfly':'It flutters from bloom to bloom',
+  'Trampoline':'Round, springy and often has a net','Lawnmower':'You push it up and down in stripes','Compost bin':'Worms love it, and it gets warm inside','Wheelbarrow':'You tip it up to empty it',
+  'Bumblebee':'Round, striped and louder than its cousins','Greenhouse':'Tomatoes grow well inside it','Clothesline':'It needs pegs and a sunny day','Scarecrow':'It wears old clothes and stands on a pole',
+  'Pizza':'It comes in a flat square box','Ice cream':'It melts if you are too slow','Banana':'Monkeys are said to love it','Popcorn':'Salty or sweet, in a big bucket','Pancake':'Served in a stack with syrup',
+  'Carrot':'Rabbits and snowmen both like one','Pavlova':'New Zealand and Australia argue over who invented it','Sushi':'Often eaten with chopsticks and soy sauce','Avocado':'Mashed up, it becomes guacamole',
+  'Lasagne':'Baked in a deep dish with white sauce','Feijoa':'Neighbours give bags of them away','Croissant':'Shaped like a crescent moon',
+  'Fridge':'It hums, and a light comes on when you open it','Toothbrush':'It has bristles and needs paste','Couch':'Coins and remotes get lost down the back of it','Television':'You change its channels',
+  'Pillow':'Good for a fight at a sleepover','Vacuum cleaner':'It has a hose and a bag to empty','Dishwasher':'You stack it, add a tablet and press start','Smoke alarm':'It chirps when its battery is low',
+  'Letterbox':'It has a number on it','Remote control':'It needs batteries and always goes missing','Hot water bottle':'Made of rubber, with a stopper','Fuse box':'You check it when the lights go out',
+  'Football':'Eleven players a side, and only the keeper uses hands','Swimming':'You need togs and goggles','Hide and seek':'Ready or not, here I come','Basketball':'Played by very tall people in singlets',
+  'Skateboard':'You do tricks on it at a park with ramps','Tag':'You touch someone and shout','Rugby':'The All Blacks play it','Chess':'Played on 64 black and white squares','Surfing':'You paddle out and wait for a good one',
+  'Netball':'Seven a side, with positions written on bibs','Archery':'Robin Hood was good at it','Monopoly':'Go to jail, do not pass Go',
+  'Santa':'He says ho ho ho','Reindeer':'One of them has a red nose','Christmas tree':'Presents go underneath it','Candy cane':'Shaped like a walking stick','Snowman':'He wears a scarf and has coal for eyes',
+  'Stocking':'A giant sock by the fireplace','Mistletoe':'It has white berries and hangs in a doorway','Advent calendar':'It often hides a chocolate each morning','Christmas cracker':'Two people pull it across the table',
+  'Tinsel':'It wraps around the tree like a fluffy rope','Pōhutukawa':'It grows along the coast and turns crimson in December','Gingerbread house':'Held together with icing',
+  'Beach':'You need a towel and sunscreen there','School':'A bell tells you when to go in','Zoo':'It has keepers and enclosures','Playground':'It has a seesaw and a sandpit','Supermarket':'You pay at the checkout',
+  'Library':'You need a card to take things home','Airport':'You show a passport and wait at a carousel','Museum':'It might have a dinosaur skeleton','Lighthouse':'Its beam spins to warn of rocks',
+  'Volcano':'Rangitoto and Ruapehu are examples','Aquarium':'You walk through a glass tunnel there','Campground':'It has shared showers and a camp kitchen',
+  'Firefighter':'Rides a big red truck with a siren','Teacher':'Marks your work and reads stories','Doctor':'Listens to your chest with a stethoscope','Chef':'Wears a tall white hat','Pilot':'Sits in the cockpit',
+  'Farmer':'Drives a tractor and gets up early','Astronaut':'Floats around and wears a helmet','Dentist':'Says open wide','Electrician':'Works with switches, plugs and power','Vet':'Your dog might not like visiting',
+  'Architect':'Makes plans before the builders arrive','Lifeguard':'Sits in a tall chair with a whistle',
+  'Sandcastle':'The tide washes it away','Seagull':'It squawks and hangs about near picnics','Crab':'It hides under rocks and scuttles off','Towel':'You lie on it on the sand','Seashell':'Hold it to your ear to hear the ocean',
+  'Sunscreen':'It comes in a bottle with a number on it','Jellyfish':'It has tentacles and no brain','Surf lifesaver':'A volunteer in a red and yellow cap','Rock pool':'You might find a starfish in one',
+  'Driftwood':'Smooth, pale and good for building a hut','Boogie board':'It has a leash for your wrist','High tide':'It happens twice a day',
+  'Pencil':'It has a rubber on the end','Lunchbox':'You open it at midday','Classroom':'It has desks and a board at the front','Playtime':'Morning tea happens then','Whiteboard':'You wipe it clean with a duster',
+  'School bag':'It has straps and a zip','Assembly':'Certificates are handed out there','Homework':'The dog is sometimes blamed for eating it','Principal':'You get sent to their office','Report card':'It has grades and comments',
+  'Science fair':'Judges walk around and give prizes','Calculator':'It has number buttons and a little screen',
+  'Bus':'You wait for it at a stop','Aeroplane':'You board it at a gate','Bicycle':'It has a bell, a chain and handlebars','Train':'It stops at stations and has carriages','Boat':'It might have sails or oars',
+  'Scooter':'It has handlebars and a small deck','Helicopter':'It can hover and land on a rooftop','Ferry':'One crosses Cook Strait','Motorbike':'The rider wears a helmet and leathers',
+  'Hot air balloon':'A burner roars to make it rise','Campervan':'You drive it and sleep in it','Tram':'Christchurch has old ones for tourists',
+  'Gumboots':'Farmers wear them','Pyjamas':'They often have a matching top and bottom','Hat':'It keeps the sun off your face','Socks':'One always goes missing in the wash','Raincoat':'It has a hood and is waterproof',
+  'Jandals':'They have a strap between your toes','Wetsuit':'Surfers and divers zip themselves into one','Dressing gown':'It ties with a cord at the waist','Tie':'You knot it under your chin',
+  'Onesie':'It zips up the front, feet and all','Apron':'It ties at the back','Swanndri':'Farmers and hunters wear it, often in checks',
+  'Rainbow':'A pot of gold is said to be at the end','Snow':'You can make a ball or an angel with it','Thunder':'It comes after the flash','Wind':'It makes kites fly','Puddle':'Gumboots are made for it',
+  'Sunshine':'It gives you a shadow','Lightning':'It strikes tall things first','Hail':'It bounces and can dent a car','Fog':'Planes cannot land in it','Frost':'You scrape it off the windscreen',
+  'Nor\'wester':'It brings an arch of cloud over the plains','Tornado':'It is also called a twister',
+  'Moon':'People have walked on it','Rocket':'It counts down from ten','Star':'You can wish on one','Sun':'Never look straight at it','Telescope':'It makes far things look near','Alien':'Little, green and from a flying saucer',
+  'Saturn':'The sixth planet from the sun','Black hole':'It forms when a giant star collapses','Comet':'A famous one is named after Halley','Matariki':'It gives New Zealand a winter public holiday',
+  'Satellite':'It beams TV and helps your phone find its way','Milky Way':'It contains billions of stars, including ours',
+  'Dolphin':'It clicks and whistles to its friends','Whale':'It breathes through a blowhole','Starfish':'It clings to rocks and can regrow an arm','Turtle':'It lays its eggs on a beach',
+  'Mermaid':'She sits on a rock and combs her hair','Seaweed':'It washes up on the beach in piles','Seahorse':'The father carries the babies','Stingray':'It glides along the sea floor like a kite',
+  'Coral reef':'Australia has a great one','Submarine':'It uses a periscope to see above','Shipwreck':'It might hold lost treasure','Crayfish':'Caught in a pot, and it has long feelers',
+  'Drum':'It keeps the beat','Guitar':'It has six strings and a long neck','Piano':'You sit on a stool to play it','Singing':'A choir does it together','Recorder':'It has holes you cover with your fingers',
+  'Trumpet':'It has three valves to press','Ukulele':'It comes from Hawaii','Violin':'The smallest of the string family in an orchestra','Bagpipes':'Played in a kilt','Conductor':'Stands at the front with a baton',
+  'Choir':'Sopranos, altos, tenors and basses','Saxophone':'It has a reed and lots of keys',
+  'Nose':'It runs when you have a cold','Teeth':'The first ones fall out','Knee':'You graze it when you fall over','Ears':'They hold up your glasses','Hair':'You brush it and wash it with shampoo',
+  'Thumb':'You stick it up to say well done','Elbow':'You should keep it off the table','Heart':'It beats faster when you run','Eyebrow':'You raise it when surprised','Skeleton':'A popular Halloween costume',
+  'Belly button':'Yours is an innie or an outie','Funny bone':'It is really a nerve',
+  'Teddy bear':'It has button eyes and stuffing','Ball':'It bounces','Kite':'It has a long tail and gets stuck in trees','Jigsaw puzzle':'You start with the edges','Building blocks':'It hurts to stand on one barefoot',
+  'Bubbles':'Made with a wand and soapy water','Yo-yo':'You can walk the dog with it','Rubik\'s cube':'It has six faces and nine squares on each','Board game':'It comes in a box with rules in the lid',
+  'Remote control car':'It has an aerial and a handset','Pogo stick':'It has a big spring inside','Marbles':'You keep them in a bag and try to win more',
+  'Cow':'Black and white, and it chews all day','Sheep':'It gets shorn once a year','Pig':'It has a curly tail and a snout','Tractor':'It has huge back tyres','Chicken':'It lives in a coop','Horse':'It wears shoes and a saddle',
+  'Sheepdog':'It obeys whistles','Shearing shed':'It is full of fleeces and clippers','Hay bale':'Wrapped in plastic, it looks like a giant marshmallow','Electric fence':'It ticks, and you only touch it once',
+  'Milking shed':'It has cups and a big vat','Quad bike':'The dog often rides on the back',
+  'Spoon':'You stir with it','Toaster':'It has slots and a lever','Oven':'You wear mitts to open it','Cup':'It has a handle and sits on a saucer','Kettle':'It whistles or clicks off','Plate':'Round, flat and washed after tea',
+  'Whisk':'Made of wire loops','Microwave':'It has a turntable inside','Rolling pin':'A wooden cylinder with handles','Colander':'Good for washing vegetables too','Tea towel':'Often printed with a calendar or a map',
+  'Recipe book':'Full of ingredients and methods',
+  'Dragon':'It has wings, scales and a hoard of gold','Princess':'She might kiss a frog','Giant':'He says fee-fi-fo-fum','Witch':'She stirs a cauldron','Unicorn':'It is white and loves rainbows',
+  'Castle':'It has a moat and a drawbridge','Fairy godmother':'She turned a pumpkin into a coach','Glass slipper':'It fitted only one foot','Troll':'The billy goats tricked it','Magic beans':'Jack swapped a cow for them',
+  'Big bad wolf':'He dressed up as a grandmother','Spinning wheel':'It turns straw into gold in one story',
+  'Kiwifruit':'It used to be called a Chinese gooseberry','Haka':'It involves stamping and poking out the tongue','Pūkeko':'It struts across swampy paddocks','Hokey pokey':'A favourite flavour in a cone',
+  'All Blacks':'They perform a haka before kick-off','Silver fern':'Its leaves are pale underneath','Marae':'You are welcomed onto it with a pōwhiri','Hāngī':'It uses hot stones and takes hours',
+  'Pounamu':'It is found in South Island rivers','Kea':'It pulls the rubber off parked cars','Cook Strait':'The Interislander crosses it','Bach':'In the south it is called a crib',
+  'Cake':'You cut it and everyone sings','Balloon':'It floats if filled with helium','Present':'You tear it open','Party hat':'Held on with elastic under the chin','Candles':'One for every year',
+  'Musical chairs':'There is always one seat too few','Piñata':'You wear a blindfold to play','Pass the parcel':'Everyone sits in a circle','Invitation':'It asks you to RSVP',
+  'Fairy bread':'Cut into triangles, with hundreds and thousands','Goody bag':'You get it as you leave','Sleepover':'Nobody gets much rest',
+  'Tent':'It has pegs, poles and a fly','Campfire':'People sing songs and tell ghost stories by it','Torch':'You shine it under your chin to look spooky','Sleeping bag':'You roll it up in the morning',
+  'Marshmallow':'Pink or white, and gooey when hot','Backpack':'It has straps for your shoulders','Compass':'It has N, S, E and W on it','Sandfly':'Its bite itches for days','Gas cooker':'It needs a canister and a match',
+  'Long drop':'You hold your nose in there','Chilly bin':'You fill it with ice','Tramping hut':'It has bunks and a logbook',
+  'Spider':'Little Miss Muffet did not like it','Ant':'It can carry far more than its own weight','Ladybird':'In the rhyme, its house is on fire','Snail':'It leaves a silver trail','Bee':'It lives in a hive and can sting',
+  'Caterpillar':'It spins a cocoon','Wētā':'It lives in holes in trees and looks fierce','Praying mantis':'It turns its head to look at you','Centipede':'Its name means a hundred feet',
+  'Cicada':'It leaves an empty shell on tree trunks','Glow-worm':'Waitomo is famous for them','Dragonfly':'It hovers and darts over water',
+  'T. rex':'The king of the tyrant lizards','Fossil':'A museum keeps them','Dinosaur egg':'It sits in a nest','Caveman':'He carries a club in cartoons','Cave painting':'It often shows animals and hunters',
+  'Footprint':'You leave one in wet sand','Triceratops':'It looked a bit like a rhino','Pterodactyl':'It soared above the dinosaurs','Woolly mammoth':'It had long curved tusks',
+  'Moa':'It stood taller than a person and could not fly','Stegosaurus':'It had a tiny head and a brain to match','Asteroid':'It left a giant crater',
+  'Chocolate':'It comes in bars and Easter eggs','Lollipop':'You lick it until it is gone','Milkshake':'Strawberry, banana or caramel','Biscuit':'Kept in a tin or a jar','Jelly':'It sets in the fridge',
+  'Hot chocolate':'Often topped with marshmallows','Candy floss':'Pink, and it melts on your tongue','Lamington':'Chocolate or raspberry, and square','Smoothie':'Made in a blender',
+  'Afghan biscuit':'A dark, crunchy treat with icing','Pineapple lumps':'They come in a yellow bag','Lemonade':'Children sell it from a stall',
+  'Sneezing':'People say bless you','Laughing':'It makes your tummy hurt if you do it too much','Sleeping':'You dream while doing it','Dancing':'People do it at a disco','Hugging':'A bear is known for it',
+  'Yawning':'It is catching','Hiccups':'People try to scare them away','Daydreaming':'The teacher tells you to pay attention','Tiptoeing':'You do it past a sleeping baby','Whistling':'You do it to call a dog',
+  'Sleepwalking':'You remember nothing in the morning','Blushing':'It happens when you are embarrassed'
+};
+
+// Every player who knows the word gets a clue nobody else has: two descriptions first, then facts about the word itself.
+function impClues(e, n){
+  const w = e[0], L = [...w].filter(isLetter).map(flat), len = L.length, words = w.trim().split(/\s+/).length;
+  const cat = Object.keys(WORDS).find(c => WORDS[c].easy.includes(e) || WORDS[c].hard.includes(e));
+  const v = L.filter(x => 'AEIOU'.includes(x)).length, ord = ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth'];
+  const out = [e[1]];
+  if (CLUE2[w]) out.push(CLUE2[w]);
+  if (cat) out.push(`You would find it under "${cat}".`);
+  out.push(`It starts with the letter ${L[0]}.`);
+  out.push(words > 1 ? `It is ${words} words, with ${len} letters in all.` : `It has ${len} letters.`);
+  out.push(`It ends with the letter ${L[len - 1]}.`);
+  out.push(`It has ${v} vowel${v === 1 ? '' : 's'}.`);
+  out.push(L.some((x, i) => i && x === L[i - 1]) ? 'It has a double letter in it.' : new Set(L).size === len ? 'No letter appears in it twice.' : 'One of its letters appears more than once.');
+  out.push(L[0] <= 'M' ? 'In the dictionary it sits in the first half, A to M.' : 'In the dictionary it sits in the second half, N to Z.');
+  if (len >= 4) { let j = shuffle(L), k = 0; while (j.join('') === L.join('') && k++ < 8) j = shuffle(L); out.push(`Its letters, jumbled up: ${j.join('')}`); }
+  for (let i = 1; i < len - 1 && i < ord.length; i++) out.push(`Its ${ord[i]} letter is ${L[i]}.`);
+  out.push(`Its letters in alphabetical order: ${L.slice().sort().join('')}`, `It has ${len - v} consonant${len - v === 1 ? '' : 's'}.`, `Spelled backwards it reads ${L.slice().reverse().join('')}.`);
+  const uniq = out.filter((x, i) => out.indexOf(x) === i && x !== e[2]);
+  return uniq.slice(0, n);
+}
+
 const TOD = {
   easy: {
     truth: [
@@ -1048,7 +1158,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '1.17'; // bump this with each change, and the cache name in sw.js
+const VERSION = '1.18'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1731,12 +1841,13 @@ function startGame(type, players){
     let fresh = list.filter(e => !used.has(e[0]));
     if (!fresh.length) { list.forEach(e => used.delete(e[0])); fresh = list; }
     const e = fresh[rnd(fresh.length)]; used.add(e[0]);
-    const imp = rnd(players.length);
+    const imp = rnd(players.length), mine = shuffle(impClues(e, players.length - 1));
+    let ci = 0;
     G = {type, players, word: e[0], imp, starter: players[rnd(players.length)], scored: false,
       L: {t:'Imposter', who:'imposter', secret:'The word', key:'imp', talk:'Go around the circle. Each player says one thing about the word without giving it away.'},
       cards: players.map((name, i) => ({name, html: i === imp
         ? `<p class="tag bad">You are the imposter</p><p class="lead">You do not get the word. Your clue is</p><p class="big sm">${esc(e[2])}</p><p class="muted">Blend in, and try to work out the word.</p>`
-        : `<p class="tag">The secret word</p><p class="big">${esc(e[0])}</p><p class="lead">${esc(e[1])}</p><p class="muted">One of the others is an imposter with a different clue.</p>`})),
+        : `<p class="tag">The secret word</p><p class="big">${esc(e[0])}</p><p class="lead">${esc(mine[ci++ % mine.length])}</p><p class="muted">Nobody else has your clue. One player is an imposter who does not have the word.</p>`})),
       after: () => go('impTalk', {left: S.timer, total: S.timer, run: false})};
     return go('pass', {i: 0, shown: false, pick: null});
   }
