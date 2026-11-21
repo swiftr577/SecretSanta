@@ -1293,7 +1293,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.2'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.3'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1325,15 +1325,15 @@ function toast(msg){ const t = document.getElementById('toast'); t.textContent =
 /* Sound: every effect is made on the spot from simple tones and noise, so there are no audio files to download. */
 let AC = null;
 const snd = (() => {
-  const ctx = () => { if (S.mute) return null; try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; } catch (e) { return null; } };
+  const ctx = () => { if (S.mute) return null; try { if (!AC || AC.state === 'closed') AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state !== 'running') AC.resume(); return AC; } catch (e) { return null; } };
   const tone = (f, d, o) => { const c = ctx(); if (!c) return; o = o || {}; const t = c.currentTime + (o.at || 0), os = c.createOscillator(), g = c.createGain();
     os.type = o.type || 'sine'; os.frequency.setValueAtTime(f, t); if (o.to) os.frequency.exponentialRampToValueAtTime(o.to, t + d);
     g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(o.vol || .18, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + d);
-    os.connect(g); g.connect(c.destination); os.start(t); os.stop(t + d + .03); };
+    os.connect(g); g.connect(c.destination); os.start(t); os.stop(t + d + .03); os.onended = () => { try { g.disconnect(); } catch (e) {} }; };
   const noise = (d, o) => { const c = ctx(); if (!c) return; o = o || {}; const t = c.currentTime + (o.at || 0), n = Math.floor(c.sampleRate * d), buf = c.createBuffer(1, n, c.sampleRate), da = buf.getChannelData(0);
     for (let i = 0; i < n; i++) da[i] = Math.random() * 2 - 1;
     const src = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain(); src.buffer = buf; fl.type = o.type || 'lowpass'; fl.frequency.setValueAtTime(o.f || 1200, t); if (o.to) fl.frequency.exponentialRampToValueAtTime(o.to, t + d);
-    g.gain.setValueAtTime(o.vol || .25, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); src.connect(fl); fl.connect(g); g.connect(c.destination); src.start(t); };
+    g.gain.setValueAtTime(o.vol || .25, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); src.connect(fl); fl.connect(g); g.connect(c.destination); src.start(t); src.onended = () => { try { g.disconnect(); } catch (e) {} }; };
   const K = {
     tap: () => tone(620, .04, {type: 'triangle', vol: .04}),
     ding: () => { tone(880, .18, {vol: .13}); tone(1320, .32, {at: .09, vol: .11}); },
@@ -1420,11 +1420,75 @@ const TUNES = {
   spooky: {bpm: 132, bar: 12, lead: 'eerie', comp: 'waltz', chords: 'Em Em Am B7 Em C B7 Em Am Am Em Em C B7 Em Em',
     mel: 'E5:4 G5:4 B5:4  A5:2 G5:2 F#5:4 E5:4  A5:4 C6:4 E6:4  D#6:6 B5:6  E5:4 G5:4 B5:4  C6:2 B5:2 G5:4 E5:4  F#5:4 A5:4 D#5:4  E5:8 _:4 ' +
          'C6:4 A5:4 E5:4  A5:6 C6:6  B5:4 G5:4 E5:4  G5:6 B5:6  E6:4 C6:4 G5:4  F#5:4 B5:4 D#6:4  E6:6 B5:6  E5:8 _:4',
-    drums: {k: 'x-----------', t: '----x---x---'}}
+    drums: {k: 'x-----------', t: '----x---x---'}},
+  // a smoky stakeout, for Find the agent
+  stakeout: {bpm: 88, swing: .3, lead: 'eerie', comp: 'stab', bassStyle: 'walk', chords: 'Cm Cm Fm G7 Cm Ab G7 Cm',
+    mel: 'G4:3 C5:3 Eb5:2 D5:4 C5:4  G4:3 C5:3 Eb5:2 G5:6 _:2  Ab4:3 C5:3 F5:2 Eb5:4 C5:4  D5:3 F5:3 D5:2 B4:6 _:2 ' +
+         'G4:3 C5:3 Eb5:2 D5:4 C5:4  Ab4:3 C5:3 Eb5:2 Ab5:4 G5:4  F5:2 D5:2 B4:2 D5:2 F5:4 Ab5:4  G5:3 Eb5:3 C5:2 C5:6 _:2',
+    drums: {c: '----x-------x---', h: 'x---x-x-x---x-x-'}},
+  // a wind-up clock, for Stop the clock
+  ticktock: {bpm: 120, lead: 'pluck', comp: 'stab', bassStyle: 'root', chords: 'C G Am F C G F G',
+    mel: 'E5:2 _:2 G5:2 _:2 C6:2 G5:2 E5:4  D5:2 _:2 G5:2 _:2 B5:2 G5:2 D5:4  C5:2 _:2 E5:2 _:2 A5:2 E5:2 C5:4  A5:2 G5:2 F5:2 E5:2 F5:4 A5:4 ' +
+         'E5:2 _:2 G5:2 _:2 C6:2 G5:2 E6:4  D6:2 _:2 B5:2 _:2 G5:2 B5:2 D6:4  C6:2 A5:2 F5:2 A5:2 C6:2 A5:2 F5:4  G5:2 B5:2 D6:2 B5:2 G5:4 _:4',
+    drums: {t: 'x---x---x---x---', h: '--x---x---x---x-'}},
+  // curtain up, for Charades
+  showtime: {bpm: 132, lead: 'bright', comp: 'stab', bassStyle: 'bounce', chords: 'C A7 Dm G7 C A7 D7 G7',
+    mel: 'E5:3 G5:3 E5:2 C5:2 E5:2 G5:4  E5:3 G5:3 E5:2 C#5:2 E5:2 A5:4  F5:3 A5:3 F5:2 D5:2 F5:2 A5:4  G5:2 F5:2 D5:2 B4:2 D5:2 F5:2 G5:4 ' +
+         'E5:3 G5:3 C6:2 G5:2 E5:2 C6:4  C#6:3 A5:3 E5:2 G5:2 A5:2 C#6:4  D6:2 C6:2 A5:2 F#5:2 A5:2 C6:2 D6:4  B5:2 G5:2 F5:2 D5:2 G5:4 _:4',
+    drums: {k: 'x-------x-------', s: '----x-------x---', h: 'x-x-x-x-x-x-x-x-'}},
+  // a toy-soldier face-off, for Rock paper scissors
+  duel: {bpm: 116, lead: 'chip', comp: 'stab', bassStyle: 'bounce', chords: 'F C7 F Bb F C7 C7 F',
+    mel: 'F5:2 F5:2 A5:2 C6:2 A5:4 F5:4  E5:2 E5:2 G5:2 Bb5:2 G5:4 E5:4  F5:2 F5:2 A5:2 C6:2 F6:4 C6:4  D6:2 Bb5:2 F5:2 Bb5:2 D6:6 _:2 ' +
+         'C6:2 C6:2 A5:2 F5:2 A5:4 C6:4  Bb5:2 Bb5:2 G5:2 E5:2 G5:4 Bb5:4  C6:2 Bb5:2 G5:2 E5:2 C5:2 E5:2 G5:4  F5:3 F5:3 F5:2 F5:4 _:4',
+    drums: {k: 'x-------x-------', s: '----x-------x-xx'}},
+  // curious and plucky, for Who am I
+  guest: {bpm: 108, lead: 'pluck', comp: 'stab', bassStyle: 'walk', chords: 'Bb Gm Eb F Bb Gm Eb F',
+    mel: 'D5:2 F5:2 Bb5:4 _:2 F5:2 D5:4  D5:2 G5:2 Bb5:4 _:2 G5:2 D5:4  Eb5:2 G5:2 Bb5:4 _:2 G5:2 Eb5:4  F5:2 A5:2 C6:2 A5:2 F5:2 A5:2 C6:4 ' +
+         'D6:2 Bb5:2 F5:4 _:2 Bb5:2 D6:4  D6:2 Bb5:2 G5:4 _:2 Bb5:2 D6:4  Eb6:2 D6:2 Bb5:2 G5:2 Eb5:2 G5:2 Bb5:4  C6:2 A5:2 F5:2 A5:2 Bb5:4 _:4',
+    drums: {k: 'x---------x-----', c: '----x-------x---', sh: 'x-x-x-x-x-x-x-x-'}},
+  // cheeky and off the beat, for Most likely to
+  cheeky: {bpm: 132, lead: 'bright', comp: 'ska', bassStyle: 'walk', chords: 'D G A D D G A A',
+    mel: 'F#5:2 _:1 F#5:1 A5:2 F#5:2 D5:4 _:4  G5:2 _:1 G5:1 B5:2 G5:2 D5:4 _:4  A5:2 _:1 A5:1 C#6:2 A5:2 E5:2 A5:2 C#6:4  D6:4 A5:4 F#5:4 _:4 ' +
+         'F#5:2 _:1 F#5:1 A5:2 D6:2 A5:4 _:4  B5:2 _:1 B5:1 D6:2 B5:2 G5:4 _:4  C#6:2 B5:2 A5:2 G5:2 E5:2 G5:2 A5:4  A5:2 C#6:2 E6:4 _:8',
+    drums: {k: 'x-------x-------', s: '----x-------x---', h: '--x---x---x---x-'}},
+  // a swaying either-or, for Would you rather
+  thisorthat: {bpm: 116, lead: 'pluck', comp: 'stab', bassStyle: 'bounce', chords: 'Am7 D7 Am7 D7 F E7 Am7 E7',
+    mel: 'E5:3 G5:3 A5:2 _:2 G5:2 E5:4  F#5:3 A5:3 C6:2 _:2 A5:2 F#5:4  E5:3 G5:3 A5:2 C6:2 A5:2 G5:4  A5:3 F#5:3 D5:2 F#5:8 ' +
+         'A5:3 C6:3 A5:2 F5:2 A5:2 C6:4  B5:3 G#5:3 E5:2 G#5:2 B5:2 D6:4  C6:2 B5:2 A5:2 G5:2 E5:2 G5:2 A5:4  G#5:4 B5:4 E5:4 _:4',
+    drums: {k: 'x-----x-x-----x-', t: 'x--x--x---x-x---', sh: 'x-x-x-x-x-x-x-x-'}},
+  // climbing and counting, for Guess the number
+  countdown: {bpm: 126, lead: 'chip', comp: 'arp', bassStyle: 'root', chords: 'Em C G D Em C D Em',
+    mel: 'E5:2 G5:2 B5:2 G5:2 E5:2 G5:2 B5:4  E5:2 G5:2 C6:2 G5:2 E5:2 G5:2 C6:4  D5:2 G5:2 B5:2 D6:2 B5:4 G5:4  A5:2 F#5:2 D5:2 F#5:2 A5:6 _:2 ' +
+         'B5:2 G5:2 E5:2 G5:2 B5:2 E6:2 B5:4  C6:2 G5:2 E5:2 G5:2 C6:2 E6:2 C6:4  D6:2 C6:2 B5:2 A5:2 F#5:2 A5:2 D6:4  E6:4 B5:4 E5:6 _:2',
+    drums: {k: 'x---x---x---x---', h: 'x-x-x-x-x-x-x-x-', c: '------------x---'}},
+  // a little music box, for Pairs
+  musicbox: {bpm: 108, bar: 12, lead: 'bell', comp: 'waltz', chords: 'C G Am F C G F C',
+    mel: 'E5:4 G5:4 C6:4  D5:4 G5:4 B5:4  C5:4 E5:4 A5:4  A5:2 G5:2 F5:4 C5:4  E5:4 G5:4 E6:4  D6:4 B5:4 G5:4  A5:4 F5:4 A5:2 B5:2  C6:8 _:4',
+    drums: {}},
+  // a tin-drum march, for Noughts and crosses
+  march: {bpm: 120, lead: 'chip', comp: 'stab', bassStyle: 'bounce', chords: 'G C D G G C D G',
+    mel: 'G5:4 D5:2 G5:2 B5:4 G5:4  E5:4 C5:2 E5:2 G5:4 E5:4  F#5:2 A5:2 D6:2 A5:2 F#5:2 A5:2 D6:4  B5:4 G5:4 D5:4 _:4 ' +
+         'G5:4 D5:2 G5:2 B5:4 D6:4  E6:4 C6:2 E6:2 G5:4 C6:4  A5:2 B5:2 C6:2 A5:2 F#5:2 A5:2 D5:4  G5:3 G5:3 G5:2 G5:4 _:4',
+    drums: {k: 'x-------x-------', s: '----x-xx----x-xx'}},
+  // easy-going and sunny, for Four in a row
+  dropit: {bpm: 96, swing: .2, lead: 'muted', comp: 'ska', bassStyle: 'root', chords: 'C F C G C F G C',
+    mel: '_:2 E5:2 G5:2 E5:2 C5:4 _:4  _:2 F5:2 A5:2 F5:2 C5:4 _:4  _:2 E5:2 G5:2 C6:2 G5:2 E5:2 G5:4  D5:4 G5:4 B5:4 _:4 ' +
+         '_:2 E5:2 G5:2 E5:2 C6:4 _:4  _:2 A5:2 C6:2 A5:2 F5:4 _:4  B5:2 A5:2 G5:2 D5:2 G5:2 B5:2 D6:4  C6:4 G5:4 E5:4 _:4',
+    drums: {k: '--------x-------', c: '--------x-------', h: 'x-x-x-x-x-x-x-x-'}},
+  // a breezy meadow, for the Easter Grinch
+  spring: {bpm: 104, lead: 'eerie', comp: 'arp', bassStyle: 'root', chords: 'A E F#m D A E D A',
+    mel: 'C#5:2 E5:2 A5:4 E5:2 C#5:2 E5:4  B4:2 E5:2 G#5:4 E5:2 B4:2 E5:4  A4:2 C#5:2 F#5:4 C#5:2 A4:2 C#5:4  F#5:2 A5:2 D6:4 A5:4 F#5:4 ' +
+         'C#5:2 E5:2 A5:4 C#6:4 A5:4  B5:2 G#5:2 E5:4 G#5:4 B5:4  A5:2 F#5:2 D5:2 F#5:2 A5:2 D6:2 A5:4  A5:8 _:4 E5:2 C#5:2',
+    drums: {k: 'x-------x-------', sh: '--x---x---x---x-'}},
+  // a disco floor-filler, for the birthday Grinch
+  party: {bpm: 124, lead: 'bright', comp: 'ska', bassStyle: 'bounce', chords: 'Em Em C D Em Em C D',
+    mel: 'B5:2 _:2 B5:2 A5:2 G5:2 E5:2 G5:4  B5:2 _:2 B5:2 A5:2 G5:2 A5:2 B5:4  C6:2 _:2 C6:2 B5:2 G5:2 E5:2 G5:4  A5:2 F#5:2 D5:2 F#5:2 A5:4 D6:4 ' +
+         'E6:2 _:2 E6:2 D6:2 B5:2 G5:2 B5:4  E6:2 _:2 E6:2 D6:2 B5:2 D6:2 E6:4  G6:2 E6:2 C6:2 E6:2 G5:2 C6:2 E6:4  D6:2 D6:2 A5:2 F#5:2 D5:4 _:4',
+    drums: {k: 'x---x---x---x---', c: '----x-------x---', h: '--x---x---x---x-'}}
 };
-const TRACK_FOR = {imp: 'tense', spy: 'sneaky', agent: 'sneaky', wolf: 'spooky', fire: 'happy', pump: 'fair', stopc: 'arcade', quick: 'arcade', char: 'arcade', rps: 'arcade',
-  who: 'groove', tod: 'groove', mlt: 'groove', wyr: 'groove', quiz: 'quiz', num: 'quiz', hang: 'puzzle', pairs: 'puzzle', oxo: 'puzzle', four: 'puzzle', santa: 'festive'};
-const GRINCH_TRACK = {xmas: 'festive', easter: 'puzzle', halloween: 'spooky', party: 'happy'};
+const TRACK_FOR = {imp: 'tense', spy: 'sneaky', agent: 'stakeout', wolf: 'spooky', fire: 'happy', pump: 'fair', stopc: 'ticktock', quick: 'arcade', char: 'showtime', rps: 'duel',
+  who: 'guest', tod: 'groove', mlt: 'cheeky', wyr: 'thisorthat', quiz: 'quiz', num: 'countdown', hang: 'puzzle', pairs: 'musicbox', oxo: 'march', four: 'dropit', santa: 'festive'};
+const GRINCH_TRACK = {xmas: 'festive', easter: 'spring', halloween: 'spooky', party: 'party'};
 const music = (() => {
   const SEMI = {C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11}, QUAL = {'': [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10]};
   const midi = n => { const m = /^([A-G])([#b]?)(-?\d)$/.exec(n); return SEMI[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0) + (+m[3] + 1) * 12; };
@@ -1443,7 +1507,8 @@ const music = (() => {
     const end = t + (o.decay ? Math.max(o.decay, .1) : d) + .08;
     (o.detune ? [0, o.detune] : [0]).forEach(dt => { const os = c.createOscillator(); os.type = o.type; os.frequency.setValueAtTime(o.f, t); os.detune.value = dt;
       if (o.vib) { const l = c.createOscillator(), lg = c.createGain(); l.frequency.value = 5.5; lg.gain.value = o.f * .012; l.connect(lg); lg.connect(os.frequency); l.start(t); l.stop(end); }
-      os.connect(dest); os.start(t); os.stop(end); });
+      os.connect(dest); os.start(t); os.stop(end);
+      if (!dt) os.onended = () => { try { g.disconnect(); } catch (e) {} }; });   // let go of each note once it has finished, so they cannot pile up
     g.connect(out);
   };
   const LEAD = {
@@ -1456,7 +1521,7 @@ const music = (() => {
     organ: (c, o, f, t, d, v) => { voice(c, o, {type: 'square', f, t, d, vol: v * .32, cut: 3000, vib: true}); voice(c, o, {type: 'sine', f: f * 2, t, d, vol: v * .25}); }
   };
   const DRUM = {
-    k: (c, o, t) => { const os = c.createOscillator(), g = c.createGain(); os.frequency.setValueAtTime(150, t); os.frequency.exponentialRampToValueAtTime(45, t + .12); g.gain.setValueAtTime(.55, t); g.gain.exponentialRampToValueAtTime(.0001, t + .2); os.connect(g); g.connect(o); os.start(t); os.stop(t + .22); },
+    k: (c, o, t) => { const os = c.createOscillator(), g = c.createGain(); os.frequency.setValueAtTime(150, t); os.frequency.exponentialRampToValueAtTime(45, t + .12); g.gain.setValueAtTime(.55, t); g.gain.exponentialRampToValueAtTime(.0001, t + .2); os.connect(g); g.connect(o); os.start(t); os.stop(t + .22); os.onended = () => { try { g.disconnect(); } catch (e) {} }; },
     s: (c, o, t) => hit(c, o, t, 'highpass', 1500, .2, .14),
     c: (c, o, t) => { hit(c, o, t, 'bandpass', 1300, .2, .09); hit(c, o, t + .012, 'bandpass', 1300, .16, .07); },
     h: (c, o, t) => hit(c, o, t, 'highpass', 7000, .07, .04),
@@ -1464,7 +1529,7 @@ const music = (() => {
     sl: (c, o, t) => { hit(c, o, t, 'bandpass', 6500, .09, .1); voice(c, o, {type: 'sine', f: 3500, t, d: .05, vol: .02, decay: .09}); },
     t: (c, o, t) => voice(c, o, {type: 'sine', f: 1150, t, d: .03, vol: .09, decay: .05})
   };
-  function hit(c, o, t, type, f, vol, d){ const n = noise(c), fl = c.createBiquadFilter(), g = c.createGain(); fl.type = type; fl.frequency.value = f; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); n.connect(fl); fl.connect(g); g.connect(o); n.start(t, Math.random() * .5, d + .02); }
+  function hit(c, o, t, type, f, vol, d){ const n = noise(c), fl = c.createBiquadFilter(), g = c.createGain(); fl.type = type; fl.frequency.value = f; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); n.connect(fl); fl.connect(g); g.connect(o); n.start(t, Math.random() * .5, d + .02); n.onended = () => { try { g.disconnect(); } catch (e) {} }; }
   function build(T){
     const bar = T.bar || 16, chords = T.chords.split(' ').map(chord), bars = chords.length;
     return {T, bar, bars, len: bar * bars, chords, mel: seq(T.mel), bass: T.bass ? seq(T.bass) : null, sd: 60 / T.bpm / 4};
@@ -1480,6 +1545,7 @@ const music = (() => {
     else if (T.bassStyle === 'walk' && p % 4 === 0) voice(c, out, {type: 'triangle', f: hz(ch[[0, 1, 2, 1][p / 4 % 4] % ch.length] - 12), t, d: sd * 3.4, vol: .28, cut: 800});
     if (T.comp === 'arp' && p % 2 === 0) LEAD.pluck(c, out, hz(ch[[0, 1, 2, 1][p / 2 % 4] % ch.length] + 12), t, sd * 2, .055);
     else if (T.comp === 'pad' && p === 0) ch.forEach(n => voice(c, out, {type: 'sawtooth', f: hz(n), t, d: P.bar * sd, vol: .028, att: .25, cut: 700, detune: 8}));
+    else if (T.comp === 'ska' && p % 4 === 2) ch.forEach(n => voice(c, out, {type: 'triangle', f: hz(n + 12), t, d: sd * 1.2, vol: .045, decay: .13}));
     else if (T.comp === 'stab' && (p === 6 || p === 14)) ch.forEach(n => voice(c, out, {type: 'triangle', f: hz(n + 12), t, d: sd * 1.4, vol: .05, decay: .16}));
     else if (T.comp === 'waltz') { if (p === 0) voice(c, out, {type: 'triangle', f: hz(ch[0] - 12), t, d: sd * 3.6, vol: .3, cut: 800}); else if (p === 4 || p === 8) ch.forEach(n => voice(c, out, {type: 'triangle', f: hz(n + 12), t, d: sd * 2, vol: .045, decay: .2})); }
     for (const k in T.drums) if (T.drums[k][p] === 'x') DRUM[k](c, out, t);
@@ -1491,7 +1557,7 @@ const music = (() => {
     try { const c = P.c, now = c.currentTime; P.bus.gain.cancelScheduledValues(now); P.bus.gain.setValueAtTime(P.bus.gain.value, now); P.bus.gain.linearRampToValueAtTime(.0001, now + (fade || .35)); setTimeout(() => { try { P.bus.disconnect(); } catch (e) {} }, 900); } catch (e) {}
   }
   function play(n, c){
-    if (n === name) return;
+    if (n === name && cur && cur.c === c && timer) return;
     stop(.3);
     const P = build(TUNES[n]); P.c = c; P.bus = c.createGain(); P.bus.gain.value = .0001; P.bus.connect(c.destination); P.level = .34; P.quiet = false;
     P.bus.gain.linearRampToValueAtTime(P.level, c.currentTime + .5);
@@ -1505,7 +1571,7 @@ const music = (() => {
   return {play, stop, hush, get name(){ return name; }};
 })();
 let gestured = false;
-function audioCtx(){ try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended' && document.visibilityState === 'visible') AC.resume(); return AC; } catch (e) { return null; } }
+function audioCtx(){ try { if (!AC || AC.state === 'closed') AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state !== 'running' && document.visibilityState === 'visible') AC.resume(); return AC; } catch (e) { return null; } }
 // Works out which tune belongs to the current screen and makes sure it is the one playing.
 function musicSync(){
   if (!gestured) return;                       // browsers only allow sound after the first tap
@@ -1522,8 +1588,14 @@ function musicSync(){
   music.play(want, c);
   music.hush((view.n === 'stopc' && view.ph === 'run') || (view.n === 'quick' && G && ['wait', 'fake', 'go'].includes(G.state)));
 }
-['pointerdown', 'keydown'].forEach(ev => document.addEventListener(ev, () => { if (gestured) return; gestured = true; setTimeout(musicSync, 0); }, true));
-document.addEventListener('visibilitychange', () => { try { if (AC) { if (document.visibilityState === 'hidden') AC.suspend(); else if (!S.mute) AC.resume(); } } catch (e) {} });
+// Phones can pause web audio on their own (a call, a notification, locking the screen). Every touch wakes it again,
+// because a phone only lets sound restart from inside a touch.
+['pointerdown', 'touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, () => {
+  try { if (AC && AC.state !== 'running' && !S.mute) AC.resume(); } catch (e) {}
+  if (!gestured) { gestured = true; if (!S.mute && S.music) audioCtx(); }
+  setTimeout(musicSync, 0);
+}, true));
+document.addEventListener('visibilitychange', () => { try { if (AC) { if (document.visibilityState === 'hidden') AC.suspend(); else if (!S.mute) { AC.resume(); setTimeout(musicSync, 0); } } } catch (e) {} });
 // Keep the screen on during a game, where the browser allows it.
 let wakeLock = null;
 async function wake(on){
