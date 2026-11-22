@@ -211,7 +211,8 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 .card{aspect-ratio:3/4; padding:0; border:2px solid var(--ink); border-radius:12px; background:var(--ink); color:var(--bg); font-size:2rem; font-weight:800; display:flex; align-items:center; justify-content:center}
 .card.up{background:var(--surface); border-color:var(--line); font-size:2.4rem}
 .card.gone{background:var(--tint); border-color:var(--tint); opacity:.45}
-.word{display:flex; flex-wrap:wrap; gap:6px 6px; justify-content:center; font-size:1.9rem; font-weight:800; line-height:1.2}
+.word{display:flex; flex-wrap:wrap; gap:.5em .9em; justify-content:center; font-size:1.9rem; font-weight:800; line-height:1.2}
+.word .wd{display:flex; flex-wrap:wrap; gap:.2em}
 .word span{min-width:1.05em; text-align:center; border-bottom:3px solid var(--ink)}
 .word span.sp{border:0; min-width:.7em}
 .keys{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
@@ -1293,7 +1294,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.5'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.6'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -2200,11 +2201,14 @@ V.hang = () => {
   if (view.ph === 'hand') b = `<div class="center"><p class="lead">Hand the phone to</p><p class="big">${esc(setter)}</p><p class="lead">${esc(setter)} sets the word. Everyone else looks away.</p></div>` +
     `<button class="btn" data-act="hangType">Type a secret word</button><button class="btn alt" data-act="hangAuto">Let the phone choose, and everyone guesses</button>`;
   else if (view.ph === 'type') b = `<p class="tag">${esc(setter)}, type your word</p>` +
-    `<input id="hw" type="text" maxlength="24" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-enter="hangSet" aria-label="Secret word or short phrase">` +
-    `<p class="muted">A word or short phrase, up to 24 letters.</p><button class="btn" data-act="hangSet">Hide it and start</button>`;
+    `<input id="hw" type="text" maxlength="100" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" data-enter="hangSet" aria-label="Secret word, phrase or sentence">` +
+    `<p class="muted">A word, a phrase or a whole sentence, up to 100 characters.</p><button class="btn" data-act="hangSet">Hide it and start</button>`;
   else {
     const gs = hangGuessers(), who = gs[G.g % gs.length], left = G.max - G.wrong, letters = [...G.word];
-    const word = `<div class="word${G.done && G.solved ? ' wave' : ''}" aria-label="The word so far">${letters.map((ch, k) => ch === ' ' ? '<span class="sp"></span>' : `<span style="--i:${k}" class="${isLetter(ch) && flat(ch) === G.lastL ? 'pop' : ''}">${!isLetter(ch) || G.done || G.tried.includes(flat(ch)) ? esc(ch.toUpperCase()) : '&nbsp;'}</span>`).join('')}</div>`;
+    let gi = 0;
+    const size = letters.length > 60 ? 1.05 : letters.length > 36 ? 1.3 : letters.length > 18 ? 1.55 : 1.9;
+    const word = `<div class="word${G.done && G.solved ? ' wave' : ''}" style="font-size:${size}rem" aria-label="The word so far">${G.word.split(' ').map(wd => { gi++;
+      return `<div class="wd">${[...wd].map(ch => `<span style="--i:${gi++}" class="${isLetter(ch) && flat(ch) === G.lastL ? 'pop' : ''}">${!isLetter(ch) || G.done || G.tried.includes(flat(ch)) ? esc(ch.toUpperCase()) : '&nbsp;'}</span>`).join('')}</div>`; }).join('')}</div>`;
     const inWord = L => letters.some(ch => isLetter(ch) && flat(ch) === L);
     const head = G.done ? `<p class="tag ${G.solved ? 'good' : 'bad'}">${G.solved ? 'Solved' : 'The snowman is finished'}</p>` : `<p class="tag">${esc(who)}, pick a letter</p>`;
     b = `<div class="center">${head}</div>${snowman(Math.ceil(G.wrong / G.max * 8), G.fromPart == null ? 99 : G.fromPart, G.done && !G.solved)}` + word +
@@ -2705,7 +2709,7 @@ A.hangType = () => { view.ph = 'type'; view.focus = 'hw'; render(); };
 const hangBegin = () => { G.tried = []; G.wrong = 0; G.g = 0; G.done = false; G.solved = false; G.lastL = ''; G.fromPart = 99; go('hang', {ph: 'play'}); };
 A.hangAuto = () => { const l = wordList(); G.word = l[rnd(l.length)][0]; G.auto = true; hangBegin(); };
 A.hangSet = () => {
-  const inp = document.getElementById('hw'), w = inp.value.replace(/\s+/g, ' ').trim().slice(0, 24);
+  const inp = document.getElementById('hw'), w = inp.value.replace(/\s+/g, ' ').trim().slice(0, 100);
   if ([...w].filter(isLetter).length < 2) { toast('Type a word with at least two letters'); return inp.focus(); }
   G.word = w; G.auto = false; hangBegin();
 };
