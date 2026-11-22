@@ -1293,7 +1293,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.4'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.5'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1303,7 +1303,7 @@ const store = {
   set(v){ try { window.localStorage.setItem(KEY, v); } catch (e) { memStore = v; } }
 };
 const blank = () => ({v:1, santa:{people:[], limit:'', pin:'', draws:[]}, extras:[], selected:null, lastPlayers:[],
-  level:'easy', timer:120, cat:'any', mute:false, music:true, scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
+  level:'easy', timer:120, cat:'any', mute:false, music:true, impAll:'off', scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
 function load(){
   try { const r = JSON.parse(store.get()); if (r && r.v === 1 && r.santa) { const o = Object.assign(blank(), r); if (!o.tally || o.tally.elves !== undefined) o.tally = {}; if (!THEMES[o.theme]) o.theme = 'xmas'; return o; } } catch (e) {}
   return blank();
@@ -1807,6 +1807,9 @@ V.setup = () => {
     `<p class="muted">${g.lv[S.level === 'easy' ? 0 : 1]}. Easy suits the youngest players.</p></section>`;
   if (view.game === 'grinch') h += `<section><h2>Version</h2><div class="seg four">${Object.keys(THEMES).map(k => `<button class="${S.theme === k ? 'on' : ''}" data-act="theme" data-k="${k}" aria-pressed="${S.theme === k}">${THEMES[k].t}</button>`).join('')}</div>` +
     `<p class="muted">${(t => `${t.Crew} guard what is ${t.place}. One of them is secretly ${t.thief}.`)(THEMES[S.theme])}</p></section>`;
+  if (view.game === 'imp') h += `<section><h2>Twist</h2><select data-chg="impAll" aria-label="Everyone is the imposter">` +
+    [['off', 'One imposter, as normal'], ['rare', 'Now and then, everyone is the imposter'], ['on', 'Everyone is the imposter, every round']].map(o => `<option value="${o[0]}"${S.impAll === o[0] ? ' selected' : ''}>${o[1]}</option>`).join('') +
+    `</select><p class="muted">${S.impAll === 'rare' ? 'About one round in eight, nobody gets the word. Nobody is told.' : S.impAll === 'on' ? 'Nobody gets the word, and everyone thinks they are the only one.' : 'A surprise round where nobody gets the word.'}</p></section>`;
   if (view.game === 'imp' || view.game === 'char' || view.game === 'hang') h += `<section><h2>Category</h2><select data-chg="cat" aria-label="Category"><option value="any">Any category</option>` +
     Object.keys(WORDS).map(c => `<option${S.cat === c ? ' selected' : ''}>${esc(c)}</option>`).join('') + `</select></section>`;
   if (view.game === 'imp' || view.game === 'wolf' || view.game === 'spy') h += `<section><h2>Discussion timer</h2><select data-chg="timer" aria-label="Discussion timer">` +
@@ -1837,6 +1840,9 @@ V.impVote = () => page(G.L.t, `<p class="lead">Count to three and all point. Who
   `<div class="list">${G.players.map((n, i) => `<button class="row" data-act="impVoted" data-i="${i}"><span>${esc(n)}</span></button>`).join('')}</div>`, 'home', true);
 
 V.impResult = () => {
+  if (G.all) return page(G.L.t, `<div class="center"><p class="tag bad">Surprise</p><p class="lead">The imposter was</p><p class="big popnow">Everyone</p>` +
+    `<p class="lead">Nobody had the word. It was <strong>${esc(G.word)}</strong></p><p class="muted">You voted for ${esc(G.players[view.vote])}, who was no more guilty than the rest of you. No points this round.</p></div>` +
+    againBtns(G.type) + board(G.L.key));
   const imp = G.players[G.imp], caught = view.vote === G.imp;
   return page(G.L.t, `<div class="center"><p class="tag ${caught ? 'good' : 'bad'}">${caught ? 'Caught' : 'Got away with it'}</p>` +
     `<p class="lead">The ${G.L.who} was</p><p class="big">${esc(imp)}</p><p class="lead">${G.L.secret} was <strong>${esc(G.word)}</strong></p>` +
@@ -2284,18 +2290,25 @@ V.quick = () => {
 };
 
 /* ---------- game starters ---------- */
+// Adding ?fixedstart to the address keeps the listed order, which is only useful for testing.
+const FIXED_START = /[?&]fixedstart/.test(location.search);
 function startGame(type, players){
+  // Start from a random person each game. The list is turned, not shuffled, so the order round the room stays the same.
+  if (!FIXED_START && !['fire', 'quick', 'mlt', 'tod'].includes(type) && players.length > 1) { const k = rnd(players.length); players = players.slice(k).concat(players.slice(0, k)); }
   if (type === 'imp') {
     const list = wordList();
     let fresh = list.filter(e => !used.has(e[0]));
     if (!fresh.length) { list.forEach(e => used.delete(e[0])); fresh = list; }
     const e = fresh[rnd(fresh.length)]; used.add(e[0]);
-    const imp = rnd(players.length), mine = shuffle(impClues(e, players.length - 1));
+    const all = S.impAll === 'on' || (S.impAll === 'rare' && Math.random() < .125);     // the twist: nobody gets the word
+    const imp = all ? -1 : rnd(players.length), mine = shuffle(impClues(e, players.length - 1));
+    // in a twist round every player needs a different vague clue: the usual one, then facts that do not give the word away
+    const vague = shuffle([e[2]].concat(impClues(e, players.length + 2).slice(2)).slice(0, players.length));
     let ci = 0;
-    G = {type, players, word: e[0], imp, starter: players[rnd(players.length)], scored: false,
+    G = {type, players, word: e[0], imp, all, starter: players[rnd(players.length)], scored: false,
       L: {t:'Imposter', who:'imposter', secret:'The word', key:'imp', talk:'Go around the circle. Each player says one thing about the word without giving it away.'},
-      cards: players.map((name, i) => ({name, html: i === imp
-        ? `<p class="tag bad">You are the imposter</p><p class="lead">You do not get the word. Your clue is</p><p class="big sm">${esc(e[2])}</p><p class="muted">Blend in, and try to work out the word.</p>`
+      cards: players.map((name, i) => ({name, html: all || i === imp
+        ? `<p class="tag bad">You are the imposter</p><p class="lead">You do not get the word. Your clue is</p><p class="big sm">${esc(all ? vague[i % vague.length] : e[2])}</p><p class="muted">Blend in, and try to work out the word.</p>`
         : `<p class="tag">The secret word</p><p class="big">${esc(e[0])}</p><p class="lead">${esc(mine[ci++ % mine.length])}</p><p class="muted">Nobody else has your clue. One player is an imposter who does not have the word.</p>`})),
       after: () => go('impTalk', {left: S.timer, total: S.timer, run: false})};
     return go('pass', {i: 0, shown: false, pick: null});
@@ -2496,6 +2509,7 @@ A.clockReset = () => { clearInterval(tick); tick = null; view.left = view.total;
 // imposter
 A.impVoted = el => {
   const v = +el.dataset.i;
+  if (G.all) { go('impResult', {vote: v}); return cheer(); }      // the twist round: no points, just the surprise
   if (!G.scored) {
     G.scored = true; const sc = pts(G.L.key);
     if (v === G.imp) G.players.forEach((n, i) => { if (i !== G.imp) sc[n] = (sc[n] || 0) + 1; });
@@ -3145,6 +3159,7 @@ A.todNext = () => { G.turn++; go('tod', {}); };
 const C = {};
 C.limit = el => { S.santa.limit = el.value.replace(/[^0-9.]/g, ''); el.value = S.santa.limit; save(); };
 C.cat = el => { S.cat = el.value; save(); };
+C.impAll = el => { S.impAll = el.value; save(); render(); };
 C.timer = el => { S.timer = +el.value; save(); };
 C.import = el => {
   const f = el.files && el.files[0]; if (!f) return;
