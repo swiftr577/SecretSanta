@@ -481,6 +481,32 @@ button.gift.on{border-color:var(--gold); background:var(--tint); box-shadow:0 0 
 @keyframes howl{0%,60%,100%{transform:rotate(0)} 75%,88%{transform:rotate(-14deg) translateY(-3px)}}
 @media (prefers-reduced-motion: reduce){.scene .gift,.d-sway,.d-bob,.d-hop,.d-fly,.d-rise,.d-tw,.d-glow,.bulbs i,.scene .fl,.gift.on.steal,.gift.on.shine::after,.popnow,.rollnum,.wsky .wf{animation:none} .wsky .nl,.wsky .dl,.wsky .orb{transition:none}}
 
+/* silly games */
+.cupbox{position:relative; height:240px; border-radius:18px; overflow:hidden; background:linear-gradient(#CDE9F7,#E9F6DC 64%,#8CCB6A 64%)}
+.cup{position:absolute; bottom:38px; width:var(--w); height:calc(var(--w) * 1.25); margin-left:calc(var(--w) / -2); padding:0; border:0; background:none; z-index:2;
+  transition:left var(--t) ease-in-out, transform .28s ease}
+.cup i{display:block; width:100%; height:100%; clip-path:polygon(17% 0,83% 0,100% 100%,0 100%); background:linear-gradient(90deg,#A51B24,#E63946 42%,#F58A93 58%,#B3202B)}
+.cup::after{content:""; position:absolute; left:-3px; right:-3px; bottom:-2px; height:10px; border-radius:5px; background:#fff; box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.cup.up{transform:translateY(-84px) rotate(-8deg)}
+.cup.fr{transform:translateY(18px) scale(1.07); z-index:3} .cup.bk{transform:translateY(-16px) scale(.93); z-index:1}
+.cup:disabled{cursor:default}
+.poo{position:absolute; bottom:40px; width:var(--w); margin-left:calc(var(--w) / -2); text-align:center; font-size:calc(var(--w) * .6); line-height:1; z-index:1; transition:left var(--t) ease-in-out}
+.poo.found{animation:bobble .5s ease-in-out infinite alternate}
+.skunk{font-size:8rem; line-height:1; display:inline-block; animation:skshake .16s linear infinite}
+.lane2{position:relative; height:54px; border-bottom:2px dashed var(--line)}
+.lane2 .rn{position:absolute; left:0; top:2px; font-size:.8rem; font-weight:800; color:var(--muted)}
+.lane2 .racer{position:absolute; left:0; bottom:2px; font-size:2rem; line-height:1; will-change:transform}
+.lane2 .racer b{display:inline-block; transform:scaleX(-1); font-weight:400}
+.lane2 .racer.run b{animation:trot .28s ease-in-out infinite alternate}
+.lane2 .rt{position:absolute; left:-1.2em; top:-.2em; font-size:1.1rem}
+.track{position:relative; border-right:6px double var(--ink); padding-right:4px}
+#wheel{width:300px; height:300px; max-width:100%}
+.wheelwrap{position:relative; display:inline-block}
+.wheelwrap::before{content:""; position:absolute; left:50%; top:-6px; margin-left:-13px; border:13px solid transparent; border-top:24px solid var(--ink); z-index:1}
+@keyframes skshake{0%,100%{transform:rotate(-5deg) translateY(0)} 50%{transform:rotate(5deg) translateY(-3px)}}
+@keyframes trot{from{transform:scaleX(-1) translateY(0) rotate(-4deg)} to{transform:scaleX(-1) translateY(-4px) rotate(4deg)}}
+@media (prefers-reduced-motion: reduce){.skunk,.poo.found,.lane2 .racer.run b{animation:none}}
+
 /* clock and scores */
 .clock{display:flex; flex-direction:column; gap:12px; align-items:stretch; text-align:center}
 #clock{font-size:4.2rem; line-height:1; font-weight:800; font-variant-numeric:tabular-nums; padding:8px 0}
@@ -1288,13 +1314,17 @@ const GAMES = {
   four: {t:'Four in a row', min:2, lv:['Four in a row, 7 columns wide','Five in a row, 9 columns wide']},
   pairs: {t:'Pairs', min:2, lv:['12 cards','20 cards']},
   rps: {t:'Rock paper scissors', min:2, lv:['First to 3 wins','First to 5 wins']},
+  cups: {t:'Find the poo', min:1},
+  bomb: {t:'Stink bomb', min:2, lv:['A slow fuse','A short fuse']},
+  race: {t:'Silly race', min:2, max:6},
+  wheel: {t:'Wheel of silliness', min:1, lv:['Gentle forfeits','Sillier forfeits']},
   fire: {t:'Fireworks', min:2, max:5},
   pump: {t:'Balloon pump', min:2, lv:['A small balloon','A bigger balloon and longer nerves']},
   stopc: {t:'Stop the clock', min:2, lv:['Stop at 5 seconds. The clock hides after 3','Stop at 10 seconds. The clock hides after 2']},
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.7'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.8'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1304,7 +1334,7 @@ const store = {
   set(v){ try { window.localStorage.setItem(KEY, v); } catch (e) { memStore = v; } }
 };
 const blank = () => ({v:1, santa:{people:[], limit:'', pin:'', draws:[]}, extras:[], selected:null, lastPlayers:[],
-  level:'easy', timer:120, cat:'any', mute:false, music:true, impAll:'off', numOne:false, scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
+  level:'easy', timer:120, cat:'any', mute:false, music:true, impAll:'off', numOne:false, cupSpeed:'easy', scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
 function load(){
   try { const r = JSON.parse(store.get()); if (r && r.v === 1 && r.santa) { const o = Object.assign(blank(), r); if (!o.tally || o.tally.elves !== undefined) o.tally = {}; if (!THEMES[o.theme]) o.theme = 'xmas'; return o; } } catch (e) {}
   return blank();
@@ -1341,6 +1371,7 @@ const snd = (() => {
     win: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, .24, {at: i * .11, type: 'triangle', vol: .16})),
     lose: () => { tone(330, .25, {type: 'sawtooth', vol: .07, to: 240}); tone(220, .42, {at: .22, type: 'sawtooth', vol: .07, to: 150}); },
     buzz: () => tone(140, .3, {type: 'square', vol: .06}),
+    fart: () => { for (let i = 0; i < 9; i++) tone(95 - i * 4 + Math.random() * 8, .07, {at: i * .055, type: 'sawtooth', vol: .2}); noise(.5, {f: 300, vol: .12}); },
     pop: () => { noise(.18, {f: 3000, vol: .5, type: 'highpass'}); tone(160, .2, {to: 50, vol: .3}); },
     whoosh: () => noise(.7, {f: 400, to: 3200, vol: .16, type: 'bandpass'}),
     boom: () => { noise(.6, {f: 900, to: 120, vol: .32}); tone(90, .45, {to: 40, vol: .26}); for (let i = 0; i < 6; i++) noise(.04, {at: .25 + Math.random() * .6, f: 5000, vol: .07, type: 'highpass'}); },
@@ -1487,7 +1518,7 @@ const TUNES = {
          'E6:2 _:2 E6:2 D6:2 B5:2 G5:2 B5:4  E6:2 _:2 E6:2 D6:2 B5:2 D6:2 E6:4  G6:2 E6:2 C6:2 E6:2 G5:2 C6:2 E6:4  D6:2 D6:2 A5:2 F#5:2 D5:4 _:4',
     drums: {k: 'x---x---x---x---', c: '----x-------x---', h: '--x---x---x---x-'}}
 };
-const TRACK_FOR = {imp: 'tense', spy: 'sneaky', agent: 'stakeout', wolf: 'spooky', fire: 'happy', pump: 'fair', stopc: 'ticktock', quick: 'arcade', char: 'showtime', rps: 'duel',
+const TRACK_FOR = {cups: 'fair', bomb: 'sneaky', race: 'happy', wheel: 'cheeky', imp: 'tense', spy: 'sneaky', agent: 'stakeout', wolf: 'spooky', fire: 'happy', pump: 'fair', stopc: 'ticktock', quick: 'arcade', char: 'showtime', rps: 'duel',
   who: 'guest', tod: 'groove', mlt: 'cheeky', wyr: 'thisorthat', quiz: 'quiz', num: 'countdown', hang: 'puzzle', pairs: 'musicbox', oxo: 'march', four: 'dropit', santa: 'festive'};
 const GRINCH_TRACK = {xmas: 'festive', easter: 'spring', halloween: 'spooky', party: 'party'};
 const music = (() => {
@@ -1685,6 +1716,10 @@ V.home = () => {
     ['wyr','⚖️','Would you rather','Vote in secret, then see how the room split.'],
     ['num','🔢','Guess the number','One player picks a secret number. The phone only says yes or no.'],
     ['agent','🏢','Find the agent','An agent hides behind one window. Look closely, and do not trust everything you see.']];
+  const silly = [['cups','💩','Find the poo','It hides under a cup, the cups shuffle, and you point.'],
+    ['bomb','🦨','Stink bomb','Pass the skunk. Do not be holding it when it goes off.'],
+    ['race','🐌','Silly race','Snails, ducks and llamas. Luck decides who wins.'],
+    ['wheel','🎡','Wheel of silliness','Spin for a daft forfeit.']];
   const minis = [['fire','🎆','Fireworks','Up to five rockets go up. Luck decides whose flies highest.'],
     ['pump','🎈','Balloon pump','Take turns pumping. Do not be the one who pops it.'],
     ['stopc','⏱️','Stop the clock','Stop a hidden clock as close to the target as you can.'],
@@ -1701,7 +1736,7 @@ V.home = () => {
     : `<p class="muted">To keep saved draws safe, add this page to your home screen: open the browser's share or menu button, then choose Add to Home Screen.</p>`;
   return SNOW + `<header class="hero"><h1>Pass the Phone</h1><p>Secret Santa and party games for one phone and a room full of people.</p>${muteBtn()}</header><main><nav class="menu">` +
     `<button class="game main" data-act="open" data-g="santa"><div><b>Secret Santa</b><span>Draw names, then reveal them one person at a time.</span></div><i aria-hidden="true">🎁</i></button>` +
-    games.map(row).join('') + `<h2>Quick-fire minigames</h2>` + minis.map(row).join('') + `<h2>Two-player classics</h2>` + classics.map(row).join('') +
+    games.map(row).join('') + `<h2>Quick-fire minigames</h2>` + minis.map(row).join('') + `<h2>Silly games</h2>` + silly.map(row).join('') + `<h2>Two-player classics</h2>` + classics.map(row).join('') +
     `</nav>${install}<p class="ver">Version ${VERSION}</p></main>`;
 };
 
@@ -1808,6 +1843,8 @@ V.setup = () => {
     `<p class="muted">${g.lv[S.level === 'easy' ? 0 : 1]}. Easy suits the youngest players.</p></section>`;
   if (view.game === 'grinch') h += `<section><h2>Version</h2><div class="seg four">${Object.keys(THEMES).map(k => `<button class="${S.theme === k ? 'on' : ''}" data-act="theme" data-k="${k}" aria-pressed="${S.theme === k}">${THEMES[k].t}</button>`).join('')}</div>` +
     `<p class="muted">${(t => `${t.Crew} guard what is ${t.place}. One of them is secretly ${t.thief}.`)(THEMES[S.theme])}</p></section>`;
+  if (view.game === 'cups') h += `<section><h2>Speed</h2><select data-chg="cupSpeed" aria-label="Speed">` +
+    [['easy', 'Easy: 3 cups, nice and slow'], ['hard', 'Hard: 4 cups, quicker'], ['super', 'Super fast: 5 cups, a blur']].map(o => `<option value="${o[0]}"${S.cupSpeed === o[0] ? ' selected' : ''}>${o[1]}</option>`).join('') + `</select></section>`;
   if (view.game === 'num') h += `<section><h2>Guesses</h2><select data-chg="numOne" aria-label="How many guesses"><option value="0"${S.numOne ? '' : ' selected'}>Keep guessing until someone finds it</option>` +
     `<option value="1"${S.numOne ? ' selected' : ''}>Extra hard: one guess each</option></select>` +
     `<p class="muted">${S.numOne ? 'Each guesser gets a single guess. Get it wrong and you are out. If nobody finds the number, the chooser wins.' : 'Guessing goes round and round until the number is found.'}</p></section>`;
@@ -2301,12 +2338,84 @@ V.quick = () => {
   return page('Quick draw', b, 'home', true);
 };
 
+/* ----- Silly games ----- */
+/* Find the poo */
+const CUPS = {easy: {n: 3, swaps: 5, ms: 520}, hard: {n: 4, swaps: 8, ms: 330}, super: {n: 5, swaps: 13, ms: 185}};
+const cupLeft = slot => ((slot + .5) / G.n * 100).toFixed(2) + '%';
+function cupsNew(){ G.slot = Array.from({length: G.n}, (_, i) => i); G.poo = rnd(G.n); G.busy = false; }
+V.cups = () => {
+  const name = G.players[G.turn % G.players.length], ph = view.ph, w = G.n === 5 ? 56 : G.n === 4 ? 66 : 78;
+  const head = ph === 'done' ? `<p class="tag ${G.ok ? 'good' : 'bad'}">${G.ok ? `${esc(name)} found it` : `Wrong cup, ${esc(name)}`}</p>`
+    : `<p class="tag">${ph === 'ready' ? `${esc(name)}, keep your eye on the poo` : ph === 'pick' ? `${esc(name)}, which cup?` : 'Watch closely'}</p>`;
+  const b = head + `<div class="cupbox" style="--w:${w}px;--t:${G.sp.ms}ms"><span class="poo${ph === 'done' ? ' found' : ''}" id="poo" style="left:${cupLeft(G.slot[G.poo])}" aria-hidden="true">💩</span>` +
+    G.slot.map((sl, i) => `<button class="cup${(ph === 'ready' || ph === 'show') && i === G.poo ? ' up' : ''}" id="cup${i}" style="left:${cupLeft(sl)}" data-act="cupPick" data-i="${i}" aria-label="Cup ${sl + 1}" ${ph === 'pick' ? '' : 'disabled'}><i></i></button>`).join('') + `</div>` +
+    (ph === 'ready' ? `<button class="btn" data-act="cupStart">Shuffle the cups</button>`
+      : ph === 'done' ? `<button class="btn" data-act="cupNext">Next: ${esc(G.players[(G.turn + 1) % G.players.length])}</button><button class="btn quiet" data-act="open" data-g="cups">Change players or speed</button>` + board('cups')
+      : `<p class="muted">${ph === 'pick' ? 'Tap the cup you think it is under.' : G.sp.swaps + ' swaps. Do not blink.'}</p>`);
+  return page('Find the poo', b, 'home', true);
+};
+
+/* Stink bomb */
+V.bomb = () => {
+  const name = G.players[G.h], next = G.players[(G.h + 1) % G.players.length];
+  let b;
+  if (view.ph === 'ready') b = `<div class="center"><p class="huge" aria-hidden="true">🦨</p><p class="lead">Pass the skunk round the room. Sooner or later it lets rip, and whoever is holding the phone loses.</p>` +
+    `<p class="muted">${esc(name)} starts with it.</p></div><button class="btn" data-act="bombStart">Start</button>`;
+  else if (view.ph === 'go') b = `<div class="center"><p class="tag">${esc(name)} is holding it</p><span class="skunk" aria-hidden="true">🦨</span></div>` +
+    `<button class="btn" style="min-height:110px" data-down="bombPass">Pass to ${esc(next)}</button>`;
+  else b = `<div class="center"><p class="tag bad">${esc(name)} got stunk</p><p class="huge" aria-hidden="true"><span class="popnow">💨</span></p><p class="big popnow">PFFFT!</p><p class="lead">Everyone else gets a point.</p></div>` + againBtns('bomb') + board('bomb');
+  return page('Stink bomb', b, 'home', true);
+};
+
+/* Silly race */
+const RACERS = ['🐌', '🐢', '🦆', '🐖', '🐓', '🦙'];
+const RC = {raf: 0, last: 0};
+V.race = () => {
+  const done = view.ph === 'done';
+  const b = `<p class="tag ${done ? 'good' : ''}" id="rcom">${done ? `${esc(G.players[G.win])}'s ${G.icons[G.win]} wins` : view.ph === 'go' ? 'And they are off' : 'Racers, take your places'}</p>` +
+    `<div class="track" id="track">${G.players.map((p, i) => `<div class="lane2"><span class="rn">${esc(p)}</span><span class="racer${view.ph === 'go' ? ' run' : ''}" id="rc${i}" style="transform:translateX(${done ? G.endX[i] : 0}px)"><span class="rt" id="rt${i}"></span><b aria-hidden="true">${G.icons[i]}</b></span></div>`).join('')}</div>` +
+    (view.ph === 'ready' ? `<button class="btn" data-act="raceGo">Start the race</button><p class="muted">Nobody controls anything. There are naps, there are turbo boosts, and the finishing line is on the right.</p>`
+      : done ? againBtns('race') + board('race') : '');
+  return page('Silly race', b, 'home', true);
+};
+
+/* Wheel of silliness */
+const FORFEIT = {
+  easy: [['🤖', 'Talk like a robot until your next turn.'], ['🐔', 'Cluck like a chicken three times.'], ['🕺', 'Do a silly dance for ten seconds.'], ['🐸', 'Hop like a frog across the room.'],
+    ['🤪', 'Pull your funniest face.'], ['🎤', 'Sing your name like an opera singer.'], ['🐒', 'Act like a monkey until someone laughs.'], ['🦀', 'Walk sideways like a crab to the door and back.'],
+    ['👑', 'You are royalty for one round. Everyone must bow to you.'], ['🙃', 'Say your name backwards.'], ['🐘', 'Make a trunk with your arm and trumpet like an elephant.'], ['🧊', 'Freeze like a statue until your next turn.'],
+    ['🤫', 'Whisper everything until your next turn.'], ['🦸', 'Strike your best superhero pose.'], ['🐍', 'Hiss like a snake and slither in your seat.'], ['🎁', 'Lucky you. Choose someone else to spin.']],
+  hard: [['🗣️', 'Speak in rhyme until your next turn.'], ['🧑‍🍳', 'Describe your last meal like a posh TV chef.'], ['📺', 'Introduce the next player like a sports commentator.'], ['🦖', 'Do your best dinosaur walk and roar.'],
+    ['🎭', 'Act out your whole morning routine in ten seconds.'], ['🧓', 'Walk and talk as if you are a hundred years old.'], ['🎵', 'Hum a tune until someone guesses it.'], ['🐧', 'Waddle like a penguin for a lap of the room.'],
+    ['💃', 'Do the robot, the floss or the worm. Your choice.'], ['💐', 'Pay everyone in the room a compliment, one by one.'], ['🕵️', 'Narrate everything you do like a secret agent until your next turn.'], ['🥄', 'Balance something on your head until your next turn.'],
+    ['🤐', 'No talking until your next turn. Mime only.'], ['🧙', 'Cast a pretend spell on the person to your left.'], ['🦜', 'Repeat everything the next player says, like a parrot.'], ['🎁', 'Lucky escape. Nothing happens to you.']]
+};
+const WH = {rot: 0, vel: 0, raf: 0, last: 0};
+function wheelDraw(){
+  const cv = document.getElementById('wheel'); if (!cv || !G || G.type !== 'wheel') return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), S2 = 300; if (cv.width !== S2 * dpr) { cv.width = cv.height = S2 * dpr; }
+  const ctx = cv.getContext('2d'), n = G.segs.length, a = 6.283 / n, r = S2 / 2 - 6;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, S2, S2); ctx.save(); ctx.translate(S2 / 2, S2 / 2); ctx.rotate(WH.rot);
+  G.segs.forEach((sg, i) => { ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, r, i * a, (i + 1) * a); ctx.closePath(); ctx.fillStyle = CONF[i % 5]; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#12332B'; ctx.stroke();
+    ctx.save(); ctx.rotate((i + .5) * a); ctx.translate(r * .68, 0); ctx.rotate(Math.PI / 2); ctx.font = '34px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(sg[0], 0, 0); ctx.restore(); });
+  ctx.beginPath(); ctx.arc(0, 0, 20, 0, 7); ctx.fillStyle = '#12332B'; ctx.fill(); ctx.restore();
+}
+const wheelAt = () => { const n = G.segs.length, a = 6.283 / n; return Math.floor((((-Math.PI / 2 - WH.rot) % 6.283) + 6.283) % 6.283 / a) % n; };
+V.wheel = () => {
+  const name = G.players[G.turn % G.players.length], res = view.ph === 'res' ? G.segs[view.idx] : null;
+  const b = `<div class="center"><p class="tag">${view.ph === 'res' ? `${esc(name)}, your forfeit` : view.ph === 'spin' ? 'Round and round' : `${esc(name)}, spin the wheel`}</p>` +
+    `<div class="wheelwrap"><canvas id="wheel" role="img" aria-label="A wheel with eight forfeits"></canvas></div>` +
+    (res ? `<p class="huge" aria-hidden="true"><span class="popnow">${res[0]}</span></p><p class="big sm">${esc(res[1])}</p>` : '') + `</div>` +
+    (view.ph === 'ready' ? `<button class="btn" data-act="wheelSpin">Spin</button>` : res ? `<button class="btn" data-act="wheelNext">Next: ${esc(G.players[(G.turn + 1) % G.players.length])}</button><button class="btn quiet" data-act="open" data-g="wheel">Change players or settings</button>` : '');
+  return page('Wheel of silliness', b, 'home', true);
+};
+
 /* ---------- game starters ---------- */
 // Adding ?fixedstart to the address keeps the listed order, which is only useful for testing.
 const FIXED_START = /[?&]fixedstart/.test(location.search);
 function startGame(type, players){
   // Start from a random person each game. The list is turned, not shuffled, so the order round the room stays the same.
-  if (!FIXED_START && !['fire', 'quick', 'mlt', 'tod'].includes(type) && players.length > 1) { const k = rnd(players.length); players = players.slice(k).concat(players.slice(0, k)); }
+  if (!FIXED_START && !['fire', 'quick', 'mlt', 'tod', 'race'].includes(type) && players.length > 1) { const k = rnd(players.length); players = players.slice(k).concat(players.slice(0, k)); }
   if (type === 'imp') {
     const list = wordList();
     let fresh = list.filter(e => !used.has(e[0]));
@@ -2387,6 +2496,10 @@ function startGame(type, players){
   if (type === 'pump') { const easy = S.level === 'easy'; G = {type, players, turn: 0, size: 0, pop: easy ? 6 + rnd(10) : 10 + rnd(21), done: false}; bpReset(); return go('pump', {}); }
   if (type === 'stopc') { const easy = S.level === 'easy'; G = {type, players, i: 0, times: [], target: easy ? 5 : 10, hide: easy ? 3 : 2}; return go('stopc', {ph: 'ready'}); }
   if (type === 'quick') { G = {type, players, out: [], state: 'idle', win: -1, ms: 0, round: (G && G.round || 0) + 1}; return go('quick', {}); }
+  if (type === 'cups') { G = {type, players, turn: 0, sp: CUPS[S.cupSpeed] || CUPS.easy}; G.n = G.sp.n; cupsNew(); return go('cups', {ph: 'ready'}); }
+  if (type === 'bomb') { G = {type, players, h: 0}; return go('bomb', {ph: 'ready'}); }
+  if (type === 'race') { G = {type, players, icons: shuffle(RACERS).slice(0, players.length), win: -1, endX: []}; return go('race', {ph: 'ready'}); }
+  if (type === 'wheel') { G = {type, players, turn: 0, segs: shuffle(FORFEIT[S.level]).slice(0, 8)}; WH.rot = Math.random() * 6.283; WH.vel = 0; return go('wheel', {ph: 'ready'}); }
   if (type === 'who') {
     G = {type, players, turn: 0, k: 0, deck: shuffle(WHO[S.level])};
     return go('who', {ph: 'ready', q: 0});
@@ -3164,6 +3277,100 @@ A.quickTap = el => {
   render();
 };
 
+// find the poo
+A.cupStart = () => {
+  if (G.busy) return; G.busy = true;
+  const round = G, live = () => G === round && view.n === 'cups', ms = G.sp.ms;
+  view.ph = 'show'; render();
+  const el = i => document.getElementById('cup' + i), poo = () => document.getElementById('poo');
+  let left = G.sp.swaps;
+  const swap = () => {
+    if (!live()) return;
+    if (left-- <= 0) { G.busy = false; view.ph = 'pick'; return render(); }
+    const a = rnd(G.n); let b = rnd(G.n - 1); if (b >= a) b++;              // two different cups trade places, one passing in front of the other
+    [G.slot[a], G.slot[b]] = [G.slot[b], G.slot[a]];
+    const ea = el(a), eb = el(b); ea.classList.add('fr'); eb.classList.add('bk'); ea.style.left = cupLeft(G.slot[a]); eb.style.left = cupLeft(G.slot[b]);
+    const p = poo(); if (p) p.style.left = cupLeft(G.slot[G.poo]);
+    snd('flip');
+    tick = setTimeout(() => { if (!live()) return; ea.classList.remove('fr'); eb.classList.remove('bk'); tick = setTimeout(swap, Math.max(30, ms * .12)); }, ms);
+  };
+  tick = setTimeout(() => { if (!live()) return; const c = el(G.poo); if (c) c.classList.remove('up'); snd('thud'); tick = setTimeout(swap, 520); }, 1300);
+};
+A.cupPick = el => {
+  if (view.ph !== 'pick') return;
+  const i = +el.dataset.i, round = G; G.ok = i === G.poo; view.ph = 'done';
+  if (G.ok) { const n = G.players[G.turn % G.players.length]; pts('cups')[n] = (pts('cups')[n] || 0) + 1; save(); }
+  render();
+  const lift = k => { const c = document.getElementById('cup' + k); if (c) c.classList.add('up'); };
+  requestAnimationFrame(() => requestAnimationFrame(() => { lift(i); snd(G.ok ? 'fart' : 'thud'); }));       // the chosen cup first, then the truth
+  setTimeout(() => { if (G !== round || view.n !== 'cups' || view.ph !== 'done') return; lift(G.poo); if (G.ok) cheer(['#8B5A2B', '#FFD166', '#6BCB77', '#FFFFFF']); else { snd('fart'); } }, 650);
+};
+A.cupNext = () => { G.turn++; cupsNew(); go('cups', {ph: 'ready'}); };
+
+// stink bomb
+A.bombStart = () => {
+  const round = G, secs = S.level === 'easy' ? 12 + Math.random() * 23 : 6 + Math.random() * 12;
+  G.passAt = performance.now(); go('bomb', {ph: 'go'});
+  const ticker = setInterval(() => { if (G !== round || view.n !== 'bomb' || view.ph !== 'go') return clearInterval(ticker); snd('tick'); }, 500);
+  tick = setTimeout(() => {
+    if (G !== round || view.n !== 'bomb') return;
+    clearInterval(ticker); view.ph = 'boom'; const loser = G.players[G.h];
+    G.players.forEach(p => { if (p !== loser) pts('bomb')[p] = (pts('bomb')[p] || 0) + 1; }); save();
+    render(); snd('fart'); buzz(); pulse(document.getElementById('app'), 'shake');
+    const o = {x: window.innerWidth / 2, y: window.innerHeight * .4}; fxPuff(o, 40, '#9BD45B'); fxPuff({x: o.x - 60, y: o.y + 30}, 20, '#C8E86B'); fxPuff({x: o.x + 60, y: o.y + 30}, 20, '#7FB93A');
+  }, secs * 1000);
+};
+A.bombPass = () => {
+  if (view.ph !== 'go' || performance.now() - G.passAt < 600) return;      // you have to hold it for a moment before passing it on
+  G.passAt = performance.now(); G.h = (G.h + 1) % G.players.length; snd('flip'); render();
+};
+
+// silly race
+A.raceGo = () => {
+  const round = G, n = G.players.length, pos = Array(n).fill(0), sp = Array(n).fill(1), until = Array(n).fill(0), mode = Array(n).fill(''), quiet = calm();
+  view.ph = 'go'; render(); snd('go');
+  const track = document.getElementById('track'), W = () => track.clientWidth - 56;
+  let leader = -1; RC.last = performance.now();
+  const frame = t => {
+    if (G !== round || view.n !== 'race' || view.ph !== 'go') { RC.raf = 0; return; }
+    const dt = Math.min((t - RC.last) / 1000, .05); RC.last = t; const lead = Math.max(...pos);
+    for (let i = 0; i < n; i++) {
+      if (t > until[i]) {                                      // every so often each racer changes pace, dozes off or gets a burst of wind
+        const r = Math.random(); mode[i] = r < .07 ? 'nap' : r < .16 ? 'boost' : '';
+        sp[i] = mode[i] === 'nap' ? 0 : mode[i] === 'boost' ? 3.2 : .35 + Math.random() * 1.4; until[i] = t + (mode[i] ? 900 : 500 + Math.random() * 500);
+        const tag = document.getElementById('rt' + i); if (tag) tag.textContent = mode[i] === 'nap' ? '💤' : mode[i] === 'boost' ? '💨' : '';
+        if (mode[i] === 'boost') snd('fart');
+      }
+      pos[i] = Math.min(1, pos[i] + dt * .085 * sp[i] * (1 + (lead - pos[i]) * .9));       // stragglers get a little help, to keep it close
+      const el = document.getElementById('rc' + i); if (el) el.style.transform = `translateX(${(pos[i] * W()).toFixed(1)}px)`;
+    }
+    const now = pos.indexOf(Math.max(...pos));
+    if (now !== leader) { leader = now; const c = document.getElementById('rcom'); if (c) c.textContent = `${G.players[now]}'s ${G.icons[now]} takes the lead`; }
+    if (pos[now] >= 1) {
+      G.win = now; G.endX = pos.map(p => +(p * W()).toFixed(1)); const nm = G.players[now]; pts('race')[nm] = (pts('race')[nm] || 0) + 1; save();
+      view.ph = 'done'; RC.raf = 0; render(); return cheer();
+    }
+    RC.raf = requestAnimationFrame(frame);
+  };
+  RC.raf = requestAnimationFrame(frame);
+};
+
+// wheel of silliness
+A.wheelSpin = () => {
+  if (view.ph !== 'ready') return;
+  const round = G; view.ph = 'spin'; render(); WH.vel = 9 + Math.random() * 6; WH.last = performance.now(); let seg = wheelAt();
+  const frame = t => {
+    if (G !== round || view.n !== 'wheel') { WH.raf = 0; return; }
+    const dt = Math.min((t - WH.last) / 1000, .05); WH.last = t;
+    WH.rot += WH.vel * dt; WH.vel *= Math.pow(.986, dt * 60); wheelDraw();
+    const s2 = wheelAt(); if (s2 !== seg) { seg = s2; snd('tick'); }
+    if (WH.vel < .22) { WH.raf = 0; view.ph = 'res'; view.idx = seg; render(); return snd('win'); }
+    WH.raf = requestAnimationFrame(frame);
+  };
+  WH.raf = requestAnimationFrame(frame);
+};
+A.wheelNext = () => { G.turn++; go('wheel', {ph: 'ready'}); };
+
 // truth or dare
 A.todPick = el => { const k = el.dataset.kind, d = G.deck[k]; view.kind = k; view.text = d[G.at[k] % d.length]; G.at[k]++; render(); };
 A.todNext = () => { G.turn++; go('tod', {}); };
@@ -3172,6 +3379,7 @@ A.todNext = () => { G.turn++; go('tod', {}); };
 const C = {};
 C.limit = el => { S.santa.limit = el.value.replace(/[^0-9.]/g, ''); el.value = S.santa.limit; save(); };
 C.cat = el => { S.cat = el.value; save(); };
+C.cupSpeed = el => { S.cupSpeed = el.value; save(); };
 C.numOne = el => { S.numOne = el.value === '1'; save(); render(); };
 C.impAll = el => { S.impAll = el.value; save(); render(); };
 C.timer = el => { S.timer = +el.value; save(); };
@@ -3230,6 +3438,7 @@ function after(){
   if (bars.length) requestAnimationFrame(() => requestAnimationFrame(() => bars.forEach((b, k) => { b.style.transitionDelay = (k * .08) + 's'; b.style.width = b.dataset.w + '%'; })));
   if (view.n === 'fire') fwStart();
   if (view.n === 'pump') bpStart();
+  if (view.n === 'wheel') wheelDraw();
   const bal = document.getElementById('bal');
   if (bal) requestAnimationFrame(() => requestAnimationFrame(() => bal.style.setProperty('--s', bal.dataset.s)));
   const mks = document.querySelectorAll('.mk[data-x]');
