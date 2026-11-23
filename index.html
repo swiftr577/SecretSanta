@@ -1294,7 +1294,7 @@ const GAMES = {
   quick: {t:'Quick draw', min:2, max:5, lv:['Tap when the screen says go','Watch out for false starts']}
 };
 
-const VERSION = '2.6'; // bump this with each change, and the cache name in sw.js
+const VERSION = '2.7'; // bump this with each change, and the cache name in sw.js
 
 /* ---------- storage ---------- */
 const KEY = 'pass-the-phone-v1';
@@ -1304,7 +1304,7 @@ const store = {
   set(v){ try { window.localStorage.setItem(KEY, v); } catch (e) { memStore = v; } }
 };
 const blank = () => ({v:1, santa:{people:[], limit:'', pin:'', draws:[]}, extras:[], selected:null, lastPlayers:[],
-  level:'easy', timer:120, cat:'any', mute:false, music:true, impAll:'off', scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
+  level:'easy', timer:120, cat:'any', mute:false, music:true, impAll:'off', numOne:false, scores:{imp:{}, who:{}}, theme:'xmas', tally:{}});
 function load(){
   try { const r = JSON.parse(store.get()); if (r && r.v === 1 && r.santa) { const o = Object.assign(blank(), r); if (!o.tally || o.tally.elves !== undefined) o.tally = {}; if (!THEMES[o.theme]) o.theme = 'xmas'; return o; } } catch (e) {}
   return blank();
@@ -1808,6 +1808,9 @@ V.setup = () => {
     `<p class="muted">${g.lv[S.level === 'easy' ? 0 : 1]}. Easy suits the youngest players.</p></section>`;
   if (view.game === 'grinch') h += `<section><h2>Version</h2><div class="seg four">${Object.keys(THEMES).map(k => `<button class="${S.theme === k ? 'on' : ''}" data-act="theme" data-k="${k}" aria-pressed="${S.theme === k}">${THEMES[k].t}</button>`).join('')}</div>` +
     `<p class="muted">${(t => `${t.Crew} guard what is ${t.place}. One of them is secretly ${t.thief}.`)(THEMES[S.theme])}</p></section>`;
+  if (view.game === 'num') h += `<section><h2>Guesses</h2><select data-chg="numOne" aria-label="How many guesses"><option value="0"${S.numOne ? '' : ' selected'}>Keep guessing until someone finds it</option>` +
+    `<option value="1"${S.numOne ? ' selected' : ''}>Extra hard: one guess each</option></select>` +
+    `<p class="muted">${S.numOne ? 'Each guesser gets a single guess. Get it wrong and you are out. If nobody finds the number, the chooser wins.' : 'Guessing goes round and round until the number is found.'}</p></section>`;
   if (view.game === 'imp') h += `<section><h2>Twist</h2><select data-chg="impAll" aria-label="Everyone is the imposter">` +
     [['off', 'One imposter, as normal'], ['rare', 'Now and then, everyone is the imposter'], ['on', 'Everyone is the imposter, every round']].map(o => `<option value="${o[0]}"${S.impAll === o[0] ? ' selected' : ''}>${o[1]}</option>`).join('') +
     `</select><p class="muted">${S.impAll === 'rare' ? 'About one round in eight, nobody gets the word. Nobody is told.' : S.impAll === 'on' ? 'Nobody gets the word, and everyone thinks they are the only one.' : 'A surprise round where nobody gets the word.'}</p></section>`;
@@ -2019,13 +2022,18 @@ V.num = () => {
     `<p class="lead">${esc(chooser)} chooses a secret number from 1 to ${G.max}. Everyone else looks away.</p></div><button class="btn" data-act="numBegin">Choose a number</button>`;
   else if (view.ph === 'choose') b = `<p class="tag">${esc(chooser)}, choose your number</p>` + grid('numSet') +
     `<button class="btn" id="lockBtn" data-act="numLock" ${view.pick == null ? 'disabled' : ''}>Lock it in and hide it</button>`;
-  else if (view.ph === 'guess') b = `<p class="tag">${esc(who)}, your guess</p><p class="muted">Guess ${G.tried.length + 1}. Numbers already tried are crossed out.</p>` + grid('numGuess', true);
+  else if (view.ph === 'guess') b = `<p class="tag">${esc(who)}, your guess</p><p class="muted">${G.one ? 'You get one guess. Get it wrong and you are out.' : `Guess ${G.tried.length + 1}.`} Numbers already tried are crossed out.</p>` + grid('numGuess', true);
   else if (view.ph === 'roll') b = `<div class="center"><p class="lead">${esc(who)} guesses</p><p class="huge rollnum">${view.val}</p><p class="tag">Is it?</p></div>`;
   else if (view.ok) b = `<div class="center"><p class="tag good">Yes</p><p class="huge popnow">${view.val}</p><p class="lead">${esc(who)} found ${esc(chooser)}'s number in ${G.tried.length} guess${G.tried.length === 1 ? '' : 'es'}.</p></div>` +
     `<button class="btn" data-act="numRound">Next round: ${esc(G.players[(G.chooser + 1) % G.players.length])} chooses</button>` +
     `<button class="btn quiet" data-act="open" data-g="num">Change players or settings</button>` + board('num');
-  else b = `<div class="center"><p class="tag bad">No</p><p class="huge popnow">${view.val}</p><p class="lead">That is not ${esc(chooser)}'s number.</p></div>` +
-    `<button class="btn" data-act="numOn">Next guess: ${esc(guessers[(G.g + 1) % guessers.length])}</button>`;
+  else if (view.ph === 'lost') b = `<div class="center"><p class="tag bad">Nobody got it</p><p class="lead">${esc(chooser)}'s number was</p><p class="huge popnow">${G.secret}</p>` +
+    `<p class="lead">${esc(chooser)} wins the round and gets a point.</p></div>` +
+    `<button class="btn" data-act="numRound">Next round: ${esc(G.players[(G.chooser + 1) % G.players.length])} chooses</button>` +
+    `<button class="btn quiet" data-act="open" data-g="num">Change players or settings</button>` + board('num');
+  else { const last = G.one && G.g + 1 >= guessers.length;       // in the one-guess game, the round ends once everyone has had their go
+    b = `<div class="center"><p class="tag bad">No</p><p class="huge popnow">${view.val}</p><p class="lead">That is not ${esc(chooser)}'s number.${G.one ? ` ${esc(who)} is out.` : ''}</p></div>` +
+      (last ? `<button class="btn" data-act="numLost">See the number</button>` : `<button class="btn" data-act="numOn">Next guess: ${esc(guessers[(G.g + 1) % guessers.length])}</button>`); }
   return page('Guess the number', b, 'home', true);
 };
 
@@ -2365,7 +2373,7 @@ function startGame(type, players){
   if (type === 'quiz') { G = {type, players, turn: 0, k: 0, deck: shuffle(QUIZ[S.level])}; return go('quiz', {ph: 'ask', opts: shuffle(G.deck[0].slice(1))}); }
   if (type === 'mlt') { G = {type, players, k: 0, deck: shuffle(MLT[S.level])}; return go('mlt', {who: null}); }
   if (type === 'wyr') { G = {type, players, k: 0, deck: shuffle(WYR[S.level])}; return go('wyr', {votes: []}); }
-  if (type === 'num') { G = {type, players, chooser: 0, g: 0, tried: [], secret: null, max: S.level === 'easy' ? 20 : 50}; return go('num', {ph: 'hand', pick: null}); }
+  if (type === 'num') { G = {type, players, chooser: 0, g: 0, tried: [], secret: null, max: S.level === 'easy' ? 20 : 50, one: !!S.numOne}; return go('num', {ph: 'hand', pick: null}); }
   if (type === 'agent') { const hard = S.level === 'hard'; G = {type, players, chooser: 0, g: 0, tries: 0, cols: hard ? 5 : 4, rows: hard ? 6 : 5, cells: null, pos: null}; return go('agent', {ph: 'hand', pick: null}); }
   if (type === 'oxo' || type === 'four') { G = {type, pair: [players[0], players[1]], bench: players.slice(2)}; gridNew(); return go('grid', {}); }
   if (type === 'rps') { G = {type, pair: [players[0], players[1]], bench: players.slice(2), target: S.level === 'easy' ? 3 : 5, sc: [0, 0], picks: []}; return go('rps', {ph: 'pick'}); }
@@ -2623,6 +2631,7 @@ A.numGuess = el => {
   if (calm()) return reveal();
   G.busy = true; go('num', {ph: 'roll', val: n, pick: null}); snd('roll'); tick = setTimeout(reveal, 1050);   // a drum roll before the answer
 };
+A.numLost = () => { const n = G.players[G.chooser]; pts('num')[n] = (pts('num')[n] || 0) + 1; save(); go('num', {ph: 'lost', pick: null}); snd('lose'); };
 A.numOn = () => { G.g++; go('num', {ph: 'guess', pick: null}); };
 A.numRound = () => { G.chooser = (G.chooser + 1) % G.players.length; G.secret = null; G.tried = []; G.g = 0; go('num', {ph: 'hand', pick: null}); };
 
@@ -3163,6 +3172,7 @@ A.todNext = () => { G.turn++; go('tod', {}); };
 const C = {};
 C.limit = el => { S.santa.limit = el.value.replace(/[^0-9.]/g, ''); el.value = S.santa.limit; save(); };
 C.cat = el => { S.cat = el.value; save(); };
+C.numOne = el => { S.numOne = el.value === '1'; save(); render(); };
 C.impAll = el => { S.impAll = el.value; save(); render(); };
 C.timer = el => { S.timer = +el.value; save(); };
 C.import = el => {
